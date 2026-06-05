@@ -369,7 +369,10 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: isPlaying
-                                  ? [const Color(0xFFD03BFF), const Color(0xFF8A2BE2)]
+                                  ? [
+                                      _getChordColor(chord),
+                                      Color.lerp(_getChordColor(chord), Colors.white, 0.35)!,
+                                    ]
                                   : isHovered
                                       ? [
                                           _getChordColor(chord),
@@ -385,9 +388,9 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isPlaying
-                                  ? const Color(0xFFD03BFF)
+                                  ? Colors.white
                                   : isHovered
-                                      ? Colors.white
+                                      ? Colors.white.withOpacity(0.9)
                                       : _getChordColor(chord).withOpacity(0.7),
                               width: 2.0,
                             ),
@@ -395,13 +398,13 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                                 ? [
                                     BoxShadow(
                                       color: _getChordColor(chord).withOpacity(0.8),
-                                      blurRadius: 12,
+                                      blurRadius: 16,
                                       spreadRadius: 2,
                                     )
                                   ]
                                 : [
                                     BoxShadow(
-                                      color: _getChordColor(chord).withOpacity(0.15),
+                                      color: _getChordColor(chord).withOpacity(0.25),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     )
