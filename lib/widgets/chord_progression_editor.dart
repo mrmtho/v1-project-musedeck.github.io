@@ -14,6 +14,7 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
   String? _selectedChordCategory = 'Major';
   int? _hoveredIndex;
   int? _playingIndex;
+  DateTime? _tapStartTime;
 
   final Map<String, List<String>> _chordBank = {
     'Major': ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'],
@@ -88,6 +89,7 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
   }
 
   void _startChord(int index, String chordName) {
+    _tapStartTime = DateTime.now();
     setState(() {
       _playingIndex = index;
     });
@@ -96,6 +98,24 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
 
   void _stopChord(int index) {
     if (_playingIndex == index) {
+      final startTime = _tapStartTime;
+      if (startTime != null) {
+        final elapsed = DateTime.now().difference(startTime);
+        const minDuration = Duration(milliseconds: 500);
+        if (elapsed < minDuration) {
+          final remaining = minDuration - elapsed;
+          Future.delayed(remaining, () {
+            if (_playingIndex == index) {
+              setState(() {
+                _playingIndex = null;
+              });
+              SynthEngine.stopChord();
+            }
+          });
+          return;
+        }
+      }
+
       setState(() {
         _playingIndex = null;
       });
