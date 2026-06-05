@@ -322,15 +322,25 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                       style: TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                   )
-                : ListView.builder(
+                : ReorderableListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: song.chords.length,
+                    onReorder: (int oldIndex, int newIndex) {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      final updatedChords = List<String>.from(song.chords);
+                      final String item = updatedChords.removeAt(oldIndex);
+                      updatedChords.insert(newIndex, item);
+                      provider.updateActiveSongChords(updatedChords);
+                    },
                     itemBuilder: (context, index) {
                       final chord = song.chords[index];
                       final isHovered = _hoveredIndex == index;
                       final isPlaying = _playingIndex == index;
 
                       return MouseRegion(
+                        key: ValueKey('chord_item_${index}_$chord'),
                         onEnter: (_) => setState(() => _hoveredIndex = index),
                         onExit: (_) => setState(() => _hoveredIndex = null),
                         child: AnimatedContainer(
