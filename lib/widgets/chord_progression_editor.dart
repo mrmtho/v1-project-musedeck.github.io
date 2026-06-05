@@ -142,8 +142,10 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Category selector (tabs)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
                       children: _chordBank.keys.map((category) {
                         final isSelected = _selectedChordCategory == category;
                         return InkWell(
@@ -251,8 +253,10 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Category selector (tabs)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
                       children: _chordBank.keys.map((category) {
                         final isSelected = _selectedChordCategory == category;
                         return InkWell(
