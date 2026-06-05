@@ -107,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'A collaborative AI workspace for modern artists',
+                  'AI Powered Music Organizer for Modern Artists',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.5),
                     fontSize: 10.5,
