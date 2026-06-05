@@ -26,19 +26,50 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
 
   Color _getChordColor(String chordName) {
     final clean = chordName.trim();
-    if (clean.endsWith('m7b5') || clean.contains('ø')) {
-      return const Color(0xFF4221B5); // half dim
+    if (clean.isEmpty) return const Color(0xFFF5B342);
+
+    // Extract suffix by removing root note (e.g., C, C#, Db)
+    String suffix = clean;
+    if (clean.length >= 2 && (clean[1] == '#' || clean[1] == 'b')) {
+      suffix = clean.substring(2);
+    } else if (clean.isNotEmpty) {
+      suffix = clean.substring(1);
     }
-    if (clean.endsWith('dim') || clean.endsWith('dim7') || clean.contains('°')) {
-      return const Color(0xFF17084A); // dim
+
+    final lowerSuffix = suffix.toLowerCase();
+
+    // 1. Half Diminished (#4221b5)
+    if (lowerSuffix.contains('m7b5') || lowerSuffix.contains('ø') || lowerSuffix.contains('half')) {
+      return const Color(0xFF4221B5);
     }
-    if (clean.endsWith('7') && !clean.endsWith('maj7')) {
-      return const Color(0xFF364D08); // dominants
+
+    // 2. Diminished (#17084a)
+    if (lowerSuffix.contains('dim') || lowerSuffix.contains('°')) {
+      return const Color(0xFF17084A);
     }
-    if (clean.endsWith('m') || clean.endsWith('min') || clean.contains('m7') || clean.contains('min7')) {
-      return const Color(0xFF5340DE); // minor
+
+    // 3. Dominants (#364d08)
+    // Includes: dom7, dom9, dom11, dom13, suspended chords, 6/9 chords
+    if (lowerSuffix.contains('sus') || lowerSuffix.contains('6/9')) {
+      return const Color(0xFF364D08);
     }
-    return const Color(0xFFF5B342); // major
+
+    final hasDominantNumber = RegExp(r'(7|9|11|13)').hasMatch(lowerSuffix);
+    final isMajorVariant = suffix.contains('maj') || suffix.contains('Maj') || suffix.contains('M');
+    final isMinorVariant = suffix.contains('min') || suffix.contains('Min') || 
+        (suffix.contains('m') && !suffix.contains('maj') && !suffix.contains('Maj') && !suffix.contains('M'));
+
+    if (hasDominantNumber && !isMajorVariant && !isMinorVariant) {
+      return const Color(0xFF364D08);
+    }
+
+    // 4. Minor (#5340de)
+    if (isMinorVariant) {
+      return const Color(0xFF5340DE);
+    }
+
+    // 5. Major (#f5b342)
+    return const Color(0xFFF5B342);
   }
 
   void _playChord(int index, String chordName) {
