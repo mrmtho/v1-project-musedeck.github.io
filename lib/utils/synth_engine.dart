@@ -88,18 +88,39 @@ class SynthEngine {
     'hat': [6000.0, 8000.0],    // High frequencies
   };
 
-  /// Plays a chord procedurally
+  /// Plays a chord procedurally with automatic decay
   static Future<void> playChord(String chordName) async {
     final cleanChord = chordName.trim();
     final freqs = _chordFrequencies[cleanChord] ?? _chordFrequencies['C']!;
     
-    // Generate 22050Hz mono 16-bit audio bytes for 0.8 seconds
-    final bytes = _generateWavBytes(freqs, durationSec: 0.8, isChord: true);
+    final bytes = _generateWavBytes(freqs, durationSec: 0.8, isChord: true, sustain: false);
     try {
       await _chordPlayer.play(BytesSource(bytes));
     } catch (e) {
-      // Fallback prints if device fails
       print('Playing Chord $cleanChord: $freqs Hz');
+    }
+  }
+
+  /// Starts playing a chord that sustains until stopChord is called
+  static Future<void> startChord(String chordName) async {
+    final cleanChord = chordName.trim();
+    final freqs = _chordFrequencies[cleanChord] ?? _chordFrequencies['C']!;
+    
+    final bytes = _generateWavBytes(freqs, durationSec: 4.0, isChord: true, sustain: true);
+    try {
+      await _chordPlayer.stop();
+      await _chordPlayer.play(BytesSource(bytes));
+    } catch (e) {
+      print('Starting Chord $cleanChord: $freqs Hz');
+    }
+  }
+
+  /// Stops the currently playing chord
+  static Future<void> stopChord() async {
+    try {
+      await _chordPlayer.stop();
+    } catch (e) {
+      print('Stopping Chord');
     }
   }
 
@@ -141,6 +162,7 @@ class SynthEngine {
     bool isChord = true,
     bool isDrum = false,
     String drumType = '',
+    bool sustain = false,
   }) {
     const sampleRate = 22050;
     final totalSamples = (sampleRate * durationSec).toInt();
@@ -215,7 +237,11 @@ class SynthEngine {
         // Apply volume envelope (exponential decay envelope)
         double envelope = 1.0;
         if (isChord) {
-          envelope = exp(-2.5 * t); // Smooth decay over 0.8 seconds
+          if (sustain) {
+            envelope = exp(-0.3 * t); // Slow decay to keep sustaining
+          } else {
+            envelope = exp(-2.5 * t); // Smooth decay over 0.8 seconds
+          }
         } else {
           envelope = exp(-40.0 * t); // Extremely rapid decay for metronome beeps
         }

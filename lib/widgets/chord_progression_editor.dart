@@ -87,6 +87,22 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
     });
   }
 
+  void _startChord(int index, String chordName) {
+    setState(() {
+      _playingIndex = index;
+    });
+    SynthEngine.startChord(chordName);
+  }
+
+  void _stopChord(int index) {
+    if (_playingIndex == index) {
+      setState(() {
+        _playingIndex = null;
+      });
+      SynthEngine.stopChord();
+    }
+  }
+
   void _showAddChordDialog(BuildContext context, SongProvider provider) {
     showDialog(
       context: context,
@@ -443,49 +459,53 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                           ),
                           child: Stack(
                             children: [
-                              // Chord contents
-                              InkWell(
-                                onTap: () => _playChord(index, chord),
-                                borderRadius: BorderRadius.circular(12),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        chord,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          shadows: isPlaying
-                                              ? [
-                                                  const Shadow(
-                                                    color: Colors.black45,
-                                                    blurRadius: 4,
-                                                    offset: Offset(1, 1),
-                                                  )
-                                                ]
-                                              : [],
+                              GestureDetector(
+                                onTapDown: (_) => _startChord(index, chord),
+                                onTapUp: (_) => _stopChord(index),
+                                onTapCancel: () => _stopChord(index),
+                                child: InkWell(
+                                  onTap: () {}, // Empty callback to allow ripple and hover effects
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          chord,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            shadows: isPlaying
+                                                ? [
+                                                    const Shadow(
+                                                      color: Colors.black45,
+                                                      blurRadius: 4,
+                                                      offset: Offset(1, 1),
+                                                    )
+                                                  ]
+                                                : [],
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      // Simulated mini waveform for previewing chord
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: List.generate(4, (i) {
-                                          return AnimatedContainer(
-                                            duration: Duration(milliseconds: 100 + (i * 100)),
-                                            width: 3,
-                                            height: isPlaying ? (12.0 + (i * 4) % 16) : 3,
-                                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                                            decoration: BoxDecoration(
-                                              color: isPlaying ? Colors.white : Colors.grey[600],
-                                              borderRadius: BorderRadius.circular(2),
-                                            ),
-                                          );
-                                        }),
-                                      )
-                                    ],
+                                        const SizedBox(height: 6),
+                                        // Simulated mini waveform for previewing chord
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: List.generate(4, (i) {
+                                            return AnimatedContainer(
+                                              duration: Duration(milliseconds: 100 + (i * 100)),
+                                              width: 3,
+                                              height: isPlaying ? (12.0 + (i * 4) % 16) : 3,
+                                              margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                                              decoration: BoxDecoration(
+                                                color: isPlaying ? Colors.white : Colors.grey[600],
+                                                borderRadius: BorderRadius.circular(2),
+                                              ),
+                                            );
+                                          }),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
