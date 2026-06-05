@@ -371,8 +371,14 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                               colors: isPlaying
                                   ? [const Color(0xFFD03BFF), const Color(0xFF8A2BE2)]
                                   : isHovered
-                                      ? [_getChordColor(chord), _getChordColor(chord).withOpacity(0.6)]
-                                      : [_getChordColor(chord).withOpacity(0.25), _getChordColor(chord).withOpacity(0.1)],
+                                      ? [
+                                          _getChordColor(chord),
+                                          Color.lerp(_getChordColor(chord), Colors.black, 0.3)!,
+                                        ]
+                                      : [
+                                          Color.lerp(_getChordColor(chord), Colors.black, 0.15)!,
+                                          Color.lerp(_getChordColor(chord), Colors.black, 0.55)!,
+                                        ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -381,19 +387,25 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                               color: isPlaying
                                   ? const Color(0xFFD03BFF)
                                   : isHovered
-                                      ? _getChordColor(chord)
-                                      : _getChordColor(chord).withOpacity(0.3),
-                              width: 1.5,
+                                      ? Colors.white
+                                      : _getChordColor(chord).withOpacity(0.7),
+                              width: 2.0,
                             ),
                             boxShadow: isPlaying
                                 ? [
                                     BoxShadow(
-                                      color: _getChordColor(chord).withOpacity(0.5),
-                                      blurRadius: 10,
-                                      spreadRadius: 1,
+                                      color: _getChordColor(chord).withOpacity(0.8),
+                                      blurRadius: 12,
+                                      spreadRadius: 2,
                                     )
                                   ]
-                                : [],
+                                : [
+                                    BoxShadow(
+                                      color: _getChordColor(chord).withOpacity(0.15),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ],
                           ),
                           child: Stack(
                             children: [
