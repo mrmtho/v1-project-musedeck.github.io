@@ -61,26 +61,57 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.03))),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.blur_on, color: Colors.black, size: 20),
                     ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.blur_on, color: Colors.black, size: 20),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'MuseDeck',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD03BFF).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: const Color(0xFFD03BFF).withOpacity(0.4), width: 0.8),
+                      ),
+                      child: const Text(
+                        'v0.01',
+                        style: TextStyle(
+                          color: Color(0xFFD03BFF),
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                const Text(
-                  'MuseDeck',
+                const SizedBox(height: 10),
+                Text(
+                  'A collaborative AI workspace for modern artists',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 10.5,
+                    height: 1.3,
                   ),
                 ),
               ],
