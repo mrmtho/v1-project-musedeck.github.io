@@ -146,6 +146,118 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
     );
   }
 
+  void _showSwapChordDialog(BuildContext context, SongProvider provider, int targetIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1E1E2E),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                'Swap Chord at Index ${targetIndex + 1}',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Category selector (tabs)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: _chordBank.keys.map((category) {
+                        final isSelected = _selectedChordCategory == category;
+                        return InkWell(
+                          onTap: () {
+                            setDialogState(() {
+                              _selectedChordCategory = category;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isSelected ? const Color(0xFF8A2BE2) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected ? const Color(0xFF8A2BE2) : Colors.grey[700]!,
+                              ),
+                            ),
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.grey[400],
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Chord selection grid
+                    Flexible(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          childAspectRatio: 1.5,
+                        ),
+                        itemCount: _chordBank[_selectedChordCategory]?.length ?? 0,
+                        itemBuilder: (context, idx) {
+                          final chordName = _chordBank[_selectedChordCategory]![idx];
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2E2E3E),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: () {
+                              final updatedChords = List<String>.from(provider.activeSong!.chords);
+                              if (targetIndex >= 0 && targetIndex < updatedChords.length) {
+                                final oldChord = updatedChords[targetIndex];
+                                updatedChords[targetIndex] = chordName;
+                                provider.updateActiveSongChords(updatedChords);
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Swapped $oldChord to $chordName'),
+                                    duration: const Duration(seconds: 1),
+                                    backgroundColor: const Color(0xFF8A2BE2),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              chordName,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SongProvider>(context);
@@ -321,6 +433,27 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                                     ),
                                     child: const Icon(
                                       Icons.close,
+                                      size: 10,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Swap button at top-left
+                              Positioned(
+                                top: 4,
+                                left: 4,
+                                child: InkWell(
+                                  onTap: () => _showSwapChordDialog(context, provider, index),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black38,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.swap_horiz,
                                       size: 10,
                                       color: Colors.white70,
                                     ),
