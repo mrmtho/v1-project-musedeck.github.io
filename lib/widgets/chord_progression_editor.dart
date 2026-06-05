@@ -20,7 +20,26 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
     'Minor': ['Cm', 'Dbm', 'Dm', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'Abm', 'Am', 'Bbm', 'Bm'],
     '7th': ['C7', 'D7', 'E7', 'F7', 'G7', 'A7', 'B7', 'Cmaj7', 'Dmaj7', 'Fmaj7', 'Gmaj7', 'Amin7'],
     'Suspended': ['Csus4', 'Dsus4', 'Esus4', 'Gsus4', 'Asus4', 'Csus2', 'Dsus2', 'Asus2'],
+    'Half Dim': ['Cm7b5', 'Dm7b5', 'Em7b5', 'F#m7b5', 'Gm7b5', 'Am7b5', 'Bm7b5'],
+    'Diminished': ['Cdim', 'Ddim', 'Edim', 'Fdim', 'Gdim', 'Adim', 'Bdim', 'Cdim7', 'Ddim7', 'Adim7'],
   };
+
+  Color _getChordColor(String chordName) {
+    final clean = chordName.trim();
+    if (clean.endsWith('m7b5') || clean.contains('ø')) {
+      return const Color(0xFF4221B5); // half dim
+    }
+    if (clean.endsWith('dim') || clean.endsWith('dim7') || clean.contains('°')) {
+      return const Color(0xFF17084A); // dim
+    }
+    if (clean.endsWith('7') && !clean.endsWith('maj7')) {
+      return const Color(0xFF364D08); // dominants
+    }
+    if (clean.endsWith('m') || clean.endsWith('min') || clean.contains('m7') || clean.contains('min7')) {
+      return const Color(0xFF5340DE); // minor
+    }
+    return const Color(0xFFF5B342); // major
+  }
 
   void _playChord(int index, String chordName) {
     setState(() {
@@ -352,8 +371,8 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                               colors: isPlaying
                                   ? [const Color(0xFFD03BFF), const Color(0xFF8A2BE2)]
                                   : isHovered
-                                      ? [const Color(0xFF2E2E3E), const Color(0xFF3E3E4E)]
-                                      : [const Color(0xFF1E1E2A), const Color(0xFF252535)],
+                                      ? [_getChordColor(chord), _getChordColor(chord).withOpacity(0.6)]
+                                      : [_getChordColor(chord).withOpacity(0.25), _getChordColor(chord).withOpacity(0.1)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -362,14 +381,14 @@ class _ChordProgressionEditorState extends State<ChordProgressionEditor> {
                               color: isPlaying
                                   ? const Color(0xFFD03BFF)
                                   : isHovered
-                                      ? const Color(0xFF8A2BE2).withOpacity(0.5)
-                                      : Colors.white.withOpacity(0.05),
+                                      ? _getChordColor(chord)
+                                      : _getChordColor(chord).withOpacity(0.3),
                               width: 1.5,
                             ),
                             boxShadow: isPlaying
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF8A2BE2).withOpacity(0.5),
+                                      color: _getChordColor(chord).withOpacity(0.5),
                                       blurRadius: 10,
                                       spreadRadius: 1,
                                     )
