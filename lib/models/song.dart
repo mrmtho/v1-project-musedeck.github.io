@@ -23,6 +23,58 @@ String songStatusToString(SongStatus status) {
   }
 }
 
+enum SongGroupType {
+  single,
+  ep,
+  album,
+  liveSet,
+}
+
+String songGroupTypeToString(SongGroupType type) {
+  switch (type) {
+    case SongGroupType.single:
+      return 'Single';
+    case SongGroupType.ep:
+      return 'EP';
+    case SongGroupType.album:
+      return 'Album';
+    case SongGroupType.liveSet:
+      return 'Live Set';
+  }
+}
+
+class CaptureItem {
+  final String id;
+  final String type; // 'audio' | 'text' | 'photo'
+  String title;
+  String content; // text content, voice memo filePath, or photo URL/base64
+  final DateTime dateCreated;
+
+  CaptureItem({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.content,
+    required this.dateCreated,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'type': type,
+        'title': title,
+        'content': content,
+        'dateCreated': dateCreated.toIso8601String(),
+      };
+
+  factory CaptureItem.fromJson(Map<String, dynamic> json) => CaptureItem(
+        id: json['id'] as String,
+        type: json['type'] as String,
+        title: json['title'] as String,
+        content: json['content'] as String,
+        dateCreated: DateTime.parse(json['dateCreated'] as String),
+      );
+}
+
 class SongTask {
   final String id;
   String title;
@@ -189,11 +241,14 @@ class Song {
   String keySignature;
   String timeSignature;
   SongStatus status;
+  SongGroupType groupType;
+  bool isArchived;
   List<String> chords; // e.g. ["C", "G", "Am", "F"]
   List<LyricVersion> lyricVersions;
   List<VoiceMemo> voiceMemos;
   List<InspirationItem> inspirationItems;
   List<SongTask> tasks;
+  List<String> collaborators;
   DateTime lastModified;
 
   Song({
@@ -203,11 +258,14 @@ class Song {
     this.keySignature = 'C Maj',
     this.timeSignature = '4/4',
     this.status = SongStatus.idea,
+    this.groupType = SongGroupType.single,
+    this.isArchived = false,
     required this.chords,
     required this.lyricVersions,
     required this.voiceMemos,
     required this.inspirationItems,
     required this.tasks,
+    required this.collaborators,
     required this.lastModified,
   });
 
@@ -223,11 +281,14 @@ class Song {
         'keySignature': keySignature,
         'timeSignature': timeSignature,
         'status': status.index,
+        'groupType': groupType.index,
+        'isArchived': isArchived,
         'chords': chords,
         'lyricVersions': lyricVersions.map((e) => e.toJson()).toList(),
         'voiceMemos': voiceMemos.map((e) => e.toJson()).toList(),
         'inspirationItems': inspirationItems.map((e) => e.toJson()).toList(),
         'tasks': tasks.map((e) => e.toJson()).toList(),
+        'collaborators': collaborators,
         'lastModified': lastModified.toIso8601String(),
       };
 
@@ -239,6 +300,8 @@ class Song {
       keySignature: json['keySignature'] as String? ?? 'C Maj',
       timeSignature: json['timeSignature'] as String? ?? '4/4',
       status: SongStatus.values[json['status'] as int? ?? 0],
+      groupType: SongGroupType.values[json['groupType'] as int? ?? 0],
+      isArchived: json['isArchived'] as bool? ?? false,
       chords: List<String>.from(json['chords'] as List<dynamic>? ?? []),
       lyricVersions: (json['lyricVersions'] as List<dynamic>?)
               ?.map((e) => LyricVersion.fromJson(e as Map<String, dynamic>))
@@ -256,19 +319,22 @@ class Song {
               ?.map((e) => SongTask.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      collaborators: List<String>.from(json['collaborators'] as List<dynamic>? ?? []),
       lastModified: DateTime.parse(json['lastModified'] as String? ?? DateTime.now().toIso8601String()),
     );
   }
 
-  static Song createNew() {
+  static Song createNew({String title = 'Untitled Song', SongGroupType groupType = SongGroupType.single}) {
     final uuid = const Uuid().v4();
     return Song(
       id: uuid,
-      title: 'Untitled Song',
+      title: title,
       bpm: 120,
       keySignature: 'C Maj',
       timeSignature: '4/4',
       status: SongStatus.idea,
+      groupType: groupType,
+      isArchived: false,
       chords: ['C', 'G', 'Am', 'F'],
       lyricVersions: [
         LyricVersion(
@@ -287,6 +353,7 @@ class Song {
         SongTask(id: const Uuid().v4(), title: 'Record a rhythmic voice memo'),
         SongTask(id: const Uuid().v4(), title: 'Refine vocal arrangement'),
       ],
+      collaborators: [],
       lastModified: DateTime.now(),
     );
   }

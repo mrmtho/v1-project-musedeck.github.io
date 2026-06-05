@@ -4,6 +4,7 @@ import '../models/song.dart';
 
 class SongProvider with ChangeNotifier {
   final List<Song> _songs = [];
+  final List<CaptureItem> _inbox = [];
   Song? _activeSong;
 
   SongProvider() {
@@ -11,10 +12,36 @@ class SongProvider with ChangeNotifier {
   }
 
   List<Song> get songs => List.unmodifiable(_songs);
+  List<CaptureItem> get inbox => List.unmodifiable(_inbox);
   Song? get activeSong => _activeSong;
 
   void _loadInitialSongs() {
-    // Populate with dummy songs if empty
+    // Populate Capture Inbox demo items
+    _inbox.addAll([
+      CaptureItem(
+        id: const Uuid().v4(),
+        type: 'audio',
+        title: 'Late Night Riff Humming',
+        content: 'mock_record_path_1.wav',
+        dateCreated: DateTime.now().subtract(const Duration(hours: 2)),
+      ),
+      CaptureItem(
+        id: const Uuid().v4(),
+        type: 'text',
+        title: 'Bridge lyrics inspiration',
+        content: 'Maybe start with "Silent waves under the moon..." and escalate to the vocal chorus.',
+        dateCreated: DateTime.now().subtract(const Duration(hours: 5)),
+      ),
+      CaptureItem(
+        id: const Uuid().v4(),
+        type: 'photo',
+        title: 'Synthesizer Panel Settings Photo',
+        content: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
+        dateCreated: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+    ]);
+
+    // Populate with dummy songs
     final demoSong1 = Song(
       id: const Uuid().v4(),
       title: 'Neon Horizon',
@@ -22,6 +49,8 @@ class SongProvider with ChangeNotifier {
       keySignature: 'A Min',
       timeSignature: '4/4',
       status: SongStatus.drafting,
+      groupType: SongGroupType.album,
+      isArchived: false,
       chords: ['Am', 'F', 'C', 'G', 'Am', 'F', 'Dm', 'E'],
       lyricVersions: [
         LyricVersion(
@@ -87,6 +116,7 @@ class SongProvider with ChangeNotifier {
         SongTask(id: const Uuid().v4(), title: 'Record synth scratch track'),
         SongTask(id: const Uuid().v4(), title: 'Schedule vocal session with Sarah'),
       ],
+      collaborators: ['Alex (Producer)', 'Sarah (Vocals)'],
       lastModified: DateTime.now().subtract(const Duration(hours: 4)),
     );
 
@@ -97,6 +127,8 @@ class SongProvider with ChangeNotifier {
       keySignature: 'G Maj',
       timeSignature: '3/4',
       status: SongStatus.idea,
+      groupType: SongGroupType.single,
+      isArchived: false,
       chords: ['G', 'C', 'D', 'Em', 'G', 'C', 'Am', 'D'],
       lyricVersions: [
         LyricVersion(
@@ -113,10 +145,67 @@ class SongProvider with ChangeNotifier {
         SongTask(id: const Uuid().v4(), title: 'Determine key structure'),
         SongTask(id: const Uuid().v4(), title: 'Write bridge lyrics'),
       ],
+      collaborators: [],
       lastModified: DateTime.now().subtract(const Duration(days: 5)),
     );
 
-    _songs.addAll([demoSong1, demoSong2]);
+    // Collaboration demo song
+    final collabSong = Song(
+      id: const Uuid().v4(),
+      title: 'Midnight Drive',
+      bpm: 124,
+      keySignature: 'D Min',
+      timeSignature: '4/4',
+      status: SongStatus.recording,
+      groupType: SongGroupType.ep,
+      isArchived: false,
+      chords: ['Dm', 'Gm', 'C', 'F'],
+      lyricVersions: [
+        LyricVersion(
+          id: const Uuid().v4(),
+          lyrics: '[Chorus]\nDriving through the city lights\nLooking for the perfect heights\nMidnight drive, just you and I...',
+          chords: 'Dm Gm C F',
+          timestamp: DateTime.now().subtract(const Duration(days: 10)),
+          note: 'Collab verse sketch',
+        )
+      ],
+      voiceMemos: [],
+      inspirationItems: [],
+      tasks: [
+        SongTask(id: const Uuid().v4(), title: 'Approve final mix down'),
+      ],
+      collaborators: ['Marcus (Synth Wave Band)', 'Dave (Manager)'],
+      lastModified: DateTime.now().subtract(const Duration(days: 1)),
+    );
+
+    // Archived Vault demo song
+    final archivedSong = Song(
+      id: const Uuid().v4(),
+      title: 'Echoes of 2023',
+      bpm: 95,
+      keySignature: 'C Maj',
+      timeSignature: '4/4',
+      status: SongStatus.mastered,
+      groupType: SongGroupType.liveSet,
+      isArchived: true,
+      chords: ['C', 'G', 'Am', 'F'],
+      lyricVersions: [
+        LyricVersion(
+          id: const Uuid().v4(),
+          lyrics: 'This is an old nostalgic track from the vault.',
+          chords: 'C G Am F',
+          timestamp: DateTime.now().subtract(const Duration(days: 1000)),
+          note: 'Vault record',
+        )
+      ],
+      voiceMemos: [],
+      inspirationItems: [],
+      tasks: [],
+      collaborators: [],
+      lastModified: DateTime.now().subtract(const Duration(days: 1000)),
+    );
+
+    _songs.addAll([demoSong1, demoSong2, collabSong, archivedSong]);
     _activeSong = demoSong1;
     notifyListeners();
   }
@@ -126,8 +215,8 @@ class SongProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void createNewSong() {
-    final newSong = Song.createNew();
+  void createNewSong({String title = 'Untitled Song', SongGroupType groupType = SongGroupType.single}) {
+    final newSong = Song.createNew(title: title, groupType: groupType);
     _songs.add(newSong);
     _activeSong = newSong;
     notifyListeners();
@@ -140,6 +229,117 @@ class SongProvider with ChangeNotifier {
       if (_activeSong?.id == id) {
         _activeSong = _songs.isNotEmpty ? _songs.first : null;
       }
+      notifyListeners();
+    }
+  }
+
+  // Archive / Vault Management
+  void archiveSong(String id) {
+    final index = _songs.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      _songs[index].isArchived = true;
+      _songs[index].lastModified = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  void restoreSong(String id) {
+    final index = _songs.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      _songs[index].isArchived = false;
+      _songs[index].lastModified = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  // Group Type management
+  void updateSongGroupType(String id, SongGroupType groupType) {
+    final index = _songs.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      _songs[index].groupType = groupType;
+      _songs[index].lastModified = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  // Collaborator management
+  void addCollaborator(String id, String collaborator) {
+    final index = _songs.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      if (!_songs[index].collaborators.contains(collaborator)) {
+        _songs[index].collaborators.add(collaborator);
+        _songs[index].lastModified = DateTime.now();
+        notifyListeners();
+      }
+    }
+  }
+
+  void removeCollaborator(String id, String collaborator) {
+    final index = _songs.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      _songs[index].collaborators.remove(collaborator);
+      _songs[index].lastModified = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  // Capture Inbox Management
+  void addCaptureItem(String title, String type, String content) {
+    final item = CaptureItem(
+      id: const Uuid().v4(),
+      type: type,
+      title: title,
+      content: content,
+      dateCreated: DateTime.now(),
+    );
+    _inbox.insert(0, item);
+    notifyListeners();
+  }
+
+  void deleteCaptureItem(String id) {
+    _inbox.removeWhere((item) => item.id == id);
+    notifyListeners();
+  }
+
+  void convertCaptureToSong(String captureId, String songTitle, SongGroupType groupType) {
+    final index = _inbox.indexWhere((item) => item.id == captureId);
+    if (index != -1) {
+      final item = _inbox[index];
+      
+      // Create a new song using the capture content
+      final newSong = Song.createNew(title: songTitle.isNotEmpty ? songTitle : item.title, groupType: groupType);
+      
+      if (item.type == 'text') {
+        newSong.lyricVersions.add(LyricVersion(
+          id: const Uuid().v4(),
+          lyrics: item.content,
+          chords: 'C G Am F',
+          timestamp: DateTime.now(),
+          note: 'Imported from Text Capture',
+        ));
+      } else if (item.type == 'audio') {
+        newSong.voiceMemos.add(VoiceMemo(
+          id: const Uuid().v4(),
+          title: item.title,
+          bpm: 120,
+          rhythmPattern: 'Boom Bap',
+          dateCreated: DateTime.now(),
+          filePath: item.content,
+        ));
+      } else if (item.type == 'photo') {
+        newSong.inspirationItems.add(InspirationItem(
+          id: const Uuid().v4(),
+          title: item.title,
+          type: 'image',
+          content: item.content,
+          comments: [],
+          timestamp: DateTime.now(),
+        ));
+      }
+
+      _songs.add(newSong);
+      _activeSong = newSong;
+      _inbox.removeAt(index);
       notifyListeners();
     }
   }
