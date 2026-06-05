@@ -9,6 +9,7 @@ import '../widgets/creative_timeline.dart';
 import '../widgets/inspiration_board.dart';
 import '../widgets/lyric_editor.dart';
 import '../widgets/rhythmic_memo_recorder.dart';
+import '../utils/synth_engine.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -26,6 +27,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   // Active navigation view: 'capture', 'library', 'collab', 'vault', 'workspace'
   String _activeView = 'library';
   String _vaultSearchQuery = '';
+  String _selectedGenre = 'Synthwave';
+  String _selectedCountry = 'Global';
 
   @override
   void initState() {
@@ -161,6 +164,24 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             isSelected: _activeView == 'vault',
             onTap: () {
               setState(() => _activeView = 'vault');
+              if (isDrawer) Navigator.of(context).pop();
+            },
+          ),
+          _buildSidebarNavItem(
+            icon: Icons.newspaper,
+            label: 'Industry News',
+            isSelected: _activeView == 'news',
+            onTap: () {
+              setState(() => _activeView = 'news');
+              if (isDrawer) Navigator.of(context).pop();
+            },
+          ),
+          _buildSidebarNavItem(
+            icon: Icons.bar_chart,
+            label: 'Charts',
+            isSelected: _activeView == 'charts',
+            onTap: () {
+              setState(() => _activeView = 'charts');
               if (isDrawer) Navigator.of(context).pop();
             },
           ),
@@ -339,6 +360,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       return _buildCollaborationsView(provider);
     } else if (_activeView == 'vault') {
       return _buildTheVaultView(provider);
+    } else if (_activeView == 'news') {
+      return _buildIndustryNewsView();
+    } else if (_activeView == 'charts') {
+      return _buildChartsView();
     } else {
       return _buildSongLibraryView(provider);
     }
@@ -1342,6 +1367,368 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           ),
         );
       },
+    );
+  }
+
+  Widget _buildIndustryNewsView() {
+    final newsList = [
+      {
+        'title': 'Synth Design is Reaching a New Golden Age',
+        'source': 'Pitchfork',
+        'time': '2 hours ago',
+        'desc': 'How bedroom producers and modular synthesis enthusiasts are driving the hardware design revival. We look at the latest semi-modular releases from Moog and Behringer.',
+        'image': 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
+      },
+      {
+        'title': 'Billboard Hot 100: Synthwave and Retro Beats Take Over',
+        'source': 'Billboard',
+        'time': '5 hours ago',
+        'desc': 'Analysis of this week\'s charts shows a massive surge in analog-sounding basslines and heavy 80s gated reverb snare drums in mainstream pop.',
+        'image': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4',
+      },
+      {
+        'title': 'The Rise of AI Collaborations in Modern Songwriting',
+        'source': 'Sound on Sound',
+        'time': '1 day ago',
+        'desc': 'A look at how tools like MuseDeck are allowing songwriters to brainstorm chord progression templates and sync draft memos collaboratively.',
+        'image': 'https://images.unsplash.com/photo-1507838153414-b4b713384a76',
+      },
+      {
+        'title': 'How Live Streaming Changed Indie Concert Touring Forever',
+        'source': 'NME',
+        'time': '3 days ago',
+        'desc': 'Even as physical venues return to full capacity, hybrid digital tickets and live stream archives are generating up to 40% of total tour revenues for independent artists.',
+        'image': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a',
+      }
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📰 Industry News',
+            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Stay updated with snippets from Billboard, Pitchfork, and other media sources.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.35,
+              ),
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                final news = newsList[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF13131A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.03)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                            image: DecorationImage(
+                              image: NetworkImage(news['image']!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              margin: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD03BFF),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                news['source']!,
+                                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    news['title']!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    news['desc']!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.grey, fontSize: 11, height: 1.4),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                news['time']!,
+                                style: const TextStyle(color: Colors.grey, fontSize: 9),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChartsView() {
+    final Map<String, List<Map<String, dynamic>>> genreCharts = {
+      'Synthwave': [
+        {'rank': 1, 'change': 'new', 'title': 'Resonance Shift', 'artist': 'Laserhawk', 'bpm': 112, 'key': 'A Min'},
+        {'rank': 2, 'change': '+1', 'title': 'Glow Rider', 'artist': 'Kavinsky', 'bpm': 118, 'key': 'D Min'},
+        {'rank': 3, 'change': '-1', 'title': 'Turbo Drive', 'artist': 'FM-84', 'bpm': 120, 'key': 'C Maj'},
+        {'rank': 4, 'change': '+3', 'title': 'Outrun Sunset', 'artist': 'The Midnight', 'bpm': 105, 'key': 'G Maj'},
+      ],
+      'Pop': [
+        {'rank': 1, 'change': '=', 'title': 'Neon Hearts', 'artist': 'Dua Lipa', 'bpm': 122, 'key': 'C Maj'},
+        {'rank': 2, 'change': 'new', 'title': 'Midnight Dance', 'artist': 'The Weeknd', 'bpm': 120, 'key': 'A Min'},
+        {'rank': 3, 'change': '+2', 'title': 'Rainy Day', 'artist': 'Taylor Swift', 'bpm': 98, 'key': 'F Maj'},
+        {'rank': 4, 'change': '-1', 'title': 'Golden Summer', 'artist': 'Harry Styles', 'bpm': 115, 'key': 'D Min'},
+      ],
+      'Techno': [
+        {'rank': 1, 'change': '+2', 'title': 'Acid Pulse', 'artist': 'Charlotte de Witte', 'bpm': 135, 'key': 'E Min'},
+        {'rank': 2, 'change': '-1', 'title': 'Industrial Noise', 'artist': 'Amelie Lens', 'bpm': 138, 'key': 'A Min'},
+        {'rank': 3, 'change': 'new', 'title': 'Dark Space', 'artist': 'Carl Cox', 'bpm': 130, 'key': 'D Min'},
+        {'rank': 4, 'change': '=', 'title': 'Modulation Loop', 'artist': 'Enrico Sangiuliano', 'bpm': 132, 'key': 'C Maj'},
+      ]
+    };
+
+    final chartsList = genreCharts[_selectedGenre] ?? genreCharts['Synthwave']!;
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '📈 Music Charts',
+                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Weekly charts for $_selectedGenre • $_selectedCountry',
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  _buildFilterDropdown(
+                    value: _selectedGenre,
+                    items: ['Synthwave', 'Pop', 'Techno'],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedGenre = val);
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  _buildFilterDropdown(
+                    value: _selectedCountry,
+                    items: ['Global', 'US', 'UK', 'Japan'],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedCountry = val);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: chartsList.length,
+              itemBuilder: (context, index) {
+                final track = chartsList[index];
+                final rank = track['rank'] as int;
+                final change = track['change'] as String;
+                final bpm = track['bpm'] as int;
+                final key = track['key'] as String;
+
+                Color changeColor = Colors.grey;
+                IconData changeIcon = Icons.remove;
+                if (change == 'new') {
+                  changeColor = const Color(0xFFD03BFF);
+                  changeIcon = Icons.fiber_new;
+                } else if (change.startsWith('+')) {
+                  changeColor = const Color(0xFF00FFCC);
+                  changeIcon = Icons.arrow_drop_up;
+                } else if (change.startsWith('-')) {
+                  changeColor = Colors.redAccent;
+                  changeIcon = Icons.arrow_drop_down;
+                }
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF13131A),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.03)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 30,
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$rank',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Row(
+                        children: [
+                          Icon(changeIcon, color: changeColor, size: 16),
+                          if (change != '=' && change != 'new')
+                            Text(
+                              change.substring(1),
+                              style: TextStyle(color: changeColor, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFF00FFCC).withOpacity(0.4),
+                              const Color(0xFFD03BFF).withOpacity(0.4),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.music_note, color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              track['title']!,
+                              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${track['artist']} • $bpm BPM • Key: $key',
+                              style: const TextStyle(color: Colors.grey, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                          foregroundColor: const Color(0xFF00FFCC),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        onPressed: () {
+                          final List<String> chords;
+                          if (key.contains('Min') || key.contains('m')) {
+                            chords = ['Am', 'F', 'Dm', 'E'];
+                          } else {
+                            chords = ['C', 'G', 'Am', 'F'];
+                          }
+                          SynthEngine.playChord(chords[0]);
+                          SynthEngine.playDrum('kick');
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            SynthEngine.playDrum('hat');
+                          });
+                          Future.delayed(const Duration(milliseconds: 600), () {
+                            SynthEngine.playDrum('snare');
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Previewing vibe of "${track['title']}" in $key ($bpm BPM)'),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.audiotrack, size: 14),
+                        label: const Text('Vibe Check', style: TextStyle(fontSize: 11)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterDropdown({
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E2E),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          dropdownColor: const Color(0xFF1E1E2E),
+          value: value,
+          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          items: items.map((val) {
+            return DropdownMenuItem<String>(
+              value: val,
+              child: Text(val),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      ),
     );
   }
 }
