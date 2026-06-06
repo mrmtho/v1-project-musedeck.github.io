@@ -155,6 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   // 1. PLAYGROUND
                   _buildSidebarHeader(
+                    icon: Icons.palette_outlined,
                     label: 'Playground',
                     isExpanded: _playgroundExpanded,
                     onTap: () => setState(() => _playgroundExpanded = !_playgroundExpanded),
@@ -199,12 +200,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   _buildSidebarNavItem(
                     icon: Icons.tune,
                     label: 'Mixer Console',
-                    isSelected: _activeView == 'workspace',
+                    isSelected: _activeView == 'mixer',
                     onTap: () {
-                      if (activeSong == null && songs.isNotEmpty) {
-                        provider.selectSong(songs.first);
-                      }
-                      setState(() => _activeView = 'workspace');
+                      setState(() => _activeView = 'mixer');
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
@@ -226,7 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     label: 'Network',
                     isSelected: _activeView == 'collab',
                     onTap: () {
-                      setState(() => _activeView == 'collab');
+                      setState(() => _activeView = 'collab');
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
@@ -235,6 +233,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   
                   // 5. INDUSTRY
                   _buildSidebarHeader(
+                    icon: Icons.business_center_outlined,
                     label: 'Industry',
                     isExpanded: _industryExpanded,
                     onTap: () => setState(() => _industryExpanded = !_industryExpanded),
@@ -266,6 +265,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   
                   // 6. MORE
                   _buildSidebarHeader(
+                    icon: Icons.more_horiz_outlined,
                     label: 'More',
                     isExpanded: _moreExpanded,
                     onTap: () => setState(() => _moreExpanded = !_moreExpanded),
@@ -312,63 +312,62 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       },
                     ),
                   ],
-                  
-                  const SizedBox(height: 8),
-                  
-                  // 7. USER
-                  _buildSidebarHeader(
-                    label: 'User',
-                    isExpanded: _userExpanded,
-                    onTap: () => setState(() => _userExpanded = !_userExpanded),
-                  ),
-                  if (_userExpanded) ...[
-                    _buildSidebarNavItem(
-                      icon: Icons.account_box_outlined,
-                      label: 'Account',
-                      isSelected: _activeView == 'account',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView == 'account');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.person_pin_outlined,
-                      label: 'Profile',
-                      isSelected: _activeView == 'profile',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView == 'profile');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.settings_outlined,
-                      label: 'Preferences',
-                      isSelected: _activeView == 'preferences',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView == 'preferences');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.logout,
-                      label: 'Logout',
-                      isSelected: false,
-                      indent: 12,
-                      onTap: () {
-                        if (isDrawer) Navigator.of(context).pop();
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => const LandingPageScreen()),
-                        );
-                      },
-                    ),
-                  ],
                 ],
               ),
             ),
           ),
+          const Divider(color: Colors.white10, height: 1),
+          // 7. USER (positioned at the bottom left)
+          _buildSidebarHeader(
+            icon: Icons.person_outline,
+            label: 'User',
+            isExpanded: _userExpanded,
+            onTap: () => setState(() => _userExpanded = !_userExpanded),
+          ),
+          if (_userExpanded) ...[
+            _buildSidebarNavItem(
+              icon: Icons.account_box_outlined,
+              label: 'Account',
+              isSelected: _activeView == 'account',
+              indent: 12,
+              onTap: () {
+                setState(() => _activeView = 'account');
+                if (isDrawer) Navigator.of(context).pop();
+              },
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.person_pin_outlined,
+              label: 'Profile',
+              isSelected: _activeView == 'profile',
+              indent: 12,
+              onTap: () {
+                setState(() => _activeView = 'profile');
+                if (isDrawer) Navigator.of(context).pop();
+              },
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.settings_outlined,
+              label: 'Preferences',
+              isSelected: _activeView == 'preferences',
+              indent: 12,
+              onTap: () {
+                setState(() => _activeView = 'preferences');
+                if (isDrawer) Navigator.of(context).pop();
+              },
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.logout,
+              label: 'Logout',
+              isSelected: false,
+              indent: 12,
+              onTap: () {
+                if (isDrawer) Navigator.of(context).pop();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+                );
+              },
+            ),
+          ],
           const SizedBox(height: 12),
         ],
       ),
@@ -436,6 +435,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
 
   Widget _buildSidebarHeader({
+    required IconData icon,
     required String label,
     required bool isExpanded,
     required VoidCallback onTap,
@@ -448,15 +448,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label.toUpperCase(),
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+              Icon(
+                icon,
+                size: 16,
+                color: Colors.white.withOpacity(0.35),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.35),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
               ),
               Icon(
@@ -560,6 +567,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         );
       }
       return _buildWorkspaceView(provider, activeSong, showSidebar);
+    } else if (_activeView == 'mixer') {
+      return _buildEmptyMixerView();
     } else if (_activeView == 'capture') {
       return _buildCaptureInboxView(provider);
     } else if (_activeView == 'collab') {
@@ -2571,7 +2580,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               const Divider(color: Colors.white10),
               const SizedBox(height: 24),
               _buildAccountInfoRow('Billing Cycle', 'Monthly'),
-              _buildAccountInfoRow('Pricing Plan', '$9.99 / month'),
+              _buildAccountInfoRow('Pricing Plan', '\$9.99 / month'),
               _buildAccountInfoRow('Next Invoice', 'July 06, 2026'),
               _buildAccountInfoRow('Payment Method', 'Visa ending in 4022'),
               const SizedBox(height: 24),
@@ -2816,6 +2825,157 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           ),
         ],
       ),
+    );
+  }
+
+  // --- EMPTY MIXER CONSOLE VIEW ---
+  Widget _buildEmptyMixerView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '🎚️ Mixer Console',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Multi-track Professional Studio Board.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 32),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Background mock channel strips (faded out)
+            Opacity(
+              opacity: 0.08,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(
+                  MediaQuery.of(context).size.width < 700 ? 3 : 6,
+                  (index) => Container(
+                    width: 70,
+                    height: 350,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF13131A),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('CH 01', style: TextStyle(color: Colors.white, fontSize: 9)),
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: const BoxDecoration(color: Colors.white10, shape: BoxShape.circle),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Container(
+                              width: 2,
+                              height: 180,
+                              color: Colors.white12,
+                              child: Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  Positioned(
+                                    top: 80,
+                                    child: Container(
+                                      width: 12,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text('M', style: TextStyle(color: Colors.grey, fontSize: 9)),
+                            Text('S', style: TextStyle(color: Colors.grey, fontSize: 9)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Foreground overlay card
+            Container(
+              padding: const EdgeInsets.all(32),
+              constraints: const BoxConstraints(maxWidth: 500),
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A).withOpacity(0.85),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.04)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: 30,
+                    spreadRadius: 10,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00FFCC).withOpacity(0.05),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF00FFCC).withOpacity(0.2)),
+                    ),
+                    child: const Icon(
+                      Icons.settings_input_component,
+                      color: Color(0xFF00FFCC),
+                      size: 36,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Console Offline',
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'There is no active multi-track workspace routed to the mixer board right now. Open a song folder from your library to load stems, tracks, and automation controls.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
+                  ),
+                  const SizedBox(height: 28),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00FFCC),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _activeView = 'library';
+                      });
+                    },
+                    icon: const Icon(Icons.library_music_outlined, size: 16),
+                    label: const Text('Open Song Library', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
 }
