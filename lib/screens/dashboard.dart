@@ -3796,8 +3796,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         // Master Output Channel strip (Pinned far right)
         Container(
           width: 120,
-          color: const Color(0xFF111318),
           decoration: const BoxDecoration(
+            color: Color(0xFF111318),
             border: Border(left: BorderSide(color: colorGrid, width: 2)),
           ),
           child: Column(
