@@ -371,166 +371,169 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   // View: Capture Inbox (Inbox)
   Widget _buildCaptureInboxView(SongProvider provider) {
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🎙️ Capture Inbox',
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Landing pad for quick ideas. Capture now, organize later.',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          const SizedBox(height: 24),
-          // Massive Action Button Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildMassiveCaptureButton(
-                  icon: Icons.mic,
-                  label: 'Hum Riff / Audio',
-                  color: const Color(0xFFD03BFF),
-                  onTap: () {
-                    provider.addCaptureItem(
-                      'Hum Idea #${Random().nextInt(100)}',
-                      'audio',
-                      'mock_record_inbox.wav',
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Captured audio memo to inbox!'), backgroundColor: Color(0xFFD03BFF)),
-                    );
-                  },
-                ),
+      children: [
+        const Text(
+          '🎙️ Capture Inbox',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Landing pad for quick ideas. Capture now, organize later.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        // Massive Action Button Row
+        Row(
+          children: [
+            Expanded(
+              child: _buildMassiveCaptureButton(
+                icon: Icons.mic,
+                label: 'Hum Riff / Audio',
+                color: const Color(0xFFD03BFF),
+                onTap: () {
+                  provider.addCaptureItem(
+                    'Hum Idea #${Random().nextInt(100)}',
+                    'audio',
+                    'mock_record_inbox.wav',
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Captured audio memo to inbox!'), backgroundColor: Color(0xFFD03BFF)),
+                  );
+                },
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildMassiveCaptureButton(
-                  icon: Icons.edit_note,
-                  label: 'Draft Text Note',
-                  color: const Color(0xFF00FFCC),
-                  onTap: () => _showAddTextCaptureDialog(context, provider),
-                ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildMassiveCaptureButton(
+                icon: Icons.edit_note,
+                label: 'Draft Text Note',
+                color: const Color(0xFF00FFCC),
+                onTap: () => _showAddTextCaptureDialog(context, provider),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildMassiveCaptureButton(
-                  icon: Icons.add_a_photo,
-                  label: 'Scan Photo Reference',
-                  color: const Color(0xFFFFD700),
-                  onTap: () {
-                    provider.addCaptureItem(
-                      'Synthesizer Reference',
-                      'photo',
-                      'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Captured photo scan reference!'), backgroundColor: Color(0xFFFFD700)),
-                    );
-                  },
-                ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildMassiveCaptureButton(
+                icon: Icons.add_a_photo,
+                label: 'Scan Photo Reference',
+                color: const Color(0xFFFFD700),
+                onTap: () {
+                  provider.addCaptureItem(
+                    'Synthesizer Reference',
+                    'photo',
+                    'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Captured photo scan reference!'), backgroundColor: Color(0xFFFFD700)),
+                  );
+                },
               ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Unorganized Inbox Ideas',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: provider.inbox.isEmpty
-                ? const Center(
-                    child: Text('Inbox is clean! All ideas sorted.', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                  )
-                : ListView.builder(
-                    itemCount: provider.inbox.length,
-                    itemBuilder: (context, index) {
-                      final item = provider.inbox[index];
-                      IconData typeIcon = Icons.notes;
-                      Color typeColor = Colors.grey;
-                      if (item.type == 'audio') {
-                        typeIcon = Icons.audiotrack;
-                        typeColor = const Color(0xFFD03BFF);
-                      } else if (item.type == 'photo') {
-                        typeIcon = Icons.photo;
-                        typeColor = const Color(0xFFFFD700);
-                      } else if (item.type == 'text') {
-                        typeIcon = Icons.text_snippet;
-                        typeColor = const Color(0xFF00FFCC);
-                      }
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          'Unorganized Inbox Ideas',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        if (provider.inbox.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Text('Inbox is clean! All ideas sorted.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: provider.inbox.length,
+            itemBuilder: (context, index) {
+              final item = provider.inbox[index];
+              IconData typeIcon = Icons.notes;
+              Color typeColor = Colors.grey;
+              if (item.type == 'audio') {
+                typeIcon = Icons.audiotrack;
+                typeColor = const Color(0xFFD03BFF);
+              } else if (item.type == 'photo') {
+                typeIcon = Icons.photo;
+                typeColor = const Color(0xFFFFD700);
+              } else if (item.type == 'text') {
+                typeIcon = Icons.text_snippet;
+                typeColor = const Color(0xFF00FFCC);
+              }
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF13131A),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.03)),
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: typeColor.withOpacity(0.1),
-                              child: Icon(typeIcon, color: typeColor, size: 20),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item.content,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'UNORGANIZED',
-                                style: TextStyle(color: Colors.grey, fontSize: 8, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
-                                foregroundColor: const Color(0xFF00FFCC),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              ),
-                              onPressed: () => _showSortCaptureDialog(context, provider, item),
-                              icon: const Icon(Icons.sort, size: 14),
-                              label: const Text('Sort / Workspace', style: TextStyle(fontSize: 11)),
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
-                              onPressed: () => provider.deleteCaptureItem(item.id),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13131A),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.03)),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: typeColor.withOpacity(0.1),
+                      child: Icon(typeIcon, color: typeColor, size: 20),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.title,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            item.content,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'UNORGANIZED',
+                        style: TextStyle(color: Colors.grey, fontSize: 8, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                        foregroundColor: const Color(0xFF00FFCC),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      onPressed: () => _showSortCaptureDialog(context, provider, item),
+                      icon: const Icon(Icons.sort, size: 14),
+                      label: const Text('Sort / Workspace', style: TextStyle(fontSize: 11)),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                      onPressed: () => provider.deleteCaptureItem(item.id),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
 
@@ -739,6 +742,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     _buildLibrarySection(provider, songs, SongGroupType.ep, '📼 EPs', columns, aspectRatio),
                     _buildLibrarySection(provider, songs, SongGroupType.album, '🎸 Albums', columns, aspectRatio),
                     _buildLibrarySection(provider, songs, SongGroupType.liveSet, '🎤 Live Sets', columns, aspectRatio),
+                    const SizedBox(height: 40),
+                    _buildFooterSection(),
                   ],
                 ),
               ),
@@ -938,266 +943,268 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   // View: Collaborations Panel
   Widget _buildCollaborationsView(SongProvider provider) {
-    // Songs containing collaborators
     final songs = provider.songs.where((s) => s.collaborators.isNotEmpty && !s.isArchived).toList();
 
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '👥 Collaborations',
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Track files, split sheets, and shared sessions.',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: songs.isEmpty
-                ? const Center(
-                    child: Text('No active collaboration workspaces.', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                  )
-                : ListView.builder(
-                    itemCount: songs.length,
-                    itemBuilder: (context, index) {
-                      final song = songs[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF13131A),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withOpacity(0.03)),
-                        ),
-                        child: Column(
+      children: [
+        const Text(
+          '👥 Collaborations',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Track files, split sheets, and shared sessions.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 20),
+        if (songs.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Text('No active collaboration workspaces.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: songs.length,
+            itemBuilder: (context, index) {
+              final song = songs[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13131A),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.03)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      song.title,
-                                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'BPM: ${song.bpm} • Key: ${song.keySignature} • Time: ${song.timeSignature}',
-                                      style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
-                                    foregroundColor: const Color(0xFF00FFCC),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  ),
-                                  onPressed: () {
-                                    provider.selectSong(song);
-                                    setState(() => _activeView = 'workspace');
-                                  },
-                                  icon: const Icon(Icons.exit_to_app, size: 14),
-                                  label: const Text('Open Workspace', style: TextStyle(fontSize: 11)),
-                                ),
-                              ],
+                            Text(
+                              song.title,
+                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(height: 16),
-                            const Divider(color: Colors.white10),
-                            const SizedBox(height: 12),
-                            const Text('Collaborators & Split shares', style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: song.collaborators.map((c) {
-                                // Mock some splits
-                                final int splitShare = (100 / (song.collaborators.length + 1)).round();
-                                return Chip(
-                                  backgroundColor: const Color(0xFF1E1E2E),
-                                  side: BorderSide.none,
-                                  label: Text(
-                                    '$c ($splitShare%)',
-                                    style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 11),
-                                  ),
-                                  avatar: CircleAvatar(
-                                    backgroundColor: const Color(0xFFD03BFF),
-                                    child: Text(
-                                      c[0],
-                                      style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                );
-                              }).toList()
-                                ..add(
-                                  Chip(
-                                    backgroundColor: const Color(0xFF1E1E2E),
-                                    side: BorderSide.none,
-                                    label: Text(
-                                      'Me (${(100 / (song.collaborators.length + 1) + (100 % (song.collaborators.length + 1))).round()}%)',
-                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                    ),
-                                    avatar: const CircleAvatar(
-                                      backgroundColor: Color(0xFF00FFCC),
-                                      child: Icon(Icons.person, color: Colors.black, size: 10),
-                                    ),
-                                  ),
-                                ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'BPM: ${song.bpm} • Key: ${song.keySignature} • Time: ${song.timeSignature}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 11),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                            foregroundColor: const Color(0xFF00FFCC),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          ),
+                          onPressed: () {
+                            provider.selectSong(song);
+                            setState(() => _activeView = 'workspace');
+                          },
+                          icon: const Icon(Icons.exit_to_app, size: 14),
+                          label: const Text('Open Workspace', style: TextStyle(fontSize: 11)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(color: Colors.white10),
+                    const SizedBox(height: 12),
+                    const Text('Collaborators & Split shares', style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: song.collaborators.map((c) {
+                        final int splitShare = (100 / (song.collaborators.length + 1)).round();
+                        return Chip(
+                          backgroundColor: const Color(0xFF1E1E2E),
+                          side: BorderSide.none,
+                          label: Text(
+                            '$c ($splitShare%)',
+                            style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 11),
+                          ),
+                          avatar: CircleAvatar(
+                            backgroundColor: const Color(0xFFD03BFF),
+                            child: Text(
+                              c[0],
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      }).toList()
+                        ..add(
+                          Chip(
+                            backgroundColor: const Color(0xFF1E1E2E),
+                            side: BorderSide.none,
+                            label: Text(
+                              'Me (${(100 / (song.collaborators.length + 1) + (100 % (song.collaborators.length + 1))).round()}%)',
+                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                            avatar: const CircleAvatar(
+                              backgroundColor: Color(0xFF00FFCC),
+                              child: Icon(Icons.person, color: Colors.black, size: 10),
+                            ),
+                          ),
+                        ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
 
   // View: The Vault (Archived ideas)
   Widget _buildTheVaultView(SongProvider provider) {
-    // Search filter
     final songs = provider.songs
         .where((s) => s.isArchived && s.title.toLowerCase().contains(_vaultSearchQuery.toLowerCase()))
         .toList();
 
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🗃️ The Vault (Archived Ideas)',
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Fully searchable repository for old drafts or discarded riffs.',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          const SizedBox(height: 20),
-          // Vault Search bar
-          TextField(
-            controller: _searchController,
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-            decoration: InputDecoration(
-              hintText: 'Search archive by riff/melody title...',
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
-              filled: true,
-              fillColor: const Color(0xFF13131A),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.04)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF00FFCC)),
-              ),
+      children: [
+        const Text(
+          '🗃️ The Vault (Archived Ideas)',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Fully searchable repository for old drafts or discarded riffs.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 20),
+        TextField(
+          controller: _searchController,
+          style: const TextStyle(color: Colors.white, fontSize: 13),
+          decoration: InputDecoration(
+            hintText: 'Search archive by riff/melody title...',
+            hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            filled: true,
+            fillColor: const Color(0xFF13131A),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.04)),
             ),
-            onChanged: (val) {
-              setState(() {
-                _vaultSearchQuery = val;
-              });
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF00FFCC)),
+            ),
+          ),
+          onChanged: (val) {
+            setState(() {
+              _vaultSearchQuery = val;
+            });
+          },
+        ),
+        const SizedBox(height: 20),
+        if (songs.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Text('No archived ideas match search.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: songs.length,
+            itemBuilder: (context, index) {
+              final song = songs[index];
+              final lastModStr = DateFormat('MMMM dd, yyyy').format(song.lastModified);
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13131A),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.03)),
+                ),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        _getSongThumbnail(song),
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 44,
+                          height: 44,
+                          color: const Color(0xFF252535),
+                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            song.title,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Archived: $lastModStr • ${song.bpm} BPM',
+                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD03BFF).withOpacity(0.15),
+                            foregroundColor: const Color(0xFFD03BFF),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
+                          onPressed: () {
+                            provider.restoreSong(song.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Restored "${song.title}" to active library!')),
+                            );
+                          },
+                          icon: const Icon(Icons.unarchive, size: 14),
+                          label: const Text('Restore', style: TextStyle(fontSize: 11)),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.delete_forever, color: Colors.redAccent, size: 18),
+                          onPressed: () {
+                            provider.deleteSong(song.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Permanently deleted "${song.title}"')),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
             },
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: songs.isEmpty
-                ? const Center(
-                    child: Text('No archived ideas match search.', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                  )
-                : ListView.builder(
-                    itemCount: songs.length,
-                    itemBuilder: (context, index) {
-                      final song = songs[index];
-                      final lastModStr = DateFormat('MMMM dd, yyyy').format(song.lastModified);
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF13131A),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.03)),
-                        ),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                _getSongThumbnail(song),
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  width: 44,
-                                  height: 44,
-                                  color: const Color(0xFF252535),
-                                  child: const Icon(Icons.broken_image, color: Colors.grey, size: 16),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    song.title,
-                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Archived: $lastModStr • ${song.bpm} BPM',
-                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFD03BFF).withOpacity(0.15),
-                                    foregroundColor: const Color(0xFFD03BFF),
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  ),
-                                  onPressed: () {
-                                    provider.restoreSong(song.id);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Restored "${song.title}" to active library!')),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.unarchive, size: 14),
-                                  label: const Text('Restore', style: TextStyle(fontSize: 11)),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_forever, color: Colors.redAccent, size: 18),
-                                  onPressed: () {
-                                    provider.deleteSong(song.id);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Permanently deleted "${song.title}"')),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
 
@@ -1463,110 +1470,109 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       }
     ];
 
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📰 Industry News',
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+      children: [
+        const Text(
+          '📰 Industry News',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Stay updated with snippets from Billboard, Pitchfork, and other media sources.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 20),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.35,
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Stay updated with snippets from Billboard, Pitchfork, and other media sources.',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.35,
+          itemCount: newsList.length,
+          itemBuilder: (context, index) {
+            final news = newsList[index];
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.03)),
               ),
-              itemCount: newsList.length,
-              itemBuilder: (context, index) {
-                final news = newsList[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF13131A),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.03)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        flex: 5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        image: DecorationImage(
+                          image: NetworkImage(news['image']!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
                         child: Container(
+                          margin: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                            image: DecorationImage(
-                              image: NetworkImage(news['image']!),
-                              fit: BoxFit.cover,
-                            ),
+                            color: const Color(0xFFD03BFF),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD03BFF),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                news['source']!,
-                                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                          child: Text(
+                            news['source']!,
+                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    news['title']!,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    news['desc']!,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.grey, fontSize: 11, height: 1.4),
-                                  ),
-                                ],
-                              ),
                               Text(
-                                news['time']!,
-                                style: const TextStyle(color: Colors.grey, fontSize: 9),
+                                news['title']!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                news['desc']!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.grey, fontSize: 11, height: 1.4),
                               ),
                             ],
                           ),
-                        ),
+                          Text(
+                            news['time']!,
+                            style: const TextStyle(color: Colors.grey, fontSize: 9),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
 
@@ -1594,175 +1600,176 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
     final chartsList = genreCharts[_selectedGenre] ?? genreCharts['Synthwave']!;
 
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '📈 Music Charts',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Weekly charts for $_selectedGenre • $_selectedCountry',
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  _buildFilterDropdown(
-                    value: _selectedGenre,
-                    items: ['Synthwave', 'Pop', 'Techno'],
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedGenre = val);
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  _buildFilterDropdown(
-                    value: _selectedCountry,
-                    items: ['Global', 'US', 'UK', 'Japan'],
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedCountry = val);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: chartsList.length,
-              itemBuilder: (context, index) {
-                final track = chartsList[index];
-                final rank = track['rank'] as int;
-                final change = track['change'] as String;
-                final bpm = track['bpm'] as int;
-                final key = track['key'] as String;
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '📈 Music Charts',
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Weekly charts for $_selectedGenre • $_selectedCountry',
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                _buildFilterDropdown(
+                  value: _selectedGenre,
+                  items: ['Synthwave', 'Pop', 'Techno'],
+                  onChanged: (val) {
+                    if (val != null) setState(() => _selectedGenre = val);
+                  },
+                ),
+                const SizedBox(width: 12),
+                _buildFilterDropdown(
+                  value: _selectedCountry,
+                  items: ['Global', 'US', 'UK', 'Japan'],
+                  onChanged: (val) {
+                    if (val != null) setState(() => _selectedCountry = val);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: chartsList.length,
+          itemBuilder: (context, index) {
+            final track = chartsList[index];
+            final rank = track['rank'] as int;
+            final change = track['change'] as String;
+            final bpm = track['bpm'] as int;
+            final key = track['key'] as String;
 
-                Color changeColor = Colors.grey;
-                IconData changeIcon = Icons.remove;
-                if (change == 'new') {
-                  changeColor = const Color(0xFFD03BFF);
-                  changeIcon = Icons.fiber_new;
-                } else if (change.startsWith('+')) {
-                  changeColor = const Color(0xFF00FFCC);
-                  changeIcon = Icons.arrow_drop_up;
-                } else if (change.startsWith('-')) {
-                  changeColor = Colors.redAccent;
-                  changeIcon = Icons.arrow_drop_down;
-                }
+            Color changeColor = Colors.grey;
+            IconData changeIcon = Icons.remove;
+            if (change == 'new') {
+              changeColor = const Color(0xFFD03BFF);
+              changeIcon = Icons.fiber_new;
+            } else if (change.startsWith('+')) {
+              changeColor = const Color(0xFF00FFCC);
+              changeIcon = Icons.arrow_drop_up;
+            } else if (change.startsWith('-')) {
+              changeColor = Colors.redAccent;
+              changeIcon = Icons.arrow_drop_down;
+            }
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF13131A),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.03)),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.03)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 30,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$rank',
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  child: Row(
+                  const SizedBox(width: 8),
+                  Row(
                     children: [
-                      Container(
-                        width: 30,
-                        alignment: Alignment.center,
-                        child: Text(
-                          '$rank',
-                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      Icon(changeIcon, color: changeColor, size: 16),
+                      if (change != '=' && change != 'new')
+                        Text(
+                          change.substring(1),
+                          style: TextStyle(color: changeColor, fontSize: 10, fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Row(
-                        children: [
-                          Icon(changeIcon, color: changeColor, size: 16),
-                          if (change != '=' && change != 'new')
-                            Text(
-                              change.substring(1),
-                              style: TextStyle(color: changeColor, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF00FFCC).withOpacity(0.4),
-                              const Color(0xFFD03BFF).withOpacity(0.4),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.music_note, color: Colors.white),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              track['title']!,
-                              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${track['artist']} • $bpm BPM • Key: $key',
-                              style: const TextStyle(color: Colors.grey, fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
-                          foregroundColor: const Color(0xFF00FFCC),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        ),
-                        onPressed: () {
-                          final List<String> chords;
-                          if (key.contains('Min') || key.contains('m')) {
-                            chords = ['Am', 'F', 'Dm', 'E'];
-                          } else {
-                            chords = ['C', 'G', 'Am', 'F'];
-                          }
-                          SynthEngine.playChord(chords[0]);
-                          SynthEngine.playDrum('kick');
-                          Future.delayed(const Duration(milliseconds: 300), () {
-                            SynthEngine.playDrum('hat');
-                          });
-                          Future.delayed(const Duration(milliseconds: 600), () {
-                            SynthEngine.playDrum('snare');
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Previewing vibe of "${track['title']}" in $key ($bpm BPM)'),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.audiotrack, size: 14),
-                        label: const Text('Vibe Check', style: TextStyle(fontSize: 11)),
-                      ),
                     ],
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                  const SizedBox(width: 16),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF00FFCC).withOpacity(0.4),
+                          const Color(0xFFD03BFF).withOpacity(0.4),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.music_note, color: Colors.white),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          track['title']!,
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${track['artist']} • $bpm BPM • Key: $key',
+                          style: const TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                      foregroundColor: const Color(0xFF00FFCC),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    onPressed: () {
+                      final List<String> chords;
+                      if (key.contains('Min') || key.contains('m')) {
+                        chords = ['Am', 'F', 'Dm', 'E'];
+                      } else {
+                        chords = ['C', 'G', 'Am', 'F'];
+                      }
+                      SynthEngine.playChord(chords[0]);
+                      SynthEngine.playDrum('kick');
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        SynthEngine.playDrum('hat');
+                      });
+                      Future.delayed(const Duration(milliseconds: 600), () {
+                        SynthEngine.playDrum('snare');
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Previewing vibe of "${track['title']}" in $key ($bpm BPM)'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.audiotrack, size: 14),
+                    label: const Text('Vibe Check', style: TextStyle(fontSize: 11)),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
     );
   }
+
+
 
   Widget _buildFilterDropdown({
     required String value,
@@ -1790,6 +1797,175 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           onChanged: onChanged,
         ),
       ),
+    );
+  }
+
+  // --- FOOTER SECTION ---
+  Widget _buildFooterSection() {
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFF040406),
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Column(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  bool isMobile = constraints.maxWidth < 800;
+                  return Column(
+                    children: [
+                      if (isMobile) ...[
+                        _buildFooterAbout(),
+                        const SizedBox(height: 40),
+                        _buildFooterLinks(),
+                      ] else ...[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 3, child: _buildFooterAbout()),
+                            const Spacer(),
+                            Expanded(flex: 6, child: _buildFooterLinks()),
+                          ],
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
+              const Divider(height: 60, color: Colors.white10),
+              // Bottom bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '© 2026 Studduo. All rights reserved.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                  ),
+                  DropdownButton<String>(
+                    dropdownColor: const Color(0xFF13131A),
+                    value: 'English',
+                    underline: const SizedBox(),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'English',
+                        child: Row(
+                          children: [
+                            Icon(Icons.language, size: 16, color: Colors.grey),
+                            SizedBox(width: 8),
+                            Text('English', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ],
+                    onChanged: (_) {},
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterAbout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFD03BFF), Color(0xFF00FFCC)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.waves,
+                color: Colors.black,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Studduo',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Outfit',
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Text(
+            'AI Powered Workstation for Music Artists',
+            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            _buildSocialIcon(Icons.camera_alt),
+            const SizedBox(width: 10),
+            _buildSocialIcon(Icons.chat_bubble_outline),
+            const SizedBox(width: 10),
+            _buildSocialIcon(Icons.play_circle_outline),
+            const SizedBox(width: 10),
+            _buildSocialIcon(Icons.hub_outlined),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialIcon(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(0.04),
+      ),
+      child: Icon(icon, color: Colors.white.withOpacity(0.6), size: 16),
+    );
+  }
+
+  Widget _buildFooterLinks() {
+    Widget buildCol(String title, List<String> links) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          const SizedBox(height: 16),
+          ...links.map((link) => Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  link,
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                ),
+              )),
+        ],
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildCol('Company', ['About Us', 'Contact Us', 'Operational Status']),
+        buildCol('Resources', ['Help Center', 'Pricing', 'Blog', 'Community', 'Download Android', 'Download iOS', 'Download Huawei']),
+        buildCol('Legal', ['Terms and Conditions', 'Privacy Policy', 'Cookie Policy']),
+      ],
     );
   }
 }
