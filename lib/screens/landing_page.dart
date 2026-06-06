@@ -602,10 +602,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final bool isSmall = constraints.maxWidth < 650;
+            final Widget headerText = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RichText(
@@ -650,8 +650,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   ],
                 ),
               ],
-            ),
-            OutlinedButton(
+            );
+
+            final Widget button = OutlinedButton(
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
                 side: BorderSide(color: Colors.white.withOpacity(0.15)),
@@ -662,8 +663,28 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               ),
               onPressed: () {},
               child: const Text('View all creators', style: TextStyle(fontSize: 12)),
-            ),
-          ],
+            );
+
+            if (isSmall) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  headerText,
+                  const SizedBox(height: 16),
+                  button,
+                ],
+              );
+            } else {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: headerText),
+                  const SizedBox(width: 16),
+                  button,
+                ],
+              );
+            }
+          },
         ),
         const SizedBox(height: 32),
 
