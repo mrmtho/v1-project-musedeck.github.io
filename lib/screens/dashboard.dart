@@ -2898,9 +2898,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           // 1. TOP NAVIGATION BAR (56px height)
           Container(
             height: 56,
-            color: colorPanel,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: const BoxDecoration(
+              color: colorPanel,
               border: Border(bottom: BorderSide(color: colorGrid, width: 1)),
             ),
             child: Row(
@@ -2995,9 +2995,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           // 2. TRANSPORT BAR (48px height)
           Container(
             height: 48,
-            color: colorSecondaryPanel,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: const BoxDecoration(
+              color: colorSecondaryPanel,
               border: Border(bottom: BorderSide(color: colorGrid, width: 1)),
             ),
             child: Row(
