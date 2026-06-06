@@ -209,7 +209,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               ),
               const SizedBox(width: 12),
               const Text(
-                'craftune',
+                'Studduo',
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Outfit',
@@ -272,7 +272,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 64,
+            fontSize: 120,
             height: 1.1,
             fontWeight: FontWeight.w900,
             fontFamily: 'Outfit',
@@ -284,11 +284,11 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         Container(
           constraints: const BoxConstraints(maxWidth: 750),
           child: Text(
-            'Create with nuanced melodies, rich textures, and the emotional resonance your music deserves.',
+            'Create nuanced melodies, rich textures, and the emotional resonance your music deserves.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
-              fontSize: 16,
+              fontSize: 30,
               height: 1.6,
             ),
           ),
@@ -308,24 +308,24 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               childAspectRatio: isMobile ? 1.4 : 0.85,
               children: [
                 _buildArtistCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4',
+                  imageUrl: 'https://images.unsplash.com/photo-1593697972672-b1c1902219e4',
                   title: 'Create',
                   description: 'Spark ideas in your space',
-                  subText: 'Coming up with the music in their bedroom',
+                  // subText: 'Coming up with the music in their bedroom',
                   icon: Icons.edit_note,
                 ),
                 _buildArtistCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b',
+                  imageUrl: 'https://plus.unsplash.com/premium_photo-1683115179716-8463fcfca85b',
                   title: 'Produce',
                   description: 'Shape your sound with depth',
-                  subText: 'Recording/producing music in studio',
+                  // subText: 'Recording/producing music in studio',
                   icon: Icons.graphic_eq,
                 ),
                 _buildArtistCard(
                   imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819',
                   title: 'Perform',
                   description: 'Share it. Feel it. Live it.',
-                  subText: 'Performing music on stage',
+                  // subText: 'Performing music on stage',
                   icon: Icons.mic_external_on,
                 ),
               ],
@@ -361,7 +361,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     required String imageUrl,
     required String title,
     required String description,
-    required String subText,
+    // String subText,
     required IconData icon,
   }) {
     return Container(
@@ -433,14 +433,14 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  subText,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
-                    fontSize: 11,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+                // Text(
+                //   subText,
+                //   style: TextStyle(
+                //     color: Colors.white.withOpacity(0.4),
+                //     fontSize: 11,
+                //     fontStyle: FontStyle.italic,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -503,7 +503,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
           'Go deep,\nnot just fast.',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 36,
+            fontSize: 45,
             height: 1.1,
             fontWeight: FontWeight.bold,
             fontFamily: 'Outfit',
@@ -1151,7 +1151,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '© 2026 Craftune. All rights reserved.',
+                    '© 2026 Studduo. All rights reserved.',
                     style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
                   ),
                   DropdownButton<String>(
@@ -1203,7 +1203,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
             ),
             const SizedBox(width: 12),
             const Text(
-              'craftune',
+              'Studduo',
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Outfit',
@@ -1217,7 +1217,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         Container(
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
-            'A home for music creators to imagine, create, collaborate and share with the world.',
+            'AI Powered Workstation for Music Artists',
             style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
           ),
         ),

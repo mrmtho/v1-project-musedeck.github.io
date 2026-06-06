@@ -89,10 +89,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     ),
                     const SizedBox(width: 12),
                     const Text(
-                      'MuseDeck',
+                      'Studduo',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
                       ),
@@ -118,7 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'AI Powered Music Organizer for Modern Artists',
+                  'AI Powered Workstation for Music Artists',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.5),
                     fontSize: 10.5,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/song_provider.dart';
 import 'screens/landing_page.dart';
-import 'screens/dashboard.dart';
 
 void main() {
   runApp(
