@@ -690,50 +690,83 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     // Exclude archived songs
     final songs = provider.songs.where((s) => !s.isArchived).toList();
 
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double width = constraints.maxWidth;
+        int columns = 3;
+        double aspectRatio = 1.05;
+
+        if (width < 650) {
+          columns = 1;
+          aspectRatio = 2.1; // Wide list aspect ratio for mobile
+        } else if (width < 1000) {
+          columns = 2;
+          aspectRatio = 1.15;
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '🎵 Song Library',
-                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '🎵 Song Library',
+                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00FFCC),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    onPressed: () {
+                      provider.createNewSong(title: 'New Workspace #${songs.length + 1}');
+                      setState(() => _activeView = 'workspace');
+                    },
+                    icon: const Icon(Icons.add, size: 16),
+                    label: const Text('New Song Workspace', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00FFCC),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildLibrarySection(provider, songs, SongGroupType.single, '💿 Singles', columns, aspectRatio),
+                    _buildLibrarySection(provider, songs, SongGroupType.ep, '📼 EPs', columns, aspectRatio),
+                    _buildLibrarySection(provider, songs, SongGroupType.album, '🎸 Albums', columns, aspectRatio),
+                    _buildLibrarySection(provider, songs, SongGroupType.liveSet, '🎤 Live Sets', columns, aspectRatio),
+                  ],
                 ),
-                onPressed: () {
-                  provider.createNewSong(title: 'New Workspace #${songs.length + 1}');
-                  setState(() => _activeView = 'workspace');
-                },
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('New Song Workspace', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              children: [
-                _buildLibrarySection(provider, songs, SongGroupType.single, '💿 Singles'),
-                _buildLibrarySection(provider, songs, SongGroupType.ep, '📼 EPs'),
-                _buildLibrarySection(provider, songs, SongGroupType.album, '🎸 Albums'),
-                _buildLibrarySection(provider, songs, SongGroupType.liveSet, '🎤 Live Sets'),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildLibrarySection(SongProvider provider, List<Song> allSongs, SongGroupType type, String sectionTitle) {
+  String _getSongThumbnail(Song song) {
+    for (final item in song.inspirationItems) {
+      if (item.type == 'image') {
+        return item.content;
+      }
+    }
+    final List<String> fallbackCovers = [
+      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819', // Concert lights
+      'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4', // Vintage mic
+      'https://images.unsplash.com/photo-1507838153414-b4b713384a76', // Turntable / headphones
+      'https://images.unsplash.com/photo-1518609878373-06d740f60d8b', // Recording room
+      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745', // DJ neon console
+    ];
+    final hash = song.id.hashCode.abs();
+    return fallbackCovers[hash % fallbackCovers.length];
+  }
+
+  Widget _buildLibrarySection(SongProvider provider, List<Song> allSongs, SongGroupType type, String sectionTitle, int columns, double aspectRatio) {
     final filtered = allSongs.where((s) => s.groupType == type).toList();
     if (filtered.isEmpty) return const SizedBox();
 
@@ -750,11 +783,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 1.9,
+            childAspectRatio: aspectRatio,
           ),
           itemCount: filtered.length,
           itemBuilder: (context, index) {
@@ -773,66 +806,77 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     provider.selectSong(song);
                     setState(() => _activeView = 'workspace');
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    song.title,
-                                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
-                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.archive_outlined, color: Colors.grey, size: 18),
-                              onPressed: () {
-                                provider.archiveSong(song.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Archived "${song.title}" to The Vault!')),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        // Custom visual progress bar representing Writing -> Mastered
-                        Column(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Progress status:', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                                Expanded(
+                                  child: Text(
+                                    song.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: const Icon(Icons.archive_outlined, color: Colors.grey, size: 16),
+                                  onPressed: () {
+                                    provider.archiveSong(song.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Archived "${song.title}" to The Vault!')),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 10),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Status:', style: TextStyle(color: Colors.grey, fontSize: 9)),
                                 Text(
                                   songStatusToString(song.status),
                                   style: TextStyle(
                                     color: _getStatusColor(song.status),
-                                    fontSize: 11,
+                                    fontSize: 9.5,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             _buildProgressNodes(song.status),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                          child: Image.network(
+                            _getSongThumbnail(song),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: const Color(0xFF252535),
+                              child: const Icon(Icons.broken_image, color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
