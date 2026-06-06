@@ -697,8 +697,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         double aspectRatio = 1.05;
 
         if (width < 650) {
-          columns = 1;
-          aspectRatio = 2.1; // Wide list aspect ratio for mobile
+          columns = 2;
+          aspectRatio = 0.85; // Consistently keep grid view even on mobile
         } else if (width < 1000) {
           columns = 2;
           aspectRatio = 1.15;
@@ -1128,21 +1128,38 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           border: Border.all(color: Colors.white.withOpacity(0.03)),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  song.title,
-                                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                _getSongThumbnail(song),
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  width: 44,
+                                  height: 44,
+                                  color: const Color(0xFF252535),
+                                  child: const Icon(Icons.broken_image, color: Colors.grey, size: 16),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Archived: $lastModStr • ${song.bpm} BPM',
-                                  style: const TextStyle(color: Colors.grey, fontSize: 11),
-                                ),
-                              ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    song.title,
+                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Archived: $lastModStr • ${song.bpm} BPM',
+                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                  ),
+                                ],
+                              ),
                             ),
                             Row(
                               children: [
