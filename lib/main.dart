@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/song_provider.dart';
+import 'screens/landing_page.dart';
 import 'screens/dashboard.dart';
 
 void main() {
@@ -53,7 +54,7 @@ class MuseDeckApp extends StatelessWidget {
           overlayColor: Color(0x2900FFCC),
         ),
       ),
-      home: const DashboardScreen(),
+      home: const LandingPageScreen(),
     );
   }
 }
