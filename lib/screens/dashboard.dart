@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -37,10 +38,54 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   bool _moreExpanded = false;
   bool _userExpanded = false;
 
+  // DAW State Variables
+  String _dawViewMode = 'mixer'; // 'track' or 'mixer'
+  bool _dawPlaying = false;
+  bool _dawLooping = false;
+  bool _dawRecording = false;
+  int _dawBars = 1;
+  int _dawBeats = 1;
+  int _dawTicks = 0;
+  
+  final List<Map<String, dynamic>> _dawTracks = [
+    {'name': 'Vocal Mic In', 'type': 'Audio', 'color': const Color(0xFF4D8DFF), 'icon': Icons.mic},
+    {'name': 'Chords Synth', 'type': 'Instrument', 'color': const Color(0xFFD03BFF), 'icon': Icons.keyboard},
+    {'name': 'Backing Drums', 'type': 'Audio', 'color': const Color(0xFF00FFCC), 'icon': Icons.audiotrack},
+    {'name': 'Synth Bass', 'type': 'MIDI', 'color': const Color(0xFFFFD700), 'icon': Icons.music_note},
+  ];
+
+  late List<double> _dawVolumes;
+  late List<double> _dawPans;
+  late List<bool> _dawMutes;
+  late List<bool> _dawSolos;
+  late List<bool> _dawRecordArms;
+  late List<bool> _dawMonitors;
+  late List<Map<String, bool>> _dawEffectsBypasses;
+  
+  double _masterVolume = 0.8;
+  double _bottomPanelHeight = 240.0;
+  bool _bottomPanelCollapsed = false;
+  String _bottomPanelTab = 'piano_roll'; // 'piano_roll', 'plugin_editor', 'automation', 'ai_assistant'
+  int _selectedTrackIndex = 0;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    
+    // Initialize DAW track parameters
+    _dawVolumes = List.filled(_dawTracks.length, 0.7);
+    _dawPans = List.filled(_dawTracks.length, 0.0); // -1.0 to 1.0 (L to R)
+    _dawMutes = List.filled(_dawTracks.length, false);
+    _dawSolos = List.filled(_dawTracks.length, false);
+    _dawRecordArms = List.filled(_dawTracks.length, false);
+    _dawMonitors = List.filled(_dawTracks.length, false);
+    _dawEffectsBypasses = List.generate(_dawTracks.length, (_) => {
+      'EQ': false,
+      'Comp': false,
+      'Reverb': true,
+      'Delay': true,
+    });
   }
 
   @override
@@ -2828,154 +2873,1618 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  // --- EMPTY MIXER CONSOLE VIEW ---
+  // --- CLOUD-NATIVE AI DAW WORKSPACE ---
   Widget _buildEmptyMixerView() {
-    return ListView(
-      padding: const EdgeInsets.all(24.0),
-      children: [
-        const Text(
-          '🎚️ Mixer Console',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Multi-track Professional Studio Board.',
-          style: TextStyle(color: Colors.grey, fontSize: 13),
-        ),
-        const SizedBox(height: 32),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            // Background mock channel strips (faded out)
-            Opacity(
-              opacity: 0.08,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(
-                  MediaQuery.of(context).size.width < 700 ? 3 : 6,
-                  (index) => Container(
-                    width: 70,
-                    height: 350,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF13131A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white24),
+    final activeSong = Provider.of<SongProvider>(context).activeSong;
+    final songTitle = activeSong?.title ?? 'Summer Lights';
+    final songBpm = activeSong?.bpm ?? 128;
+    final songKey = activeSong?.keySignature ?? 'G Min';
+    final songTime = activeSong?.timeSignature ?? '4/4';
+
+    // DAW visual theme colors
+    const Color colorBg = Color(0xFF111318);
+    const Color colorPanel = Color(0xFF1A1E25);
+    const Color colorSecondaryPanel = Color(0xFF222833);
+    const Color colorGrid = Color(0xFF2F3542);
+    const Color colorAccent = Color(0xFF4D8DFF);
+    const Color colorRecord = Color(0xFFFF4D5A);
+    const Color colorWaveform = Color(0xFF62B6FF);
+
+    return Container(
+      color: colorBg,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. TOP NAVIGATION BAR (56px height)
+          Container(
+            height: 56,
+            color: colorPanel,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: colorGrid, width: 1)),
+            ),
+            child: Row(
+              children: [
+                // Project Details
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      songTitle,
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                     ),
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    const SizedBox(height: 2),
+                    Row(
                       children: [
-                        const Text('CH 01', style: TextStyle(color: Colors.white, fontSize: 9)),
+                        Text('Norway Mix', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
+                        const SizedBox(width: 8),
                         Container(
-                          width: 24,
-                          height: 24,
-                          decoration: const BoxDecoration(color: Colors.white10, shape: BoxShape.circle),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: colorAccent.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: colorAccent.withOpacity(0.3), width: 0.5),
+                          ),
+                          child: const Text('v0.01', style: TextStyle(color: colorAccent, fontSize: 8, fontWeight: FontWeight.bold)),
                         ),
-                        Expanded(
-                          child: Center(
+                        const SizedBox(width: 8),
+                        Icon(Icons.cloud_done_outlined, color: Colors.greenAccent.withOpacity(0.5), size: 12),
+                      ],
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                // Musical Metadata Display
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colorSecondaryPanel,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: colorGrid, width: 0.8),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildMetadataUnit('BPM', '$songBpm'),
+                      _buildMetadataSeparator(),
+                      _buildMetadataUnit('KEY', songKey),
+                      _buildMetadataSeparator(),
+                      _buildMetadataUnit('SIGN', songTime),
+                      _buildMetadataSeparator(),
+                      _buildMetadataUnit('MODE', 'TEMPO'),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                // Project Actions & User
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.undo, color: Colors.white.withOpacity(0.7), size: 18),
+                      onPressed: () {},
+                      tooltip: 'Undo',
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.redo, color: Colors.white.withOpacity(0.7), size: 18),
+                      onPressed: () {},
+                      tooltip: 'Redo',
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorAccent,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Saving project automatically to cloud sync...')),
+                        );
+                      },
+                      icon: const Icon(Icons.cloud_upload_outlined, size: 14),
+                      label: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // 2. TRANSPORT BAR (48px height)
+          Container(
+            height: 48,
+            color: colorSecondaryPanel,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: colorGrid, width: 1)),
+            ),
+            child: Row(
+              children: [
+                // Transport Buttons
+                Row(
+                  children: [
+                    _buildTransportButton(
+                      icon: Icons.skip_previous,
+                      onPressed: () => setState(() {
+                        _dawBars = 1;
+                        _dawBeats = 1;
+                        _dawTicks = 0;
+                      }),
+                      tooltip: 'Return to Start',
+                    ),
+                    _buildTransportButton(
+                      icon: Icons.stop,
+                      isSelected: !_dawPlaying && !_dawRecording,
+                      onPressed: () => setState(() {
+                        _dawPlaying = false;
+                        _dawRecording = false;
+                      }),
+                      tooltip: 'Stop',
+                    ),
+                    _buildTransportButton(
+                      icon: _dawPlaying ? Icons.pause : Icons.play_arrow,
+                      isSelected: _dawPlaying,
+                      color: const Color(0xFF3DDC84),
+                      onPressed: () => setState(() {
+                        _dawPlaying = !_dawPlaying;
+                        if (_dawPlaying) _dawRecording = false;
+                      }),
+                      tooltip: 'Play/Pause',
+                    ),
+                    _buildTransportButton(
+                      icon: Icons.fiber_manual_record,
+                      isSelected: _dawRecording,
+                      color: colorRecord,
+                      onPressed: () => setState(() {
+                        _dawRecording = !_dawRecording;
+                        if (_dawRecording) _dawPlaying = true;
+                      }),
+                      tooltip: 'Record',
+                    ),
+                    _buildTransportButton(
+                      icon: Icons.loop,
+                      isSelected: _dawLooping,
+                      onPressed: () => setState(() => _dawLooping = !_dawLooping),
+                      tooltip: 'Loop Region',
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 20),
+                // Position Counter
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: colorGrid, width: 1),
+                  ),
+                  child: Text(
+                    '${_dawBars.toString().padLeft(3, '0')} . ${_dawBeats.toString().padLeft(2, '0')} . ${_dawTicks.toString().padLeft(3, '0')}',
+                    style: const TextStyle(
+                      color: Color(0xFF3DDC84),
+                      fontFamily: 'Courier',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                // Performance indicators
+                Row(
+                  children: [
+                    _buildPerformanceMetric('CPU', '14%'),
+                    _buildPerformanceMetric('BUFFER', '256 smpl'),
+                    _buildPerformanceMetric('LATENCY', '12 ms'),
+                    _buildPerformanceMetric('AUDIO', '48 kHz'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // 3. WORKSPACE BODY (ARRANGEMENT OR MIXER)
+          Expanded(
+            child: Column(
+              children: [
+                // Mode Switcher Header
+                Container(
+                  color: colorBg,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      // View switcher Segmented Control
+                      Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: colorPanel,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: colorGrid, width: 0.8),
+                        ),
+                        child: Row(
+                          children: [
+                            _buildSwitcherSegment('track', 'Arrangement Timeline', Icons.linear_scale),
+                            _buildSwitcherSegment('mixer', 'Mixer Console', Icons.tune),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      // Metronome & Settings
+                      IconButton(
+                        icon: Icon(Icons.notifications_active_outlined, color: Colors.white.withOpacity(0.5), size: 16),
+                        onPressed: () {},
+                        tooltip: 'Metronome sound',
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white.withOpacity(0.5), size: 16),
+                        onPressed: () {},
+                        tooltip: 'Settings',
+                      ),
+                    ],
+                  ),
+                ),
+                // Main Workspace Switcher
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _dawViewMode == 'track'
+                        ? _buildDawArrangementTimeline()
+                        : _buildDawMixerConsole(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 4. BOTTOM PANEL EDITOR
+          Container(
+            height: _bottomPanelCollapsed ? 32 : _bottomPanelHeight,
+            decoration: const BoxDecoration(
+              color: colorPanel,
+              border: Border(top: BorderSide(color: colorGrid, width: 1.5)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Bottom panel tab headers & collapse trigger
+                Container(
+                  height: 32,
+                  color: colorSecondaryPanel,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _bottomPanelCollapsed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          size: 14,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () => setState(() => _bottomPanelCollapsed = !_bottomPanelCollapsed),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildBottomPanelTab('piano_roll', '🎹 Piano Roll'),
+                      _buildBottomPanelTab('plugin_editor', '🔌 FX Plugin Editor'),
+                      _buildBottomPanelTab('automation', '📈 Automation Curves'),
+                      _buildBottomPanelTab('ai_assistant', '✨ AI Co-Pilot'),
+                      const Spacer(),
+                      if (!_bottomPanelCollapsed)
+                        GestureDetector(
+                          onPanUpdate: (details) {
+                            setState(() {
+                              _bottomPanelHeight = (details.globalPosition.dy - 500).clamp(160, 450);
+                            });
+                          },
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.resizeUpDown,
                             child: Container(
-                              width: 2,
-                              height: 180,
-                              color: Colors.white12,
-                              child: Stack(
-                                alignment: Alignment.topCenter,
+                              width: 50,
+                              color: colorGrid.withOpacity(0.5),
+                              child: const Icon(Icons.drag_handle, size: 12, color: Colors.white30),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                // Expanded tab contents
+                if (!_bottomPanelCollapsed)
+                  Expanded(
+                    child: Container(
+                      color: colorBg,
+                      child: _buildBottomPanelContent(),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- TOP BAR SUB WIDGETS ---
+  Widget _buildMetadataUnit(String label, String value) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 8, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          value,
+          style: const TextStyle(color: Color(0xFF4D8DFF), fontSize: 11, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetadataSeparator() {
+    return Container(
+      width: 1,
+      height: 18,
+      color: const Color(0xFF2F3542),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+    );
+  }
+
+  // --- TRANSPORT BAR SUB WIDGETS ---
+  Widget _buildTransportButton({
+    required IconData icon,
+    bool isSelected = false,
+    Color? color,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    final activeColor = color ?? const Color(0xFF4D8DFF);
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        child: Material(
+          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: onPressed,
+            child: Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Icon(
+                icon,
+                color: isSelected ? activeColor : Colors.white.withOpacity(0.6),
+                size: 18,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPerformanceMetric(String label, String val) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: Row(
+        children: [
+          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 9, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 4),
+          Text(val, style: const TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  // --- WORKSPACE VIEW SWITCHER ---
+  Widget _buildSwitcherSegment(String mode, String label, IconData icon) {
+    final bool isSelected = _dawViewMode == mode;
+    return Material(
+      color: isSelected ? const Color(0xFF222833) : Colors.transparent,
+      borderRadius: BorderRadius.circular(6),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => setState(() => _dawViewMode = mode),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              Icon(icon, color: isSelected ? const Color(0xFF4D8DFF) : Colors.grey[400], size: 14),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey[400],
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- TRACK ARRANGEMENT VIEW ---
+  Widget _buildDawArrangementTimeline() {
+    const Color colorGrid = Color(0xFF2F3542);
+    const Color colorArrangementBg = Color(0xFF13151A);
+
+    return Row(
+      children: [
+        // A. Left side track list header
+        SizedBox(
+          width: 220,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header spacer matching ruler
+              Container(
+                height: 28,
+                color: const Color(0xFF1A1E25),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: colorGrid), right: BorderSide(color: colorGrid)),
+                ),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: const Text('Track List', style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+              ),
+              // Track headers
+              Expanded(
+                child: Container(
+                  color: const Color(0xFF1A1E25),
+                  child: ListView.builder(
+                    itemCount: _dawTracks.length,
+                    itemBuilder: (context, index) {
+                      final track = _dawTracks[index];
+                      final isSelected = _selectedTrackIndex == index;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedTrackIndex = index),
+                        child: Container(
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF222833) : Colors.transparent,
+                            border: const Border(
+                              bottom: BorderSide(color: colorGrid, width: 0.8),
+                              right: BorderSide(color: colorGrid, width: 1.5),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
                                 children: [
-                                  Positioned(
-                                    top: 80,
+                                  // Track colored accent block
+                                  Container(
+                                    width: 4,
+                                    height: 16,
+                                    decoration: BoxDecoration(
+                                      color: track['color'] as Color,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(track['icon'] as IconData, size: 14, color: Colors.white.withOpacity(0.6)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      track['name'] as String,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      _buildTrackControlToggle('M', _dawMutes[index], () {
+                                        setState(() => _dawMutes[index] = !_dawMutes[index]);
+                                      }),
+                                      _buildTrackControlToggle('S', _dawSolos[index], () {
+                                        setState(() => _dawSolos[index] = !_dawSolos[index]);
+                                      }),
+                                      _buildTrackControlToggle('R', _dawRecordArms[index], () {
+                                        setState(() => _dawRecordArms[index] = !_dawRecordArms[index]);
+                                      }, color: const Color(0xFFFF4D5A)),
+                                      _buildTrackControlToggle('I', _dawMonitors[index], () {
+                                        setState(() => _dawMonitors[index] = !_dawMonitors[index]);
+                                      }, color: const Color(0xFF4D8DFF)),
+                                    ],
+                                  ),
+                                  // Tiny meter indicator
+                                  Container(
+                                    width: 50,
+                                    height: 6,
+                                    decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(3)),
+                                    alignment: Alignment.centerLeft,
                                     child: Container(
-                                      width: 12,
-                                      height: 20,
+                                      width: _dawMutes[index] ? 0 : 35,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius: BorderRadius.circular(4),
+                                        color: const Color(0xFF3DDC84),
+                                        borderRadius: BorderRadius.circular(3),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text('M', style: TextStyle(color: Colors.grey, fontSize: 9)),
-                            Text('S', style: TextStyle(color: Colors.grey, fontSize: 9)),
-                          ],
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ),
-            ),
-            // Foreground overlay card
-            Container(
-              padding: const EdgeInsets.all(32),
-              constraints: const BoxConstraints(maxWidth: 500),
-              decoration: BoxDecoration(
-                color: const Color(0xFF13131A).withOpacity(0.85),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.04)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 30,
-                    spreadRadius: 10,
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+            ],
+          ),
+        ),
+        // B. Right side arrangement grid
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, gridConstraints) {
+              return Stack(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00FFCC).withOpacity(0.05),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF00FFCC).withOpacity(0.2)),
-                    ),
-                    child: const Icon(
-                      Icons.settings_input_component,
-                      color: Color(0xFF00FFCC),
-                      size: 36,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Console Offline',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'There is no active multi-track workspace routed to the mixer board right now. Open a song folder from your library to load stems, tracks, and automation controls.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
-                  ),
-                  const SizedBox(height: 28),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00FFCC),
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _activeView = 'library';
-                      });
-                    },
-                    icon: const Icon(Icons.library_music_outlined, size: 16),
-                    label: const Text('Open Song Library', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Ruler header
+                      Container(
+                        height: 28,
+                        color: const Color(0xFF1A1E25),
+                        child: CustomPaint(
+                          painter: TimelineRulerPainter(colorGrid),
+                        ),
+                      ),
+                      // Grid items
+                      Expanded(
+                        child: Container(
+                          color: colorArrangementBg,
+                          child: Stack(
+                            children: [
+                              // Horizontal grid backgrounds
+                              ListView.builder(
+                                itemCount: _dawTracks.length,
+                                itemBuilder: (context, index) {
+                                  final track = _dawTracks[index];
+                                  return Container(
+                                    height: 72,
+                                    decoration: const BoxDecoration(
+                                      border: Border(bottom: BorderSide(color: colorGrid, width: 0.6)),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Stack(
+                                      children: [
+                                        // Grid Background divisions lines
+                                        Positioned.fill(child: CustomPaint(painter: GridVerticalLinePainter(colorGrid))),
+                                        // Mock Clips
+                                        if (index == 0)
+                                          _buildArrangementClip(
+                                            startBar: 2,
+                                            endBar: 14,
+                                            color: track['color'] as Color,
+                                            isAudio: true,
+                                            label: 'Lead Vocals Norway.wav',
+                                          ),
+                                        if (index == 1)
+                                          _buildArrangementClip(
+                                            startBar: 1,
+                                            endBar: 16,
+                                            color: track['color'] as Color,
+                                            isAudio: false,
+                                            label: 'Synthesizer Chord Pattern',
+                                          ),
+                                        if (index == 2)
+                                          _buildArrangementClip(
+                                            startBar: 4,
+                                            endBar: 15,
+                                            color: track['color'] as Color,
+                                            isAudio: true,
+                                            label: 'BPM Backing Groove_Full.wav',
+                                          ),
+                                        if (index == 3)
+                                          _buildArrangementClip(
+                                            startBar: 5,
+                                            endBar: 13,
+                                            color: track['color'] as Color,
+                                            isAudio: false,
+                                            label: 'Bass Synth Line MIDI',
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Vertical playhead line
+                              Positioned(
+                                top: 0,
+                                bottom: 0,
+                                left: 160, // Mock current playhead position
+                                child: Container(
+                                  width: 2,
+                                  color: Colors.redAccent,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Positioned(
+                                        top: 0,
+                                        left: -4,
+                                        child: Icon(Icons.arrow_drop_down, color: Colors.redAccent, size: 10),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTrackControlToggle(String label, bool value, VoidCallback onTap, {Color? color}) {
+    final activeColor = color ?? const Color(0xFFE2E212);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 18,
+        height: 18,
+        margin: const EdgeInsets.only(right: 4),
+        decoration: BoxDecoration(
+          color: value ? activeColor : Colors.black45,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.white12),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: value ? Colors.black : Colors.grey[400],
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArrangementClip({
+    required int startBar,
+    required int endBar,
+    required Color color,
+    required bool isAudio,
+    required String label,
+  }) {
+    double unitWidth = 45.0; // horizontal grid scale size per bar
+    double leftOffset = startBar * unitWidth;
+    double clipWidth = (endBar - startBar) * unitWidth;
+
+    return Positioned(
+      left: leftOffset,
+      width: clipWidth,
+      top: 2,
+      bottom: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.25),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color, width: 1.5),
+        ),
+        child: Stack(
+          children: [
+            // Waveform mock visualizer
+            if (isAudio)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.45,
+                  child: CustomPaint(
+                    painter: AudioClipWavePainter(color),
+                  ),
+                ),
+              ),
+            // MIDI mock note strips
+            if (!isAudio)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.35,
+                  child: CustomPaint(
+                    painter: MidiClipNotesPainter(color),
+                  ),
+                ),
+              ),
+            // Clip title label
+            Positioned(
+              top: 4,
+              left: 8,
+              child: Text(
+                label,
+                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 40),
-        _buildFooterSection(),
+      ),
+    );
+  }
+
+  // --- MIXER CONSOLE VIEW ---
+  Widget _buildDawMixerConsole() {
+    const Color colorGrid = Color(0xFF2F3542);
+    return Row(
+      children: [
+        // Side-by-side horizontal channel strips
+        Expanded(
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _dawTracks.length,
+            itemBuilder: (context, index) {
+              final track = _dawTracks[index];
+              return Container(
+                width: 110,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1A1E25),
+                  border: Border(right: BorderSide(color: colorGrid, width: 1)),
+                ),
+                child: Column(
+                  children: [
+                    // Top Color bar
+                    Container(height: 4, color: track['color'] as Color),
+                    const SizedBox(height: 8),
+                    // Track Title & Icon
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(track['icon'] as IconData, size: 12, color: Colors.white70),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              track['name'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Input select box
+                    Container(
+                      height: 18,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(4)),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        track['type'] == 'Audio' ? 'Mic In 1' : 'Inst Synth 1',
+                        style: const TextStyle(color: Colors.grey, fontSize: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Inserts FX rack
+                    const Text('INSERTS', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    _buildEffectsInsertSlot(index, 'EQ'),
+                    _buildEffectsInsertSlot(index, 'Comp'),
+                    _buildEffectsInsertSlot(index, 'Reverb'),
+                    _buildEffectsInsertSlot(index, 'Delay'),
+                    const SizedBox(height: 12),
+                    // Sends Section
+                    const Text('SENDS', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildSendDial('A', 0.25),
+                        _buildSendDial('B', 0.60),
+                        _buildSendDial('C', 0.10),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Pan Control
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('C', style: TextStyle(color: Colors.grey, fontSize: 8)),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white24, width: 1.5),
+                          ),
+                          child: Transform.rotate(
+                            angle: _dawPans[index] * 1.5,
+                            child: const Center(
+                              child: Divider(color: Color(0xFF4D8DFF), endIndent: 10, thickness: 2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Volume Fader & Metering Row
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Vertical volume fader
+                          RotatedBox(
+                            quarterTurns: 3,
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                trackHeight: 3,
+                                activeTrackColor: const Color(0xFF4D8DFF),
+                                inactiveTrackColor: Colors.black26,
+                                thumbColor: Colors.grey[350],
+                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                              ),
+                              child: Slider(
+                                value: _dawVolumes[index],
+                                onChanged: (val) => setState(() => _dawVolumes[index] = val),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          // Track Meter indicator
+                          Container(
+                            width: 6,
+                            height: 120,
+                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(3)),
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              height: _dawMutes[index] ? 0 : (_dawVolumes[index] * 110),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Colors.green, Colors.yellow, Colors.red],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                ),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Fader db text
+                    Text(
+                      _dawMutes[index] ? '-inf dB' : '${((_dawVolumes[index] - 0.7) * 20).toStringAsFixed(1)} dB',
+                      style: const TextStyle(color: Colors.grey, fontSize: 8),
+                    ),
+                    const SizedBox(height: 12),
+                    // Controls (Mute / Solo / Record Arm)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTrackControlToggle('M', _dawMutes[index], () {
+                          setState(() => _dawMutes[index] = !_dawMutes[index]);
+                        }),
+                        _buildTrackControlToggle('S', _dawSolos[index], () {
+                          setState(() => _dawSolos[index] = !_dawSolos[index]);
+                        }),
+                        _buildTrackControlToggle('R', _dawRecordArms[index], () {
+                          setState(() => _dawRecordArms[index] = !_dawRecordArms[index]);
+                        }, color: const Color(0xFFFF4D5A)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        // Master Output Channel strip (Pinned far right)
+        Container(
+          width: 120,
+          color: const Color(0xFF111318),
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: colorGrid, width: 2)),
+          ),
+          child: Column(
+            children: [
+              Container(height: 4, color: const Color(0xFFFF4D5A)),
+              const SizedBox(height: 8),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.waves, size: 12, color: Color(0xFFFF4D5A)),
+                  SizedBox(width: 4),
+                  Text('MASTER OUT', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Pinned input mode
+              Container(
+                height: 18,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(4)),
+                alignment: Alignment.center,
+                child: const Text('Stereo Master', style: TextStyle(color: Colors.grey, fontSize: 8)),
+              ),
+              const SizedBox(height: 12),
+              // Master FX inserts
+              const Text('MASTER FX', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              _buildMasterFxSlot('Bus Compressor', true),
+              _buildMasterFxSlot('EQ Master', true),
+              _buildMasterFxSlot('Tape Saturation', false),
+              _buildMasterFxSlot('Limiter Max', true),
+              const SizedBox(height: 20),
+              // Stereo Outputs meter & master fader
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Fader slider
+                    RotatedBox(
+                      quarterTurns: 3,
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 4,
+                          activeTrackColor: const Color(0xFFFF4D5A),
+                          inactiveTrackColor: Colors.black26,
+                          thumbColor: Colors.grey[300],
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                        ),
+                        child: Slider(
+                          value: _masterVolume,
+                          onChanged: (val) => setState(() => _masterVolume = val),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Large Stereo Level Indicator
+                    Row(
+                      children: [
+                        _buildMasterOutputMeterLevel(_masterVolume),
+                        const SizedBox(width: 2),
+                        _buildMasterOutputMeterLevel(_masterVolume),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${((_masterVolume - 0.8) * 20).toStringAsFixed(1)} dB',
+                style: const TextStyle(color: Colors.grey, fontSize: 8, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              // Master solo & mute safe toggles
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTrackControlToggle('C', false, () {}, color: Colors.blueAccent),
+                  _buildTrackControlToggle('L', true, () {}, color: Colors.amber),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
       ],
     );
   }
+
+  Widget _buildEffectsInsertSlot(int trackIdx, String fxName) {
+    final bool bypass = _dawEffectsBypasses[trackIdx][fxName] ?? true;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _dawEffectsBypasses[trackIdx][fxName] = !bypass;
+        });
+      },
+      child: Container(
+        height: 18,
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        decoration: BoxDecoration(
+          color: bypass ? Colors.black38 : const Color(0xFF2E3E2F),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: bypass ? Colors.white10 : const Color(0xFF3DDC84).withOpacity(0.3)),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          fxName,
+          style: TextStyle(
+            color: bypass ? Colors.white.withOpacity(0.35) : const Color(0xFF3DDC84),
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMasterFxSlot(String name, bool active) {
+    return Container(
+      height: 18,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      decoration: BoxDecoration(
+        color: active ? const Color(0xFF382329) : Colors.black38,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: active ? const Color(0xFFFF4D5A).withOpacity(0.3) : Colors.white10),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        name,
+        style: TextStyle(
+          color: active ? const Color(0xFFFF4D5A) : Colors.white24,
+          fontSize: 8,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSendDial(String label, double value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white24, fontSize: 8)),
+        const SizedBox(height: 2),
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white24, width: 1),
+          ),
+          child: Transform.rotate(
+            angle: value * 3.14,
+            child: const Center(
+              child: Divider(color: Colors.white30, endIndent: 8, thickness: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMasterOutputMeterLevel(double volume) {
+    return Container(
+      width: 6,
+      height: 140,
+      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(2)),
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: _dawPlaying ? (volume * 135) : 0,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.green, Colors.yellow, Colors.red],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+
+  // --- BOTTOM PANEL TAB SWITCHER ---
+  Widget _buildBottomPanelTab(String tab, String label) {
+    final bool isSelected = _bottomPanelTab == tab;
+    return GestureDetector(
+      onTap: () => setState(() {
+        _bottomPanelTab = tab;
+        _bottomPanelCollapsed = false;
+      }),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF111318) : Colors.transparent,
+          border: Border(right: const BorderSide(color: Color(0xFF2F3542))),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF4D8DFF) : Colors.grey[400],
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- TAB CONTENT BUILDERS ---
+  Widget _buildBottomPanelContent() {
+    if (_bottomPanelTab == 'piano_roll') {
+      return _buildPianoRollEditor();
+    } else if (_bottomPanelTab == 'plugin_editor') {
+      return _buildPluginEditorView();
+    } else if (_bottomPanelTab == 'automation') {
+      return _buildAutomationEditorView();
+    } else {
+      return _buildAiAssistantPanelView();
+    }
+  }
+
+  Widget _buildPianoRollEditor() {
+    const Color colorGrid = Color(0xFF2F3542);
+    // Render basic DAW Piano roll keyboard keys and midi note grid blocks
+    return Row(
+      children: [
+        // Keyboard Keys
+        Container(
+          width: 50,
+          color: const Color(0xFF1E1E25),
+          child: ListView.builder(
+            itemCount: 16,
+            reverse: true,
+            itemBuilder: (context, index) {
+              final isBlackKey = [1, 3, 6, 8, 10, 13, 15].contains(index % 12);
+              return Container(
+                height: 20,
+                decoration: BoxDecoration(
+                  color: isBlackKey ? Colors.black87 : Colors.white,
+                  border: const Border(bottom: BorderSide(color: Colors.black26)),
+                ),
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 4),
+                child: Text(
+                  isBlackKey ? '' : 'C${(index / 12).floor() + 3}',
+                  style: const TextStyle(color: Colors.black54, fontSize: 8, fontWeight: FontWeight.bold),
+                ),
+              );
+            },
+          ),
+        ),
+        // Midi grid
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: 900,
+              child: ListView.builder(
+                itemCount: 16,
+                reverse: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, keyIdx) {
+                  return Container(
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      border: Border(bottom: BorderSide(color: colorGrid, width: 0.5)),
+                    ),
+                    child: Stack(
+                      children: [
+                        // Grid lines vertical
+                        Positioned.fill(child: CustomPaint(painter: GridVerticalLinePainter(colorGrid))),
+                        // Mock MIDI notes
+                        if (keyIdx == 4) _buildMidiNoteBox(2, 6, const Color(0xFFD03BFF)),
+                        if (keyIdx == 7) _buildMidiNoteBox(4, 9, const Color(0xFFD03BFF)),
+                        if (keyIdx == 11) _buildMidiNoteBox(8, 12, const Color(0xFF00FFCC)),
+                        if (keyIdx == 2) _buildMidiNoteBox(11, 15, const Color(0xFF00FFCC)),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMidiNoteBox(int startCol, int endCol, Color color) {
+    double barSize = 45.0; // matching ruler subdivisions
+    return Positioned(
+      left: startCol * barSize,
+      width: (endCol - startCol) * barSize,
+      top: 2,
+      bottom: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPluginEditorView() {
+    // Render a high-fidelity visual parametric EQ graph interface
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          // EQ Parametric Graph Canvas
+          Expanded(
+            flex: 6,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF2F3542)),
+              ),
+              child: CustomPaint(
+                painter: ParametricEqPainter(),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Control parameters dials
+          Expanded(
+            flex: 4,
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 2.2,
+              children: [
+                _buildPluginParamDial('LOW CUT', '24 Hz', 0.1),
+                _buildPluginParamDial('MID GAIN', '+1.2 dB', 0.55),
+                _buildPluginParamDial('HIGH SHLF', '8.4 kHz', 0.75),
+                _buildPluginParamDial('Q FACTOR', '0.70', 0.35),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPluginParamDial(String title, String val, double pct) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E25),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF2F3542)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFF4D8DFF), width: 2)),
+            transform: Matrix4.rotationZ(pct * 3.14),
+            child: const Center(child: VerticalDivider(color: Colors.white70, thickness: 2)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(title, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 8, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(val, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAutomationEditorView() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('Automation lane:', style: TextStyle(color: Colors.white60, fontSize: 11)),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(6)),
+                child: const Text('Track 1 - Volume Fader', style: TextStyle(color: Color(0xFF4D8DFF), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF2F3542)),
+              ),
+              child: CustomPaint(
+                painter: AutomationCurvePainter(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAiAssistantPanelView() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('✨ AI Co-Pilot Assistant Tools', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text('Cloud-Native intelligent workflows inside Studduo.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: MediaQuery.of(context).size.width < 900 ? 2 : 4,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 2.8,
+              children: [
+                _buildAiWorkflowCard(Icons.auto_awesome, 'Generate Chords', 'Builds premium harmonic progressions'),
+                _buildAiWorkflowCard(Icons.graphic_eq, 'Mix Assistant', 'Balances relative track volumes & pans'),
+                _buildAiWorkflowCard(Icons.analytics_outlined, 'Stem Separator', 'Extracts vocals & backing stems'),
+                _buildAiWorkflowCard(Icons.star_border, 'Mastering Guide', 'Applies dynamic curves & EQ limits'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAiWorkflowCard(IconData icon, String title, String desc) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E25),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF4D8DFF).withOpacity(0.2)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Starting AI processor workflow for: "$title"...')),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: [
+                Icon(icon, color: const Color(0xFF4D8DFF), size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 2),
+                      Text(desc, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- CUSTOM PAINTERS FOR TIMELINE & AUDIO/MIDI GRAPHICS ---
+
+class TimelineRulerPainter extends CustomPainter {
+  final Color gridColor;
+  TimelineRulerPainter(this.gridColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = gridColor
+      ..strokeWidth = 1.0;
+    
+    double barSize = 45.0; // Bar grid horizontal spacing
+    int totalBars = (size.width / barSize).ceil();
+
+    for (int i = 0; i < totalBars; i++) {
+      double x = i * barSize;
+      // draw major line
+      canvas.drawLine(Offset(x, size.height - 12), Offset(x, size.height), paint);
+      // text bar number
+      final textSpan = TextSpan(
+        text: '${i + 1}',
+        style: const TextStyle(color: Colors.grey, fontSize: 8),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: ui.TextDirection.ltr,
+      )..layout();
+      textPainter.paint(canvas, Offset(x + 4, 4));
+
+      // minor beats ticks
+      for (int b = 1; b < 4; b++) {
+        double bx = x + (b * barSize / 4);
+        canvas.drawLine(Offset(bx, size.height - 6), Offset(bx, size.height), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class GridVerticalLinePainter extends CustomPainter {
+  final Color gridColor;
+  GridVerticalLinePainter(this.gridColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = gridColor.withOpacity(0.4)
+      ..strokeWidth = 0.5;
+
+    double barSize = 45.0;
+    int totalBars = (size.width / barSize).ceil();
+
+    for (int i = 0; i < totalBars; i++) {
+      double x = i * barSize;
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class AudioClipWavePainter extends CustomPainter {
+  final Color waveColor;
+  AudioClipWavePainter(this.waveColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = waveColor.withOpacity(0.55)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final path = Path();
+    double midY = size.height / 2;
+    path.moveTo(0, midY);
+
+    for (double x = 0; x < size.width; x += 4) {
+      double sample = sin(x * 0.1) * cos(x * 0.02) * (size.height * 0.4);
+      path.lineTo(x, midY + sample);
+      path.moveTo(x, midY - sample);
+      path.lineTo(x, midY + sample);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class MidiClipNotesPainter extends CustomPainter {
+  final Color noteColor;
+  MidiClipNotesPainter(this.noteColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = noteColor.withOpacity(0.45)
+      ..style = PaintingStyle.fill;
+
+    // Draw little grid blocks representing MIDI notes in a clip
+    canvas.drawRect(Rect.fromLTWH(10, 8, 30, 4), paint);
+    canvas.drawRect(Rect.fromLTWH(50, 16, 20, 4), paint);
+    canvas.drawRect(Rect.fromLTWH(80, 12, 40, 4), paint);
+    canvas.drawRect(Rect.fromLTWH(130, 24, 25, 4), paint);
+    canvas.drawRect(Rect.fromLTWH(160, 16, 30, 4), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class ParametricEqPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final gridPaint = Paint()
+      ..color = const Color(0xFF2F3542).withOpacity(0.3)
+      ..strokeWidth = 0.5;
+
+    // Draw vertical and horizontal grid lines
+    for (double x = 50; x < size.width; x += 50) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
+    }
+    for (double y = 20; y < size.height; y += 20) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    // EQ Curve
+    final curvePaint = Paint()
+      ..color = const Color(0xFF4D8DFF)
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+
+    final curvePath = Path();
+    double midY = size.height / 2;
+    curvePath.moveTo(0, midY);
+
+    for (double x = 0; x < size.width; x++) {
+      // Create a curve with a low cut, a peak mid filter boost, and high shelf roll off
+      double y = midY;
+      // Low cut roll off
+      if (x < 60) {
+        y += (60 - x) * 0.8;
+      }
+      // Mid peak boost
+      double midPos = size.width * 0.45;
+      double dist = (x - midPos).abs();
+      if (dist < 80) {
+        y -= (80 - dist) * 0.35 * sin((80 - dist) * 3.14 / 160);
+      }
+      // High shelf boost
+      if (x > size.width * 0.75) {
+        y -= (x - size.width * 0.75) * 0.15;
+      }
+      curvePath.lineTo(x, y.clamp(0, size.height));
+    }
+    canvas.drawPath(curvePath, curvePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class AutomationCurvePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = const Color(0xFFFFD700)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final nodePaint = Paint()
+      ..color = const Color(0xFFFFD700)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, size.height * 0.7);
+
+    // Nodes
+    final points = [
+      Offset(0, size.height * 0.7),
+      Offset(size.width * 0.2, size.height * 0.7),
+      Offset(size.width * 0.35, size.height * 0.25),
+      Offset(size.width * 0.6, size.height * 0.45),
+      Offset(size.width * 0.8, size.height * 0.1),
+      Offset(size.width, size.height * 0.1),
+    ];
+
+    for (var i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+    canvas.drawPath(path, linePaint);
+
+    for (var pt in points) {
+      canvas.drawCircle(pt, 4.0, nodePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
