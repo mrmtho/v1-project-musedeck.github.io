@@ -10,6 +10,7 @@ import '../widgets/inspiration_board.dart';
 import '../widgets/lyric_editor.dart';
 import '../widgets/rhythmic_memo_recorder.dart';
 import '../utils/synth_engine.dart';
+import 'landing_page.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -29,6 +30,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   String _vaultSearchQuery = '';
   String _selectedGenre = 'Synthwave';
   String _selectedCountry = 'Global';
+
+  // Sidebar collapsible state variables
+  bool _playgroundExpanded = true;
+  bool _industryExpanded = true;
+  bool _moreExpanded = false;
+  bool _userExpanded = false;
 
   @override
   void initState() {
@@ -66,144 +73,301 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Logo Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.03))),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          // Logo Header (Clicking routes user back to Landing Page)
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+              );
+            },
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.03))),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.blur_on, color: Colors.black, size: 20),
                         ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.blur_on, color: Colors.black, size: 20),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Studduo',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD03BFF).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFFD03BFF).withOpacity(0.4), width: 0.8),
+                          ),
+                          child: const Text(
+                            'v0.01',
+                            style: TextStyle(
+                              color: Color(0xFFD03BFF),
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Studduo',
+                    const SizedBox(height: 10),
+                    Text(
+                      'AI Powered Workstation for Music Artists',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD03BFF).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: const Color(0xFFD03BFF).withOpacity(0.4), width: 0.8),
-                      ),
-                      child: const Text(
-                        'v0.01',
-                        style: TextStyle(
-                          color: Color(0xFFD03BFF),
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 10.5,
+                        height: 1.3,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'AI Powered Workstation for Music Artists',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 10.5,
-                    height: 1.3,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          // Sidebar Nav Items
-          _buildSidebarNavItem(
-            icon: Icons.mic,
-            label: 'Capture (Inbox)',
-            isSelected: _activeView == 'capture',
-            badgeCount: provider.inbox.length,
-            onTap: () {
-              setState(() => _activeView = 'capture');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.library_music,
-            label: 'Song Library',
-            isSelected: _activeView == 'library',
-            onTap: () {
-              setState(() => _activeView = 'library');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.people,
-            label: 'Collaborations',
-            isSelected: _activeView == 'collab',
-            onTap: () {
-              setState(() => _activeView = 'collab');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.archive,
-            label: 'The Vault',
-            isSelected: _activeView == 'vault',
-            onTap: () {
-              setState(() => _activeView = 'vault');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.newspaper,
-            label: 'Industry News',
-            isSelected: _activeView == 'news',
-            onTap: () {
-              setState(() => _activeView = 'news');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.bar_chart,
-            label: 'Charts',
-            isSelected: _activeView == 'charts',
-            onTap: () {
-              setState(() => _activeView = 'charts');
-              if (isDrawer) Navigator.of(context).pop();
-            },
-          ),
-          const Spacer(),
-          const Divider(color: Colors.white10),
-          _buildSidebarNavItem(
-            icon: Icons.notifications_none,
-            label: 'Updates',
-            isSelected: false,
-            onTap: () {
-              if (isDrawer) Navigator.of(context).pop();
-              _showUpdatesDialog(context);
-            },
-          ),
-          _buildSidebarNavItem(
-            icon: Icons.more_horiz,
-            label: 'More',
-            isSelected: false,
-            onTap: () {
-              if (isDrawer) Navigator.of(context).pop();
-              _showMoreDialog(context);
-            },
+          
+          // Scrollable Sidebar Nav Items to prevent vertical overflow
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 1. PLAYGROUND
+                  _buildSidebarHeader(
+                    label: 'Playground',
+                    isExpanded: _playgroundExpanded,
+                    onTap: () => setState(() => _playgroundExpanded = !_playgroundExpanded),
+                  ),
+                  if (_playgroundExpanded) ...[
+                    _buildSidebarNavItem(
+                      icon: Icons.mic_none,
+                      label: 'Capture',
+                      isSelected: _activeView == 'capture',
+                      badgeCount: provider.inbox.length,
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'capture');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.library_music_outlined,
+                      label: 'Song Library',
+                      isSelected: _activeView == 'library',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'library');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.archive_outlined,
+                      label: 'Vault',
+                      isSelected: _activeView == 'vault',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'vault');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                  
+                  const SizedBox(height: 8),
+                  
+                  // 2. MIXER CONSOLE
+                  _buildSidebarNavItem(
+                    icon: Icons.tune,
+                    label: 'Mixer Console',
+                    isSelected: _activeView == 'workspace',
+                    onTap: () {
+                      if (activeSong == null && songs.isNotEmpty) {
+                        provider.selectSong(songs.first);
+                      }
+                      setState(() => _activeView = 'workspace');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+                  
+                  // 3. PROJECTS
+                  _buildSidebarNavItem(
+                    icon: Icons.folder_open,
+                    label: 'Projects',
+                    isSelected: _activeView == 'projects',
+                    onTap: () {
+                      setState(() => _activeView = 'projects');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+                  
+                  // 4. NETWORK (Collaborators)
+                  _buildSidebarNavItem(
+                    icon: Icons.people_outline,
+                    label: 'Network',
+                    isSelected: _activeView == 'collab',
+                    onTap: () {
+                      setState(() => _activeView == 'collab');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // 5. INDUSTRY
+                  _buildSidebarHeader(
+                    label: 'Industry',
+                    isExpanded: _industryExpanded,
+                    onTap: () => setState(() => _industryExpanded = !_industryExpanded),
+                  ),
+                  if (_industryExpanded) ...[
+                    _buildSidebarNavItem(
+                      icon: Icons.newspaper_outlined,
+                      label: 'News',
+                      isSelected: _activeView == 'news',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'news');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.bar_chart_outlined,
+                      label: 'Charts',
+                      isSelected: _activeView == 'charts',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'charts');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                  
+                  const SizedBox(height: 8),
+                  
+                  // 6. MORE
+                  _buildSidebarHeader(
+                    label: 'More',
+                    isExpanded: _moreExpanded,
+                    onTap: () => setState(() => _moreExpanded = !_moreExpanded),
+                  ),
+                  if (_moreExpanded) ...[
+                    _buildSidebarNavItem(
+                      icon: Icons.info_outline,
+                      label: 'Company',
+                      isSelected: _activeView == 'company',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'company');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.notifications_none,
+                      label: 'Updates',
+                      isSelected: false,
+                      indent: 12,
+                      onTap: () {
+                        if (isDrawer) Navigator.of(context).pop();
+                        _showUpdatesDialog(context);
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.check_circle_outline,
+                      label: 'Status',
+                      isSelected: _activeView == 'status',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'status');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.gavel,
+                      label: 'Legals',
+                      isSelected: _activeView == 'legals',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView = 'legals');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                  
+                  const SizedBox(height: 8),
+                  
+                  // 7. USER
+                  _buildSidebarHeader(
+                    label: 'User',
+                    isExpanded: _userExpanded,
+                    onTap: () => setState(() => _userExpanded = !_userExpanded),
+                  ),
+                  if (_userExpanded) ...[
+                    _buildSidebarNavItem(
+                      icon: Icons.account_box_outlined,
+                      label: 'Account',
+                      isSelected: _activeView == 'account',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView == 'account');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.person_pin_outlined,
+                      label: 'Profile',
+                      isSelected: _activeView == 'profile',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView == 'profile');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.settings_outlined,
+                      label: 'Preferences',
+                      isSelected: _activeView == 'preferences',
+                      indent: 12,
+                      onTap: () {
+                        setState(() => _activeView == 'preferences');
+                        if (isDrawer) Navigator.of(context).pop();
+                      },
+                    ),
+                    _buildSidebarNavItem(
+                      icon: Icons.logout,
+                      label: 'Logout',
+                      isSelected: false,
+                      indent: 12,
+                      onTap: () {
+                        if (isDrawer) Navigator.of(context).pop();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 12),
         ],
@@ -217,9 +381,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     required bool isSelected,
     required VoidCallback onTap,
     int? badgeCount,
+    double indent = 0.0,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      padding: EdgeInsets.only(left: 12 + indent, right: 12, top: 3, bottom: 3),
       child: Material(
         color: isSelected ? const Color(0xFF1E1E2E) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
@@ -264,6 +429,42 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSidebarHeader({
+    required String label,
+    required bool isExpanded,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.35),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              Icon(
+                isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                size: 14,
+                color: Colors.white.withOpacity(0.35),
+              ),
+            ],
           ),
         ),
       ),
@@ -349,6 +550,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   Widget _buildMainContent(SongProvider provider, Song? activeSong, bool showSidebar) {
     if (_activeView == 'workspace') {
       if (activeSong == null) {
+        if (provider.songs.isNotEmpty) {
+          // Select first song if none is active
+          provider.selectSong(provider.songs.first);
+          return _buildWorkspaceView(provider, provider.songs.first, showSidebar);
+        }
         return const Center(
           child: Text('Create or select a song to open workspace', style: TextStyle(color: Colors.white)),
         );
@@ -364,6 +570,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       return _buildIndustryNewsView();
     } else if (_activeView == 'charts') {
       return _buildChartsView();
+    } else if (_activeView == 'projects') {
+      return _buildProjectsView(provider);
+    } else if (_activeView == 'company') {
+      return _buildCompanyView();
+    } else if (_activeView == 'status') {
+      return _buildStatusView();
+    } else if (_activeView == 'legals') {
+      return _buildLegalsView();
+    } else if (_activeView == 'account') {
+      return _buildAccountView();
+    } else if (_activeView == 'profile') {
+      return _buildProfileView();
+    } else if (_activeView == 'preferences') {
+      return _buildPreferencesView();
     } else {
       return _buildSongLibraryView(provider);
     }
@@ -1966,6 +2186,636 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         buildCol('Resources', ['Help Center', 'Pricing', 'Blog', 'Community', 'Download Android', 'Download iOS', 'Download Huawei']),
         buildCol('Legal', ['Terms and Conditions', 'Privacy Policy', 'Cookie Policy']),
       ],
+    );
+  }
+
+  // --- PROJECTS (ASSET MANAGEMENT) VIEW ---
+  Widget _buildProjectsView(SongProvider provider) {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '📂 Projects & Assets',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Manage your multi-track stems, master files, samples, and exports.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        // Storage Bar
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Cloud Storage Space', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text('4.2 GB of 10.0 GB (42%)', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 12, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: 0.42,
+                  backgroundColor: Colors.white.withOpacity(0.05),
+                  color: const Color(0xFF00FFCC),
+                  minHeight: 8,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        // Folders Grid
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: MediaQuery.of(context).size.width < 600 ? 1 : 3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.6,
+          children: [
+            _buildProjectFolderCard(Icons.audiotrack, 'Stems & Multi-tracks', '14 files', const Color(0xFFD03BFF)),
+            _buildProjectFolderCard(Icons.album, 'Mixdowns & Masters', '8 files', const Color(0xFF00FFCC)),
+            _buildProjectFolderCard(Icons.library_music, 'Samples & Loops', '32 files', const Color(0xFFFFD700)),
+          ],
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          'Recent Multi-track Files',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        ...provider.songs.take(3).map((song) => Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.insert_drive_file_outlined, color: Colors.white.withOpacity(0.5), size: 24),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${song.title} - Mixdown.wav', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text('Last modified: 1 day ago • 38.4 MB', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.download_outlined, color: Color(0xFF00FFCC), size: 18),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Downloading stem package for "${song.title}"...')),
+                  );
+                },
+              ),
+            ],
+          ),
+        )),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  Widget _buildProjectFolderCard(IconData icon, String title, String subtitle, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- COMPANY VIEW ---
+  Widget _buildCompanyView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '🏢 About Studduo',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Brewing every idea at your pace. Go deep, not just fast.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Our Philosophy',
+                style: TextStyle(color: Color(0xFF00FFCC), fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Studduo was born from the belief that great music needs space. Not just a physical studio, but a mental space free from stressors, algorithms, and deadlines. '
+                'We design toolkits that capture transient thoughts seamlessly, allowing you to nurse them into full compositions over time.',
+                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5),
+              ),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              const Text(
+                'Built by Artists, for Artists',
+                style: TextStyle(color: Color(0xFFD03BFF), fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Our team consists of acoustic engineers, software developers, synth designers, and touring musicians working collectively to bridge the gap between creative spark and finished master. '
+                'Thank you for joining our community. Enjoy the quiet creative playground.',
+                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  // --- STATUS VIEW ---
+  Widget _buildStatusView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '🟢 Operational Status',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Real-time health statistics for Studduo core sub-systems.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: MediaQuery.of(context).size.width < 600 ? 1 : 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 2.2,
+          children: [
+            _buildStatusNodeCard('Synthesizer Engine', 'Operational', '12ms latency', const Color(0xFF00FFCC)),
+            _buildStatusNodeCard('Backing Track Generator', 'Operational', '85ms latency', const Color(0xFF00FFCC)),
+            _buildStatusNodeCard('Real-time Cloud Sync', 'Operational', '45ms latency', const Color(0xFF00FFCC)),
+            _buildStatusNodeCard('Audio Recording Pipeline', 'Operational', '2ms latency', const Color(0xFF00FFCC)),
+          ],
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  Widget _buildStatusNodeCard(String title, String status, String metric, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            margin: const EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: color.withOpacity(0.4), blurRadius: 6, spreadRadius: 1),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+                Text(metric, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- LEGALS VIEW ---
+  Widget _buildLegalsView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '⚖️ Legals & Agreement',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Read our terms of service, privacy policy, and licensing agreements.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Terms & Conditions', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Text(
+                'By using Studduo, you retain full copyright ownership of all melodies, lyrics, synthesizer presets, and rhythm arrangements generated using the platform. '
+                'We do not claim ownership, royalties, or licensing cuts from any work exported or finished using our toolkits.',
+                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12.5, height: 1.5),
+              ),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              const Text('Privacy Policy', style: TextStyle(color: Color(0xFFD03BFF), fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Text(
+                'We collect local sketch files and telemetry data solely to run synthesizer synthesis pipelines, synchronise backups, and diagnostic testing. '
+                'Your files are never shared with third parties or used to train general generative audio AI models without your explicit consent.',
+                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12.5, height: 1.5),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  // --- ACCOUNT VIEW ---
+  Widget _buildAccountView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '💳 Account Subscription',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Manage your billing, subscription tier, and receipts.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Current Tier', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      SizedBox(height: 4),
+                      Text('Pro Producer', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00FFCC).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+                    ),
+                    child: const Text('ACTIVE', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              _buildAccountInfoRow('Billing Cycle', 'Monthly'),
+              _buildAccountInfoRow('Pricing Plan', '$9.99 / month'),
+              _buildAccountInfoRow('Next Invoice', 'July 06, 2026'),
+              _buildAccountInfoRow('Payment Method', 'Visa ending in 4022'),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00FFCC),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Redirecting to Stripe Billing Portal...')),
+                  );
+                },
+                child: const Text('Manage Billing Portal', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  Widget _buildAccountInfoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13)),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  // --- PROFILE VIEW ---
+  Widget _buildProfileView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '👤 Artist Profile',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Personalize how other collaborators see your credit details.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD03BFF), Color(0xFF00FFCC)],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text('HS', style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('HotSnow', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 4),
+                      Text('Indie Synthwave Producer', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              _buildProfileField('Username', 'HotSnow'),
+              _buildProfileField('Contact Email', 'hotsnow@example.com'),
+              _buildProfileField('Country', 'Norway'),
+              _buildProfileField('Primary Genre', 'Synthwave / Outrun'),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD03BFF),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile changes saved successfully!')),
+                    );
+                  },
+                  child: const Text('Update Profile Info', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  Widget _buildProfileField(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+          const SizedBox(height: 6),
+          TextField(
+            controller: TextEditingController(text: value),
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFF1E1E2E).withOpacity(0.5),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.04)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFD03BFF)),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- PREFERENCES VIEW ---
+  Widget _buildPreferencesView() {
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        const Text(
+          '⚙️ Workstation Preferences',
+          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Adjust sample buffer rates, default metronome ticks, and AI assistance modules.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.03)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Audio Settings', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 14, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildPreferenceDropdown('Sample Rate', '48,000 Hz', ['44,100 Hz', '48,000 Hz', '96,000 Hz']),
+              _buildPreferenceDropdown('Buffer Size', '256 samples', ['64 samples', '128 samples', '256 samples', '512 samples']),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              const Text('Workstation Metronome', style: TextStyle(color: Color(0xFFD03BFF), fontSize: 14, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildPreferenceDropdown('Click Sound', 'Woodblock', ['Beep', 'Woodblock', 'Rimshot', 'Hi-hat']),
+              const SizedBox(height: 24),
+              const Divider(color: Colors.white10),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Enable AI Co-Pilot Suggestions', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 4),
+                      Text('Auto-generate matching chord paths as you type lyrics', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                    ],
+                  ),
+                  Switch(
+                    value: true,
+                    activeColor: const Color(0xFF00FFCC),
+                    onChanged: (val) {},
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFooterSection(),
+      ],
+    );
+  }
+
+  Widget _buildPreferenceDropdown(String label, String value, List<String> items) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E2E),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                dropdownColor: const Color(0xFF1E1E2E),
+                value: value,
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                items: items.map((val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
