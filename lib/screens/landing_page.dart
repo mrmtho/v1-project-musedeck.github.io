@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
+import '../widgets/floating_particles_background.dart';
 
 class LandingPageScreen extends StatefulWidget {
   const LandingPageScreen({super.key});
@@ -137,43 +138,55 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070B),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Top Header
-            _buildHeader(context),
-
-            // Main Content Area (Max width wrapper for desktop elegance)
-            Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 1200),
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  children: [
-                    // Hero Section
-                    _buildHeroSection(),
-                    const SizedBox(height: 100),
-
-                    // Value Propositions Section
-                    _buildValuePropsSection(),
-                    const SizedBox(height: 100),
-
-                    // Social Proof Section (Pinterest layout & profile preview)
-                    _buildSocialProofSection(),
-                    const SizedBox(height: 80),
-
-                    // Listen Everywhere Banner
-                    _buildListenEverywhereSection(),
-                    const SizedBox(height: 100),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          // Pleasingly floating particle background behind the content
+          const Positioned.fill(
+            child: FloatingParticlesBackground(),
+          ),
+          
+          // Scrollable hero content
+          Positioned.fill(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Top Header
+                  _buildHeader(context),
+      
+                  // Main Content Area (Max width wrapper for desktop elegance)
+                  Center(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        children: [
+                          // Hero Section
+                          _buildHeroSection(),
+                          const SizedBox(height: 100),
+      
+                          // Value Propositions Section
+                          _buildValuePropsSection(),
+                          const SizedBox(height: 100),
+      
+                          // Social Proof Section (Pinterest layout & profile preview)
+                          _buildSocialProofSection(),
+                          const SizedBox(height: 80),
+      
+                          // Listen Everywhere Banner
+                          _buildListenEverywhereSection(),
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
+                  ),
+      
+                  // Footer Section
+                  _buildFooterSection(),
+                ],
               ),
             ),
-
-            // Footer Section
-            _buildFooterSection(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
