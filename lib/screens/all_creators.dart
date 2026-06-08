@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'dashboard.dart';
 import '../widgets/floating_particles_background.dart';
 import '../utils/synth_engine.dart';
 
@@ -13,6 +14,8 @@ class CreatorProfile {
   final String bio;
   final int songsInProgress;
   final List<String> genres;
+  final String location;
+  final List<Map<String, String>> tracksInProgress;
 
   const CreatorProfile({
     required this.name,
@@ -24,6 +27,8 @@ class CreatorProfile {
     required this.bio,
     required this.songsInProgress,
     required this.genres,
+    required this.location,
+    required this.tracksInProgress,
   });
 }
 
@@ -37,6 +42,7 @@ class AllCreatorsScreen extends StatefulWidget {
 class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   String _searchQuery = '';
   String _selectedRoleFilter = 'All';
+  late int _randomStartOffset;
 
   // 16 Detailed premium mock creators
   final List<CreatorProfile> _allCreators = const [
@@ -50,6 +56,12 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Melody chaser. Story teller. Building sonic worlds that feel like home. Indie artist & producer from LA.',
       songsInProgress: 17,
       genres: ['Indie Pop', 'Chillwave'],
+      location: 'Los Angeles, USA',
+      tracksInProgress: [
+        {'title': 'Glass House (Lead Vocals)', 'bpm': '112', 'key': 'A Min'},
+        {'title': 'Overthinker (Alt Chorus Hooks)', 'bpm': '124', 'key': 'C Maj'},
+        {'title': 'Bloom (Harmony Stems)', 'bpm': '98', 'key': 'F Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'kai.wav',
@@ -61,6 +73,11 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Bedroom producer blending lofi beats with jazz chords. Always searching for the perfect vinyl crackle from Seattle.',
       songsInProgress: 8,
       genres: ['Lofi Hip Hop', 'Jazz Fusion'],
+      location: 'Seattle, USA',
+      tracksInProgress: [
+        {'title': 'Rainy Sundays (EP Beat Layout)', 'bpm': '78', 'key': 'D Min'},
+        {'title': 'Chilled Waves (Rhodes Chords)', 'bpm': '84', 'key': 'G Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'prodbylance',
@@ -72,6 +89,11 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Multi-genre producer and sound designer. Specializing in trap beats, cinematic ambient, and synth-heavy pop tracks.',
       songsInProgress: 22,
       genres: ['Trap', 'Pop', 'Ambient'],
+      location: 'Atlanta, USA',
+      tracksInProgress: [
+        {'title': 'Neo Tokyo (808 Sub Bassline)', 'bpm': '140', 'key': 'E Min'},
+        {'title': 'Shattered Mirrors (Synth Pad Layer)', 'bpm': '120', 'key': 'A Min'},
+      ],
     ),
     CreatorProfile(
       name: 'milesonit',
@@ -83,6 +105,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Guitarist and composer. Blending blues riffs with modern electronic elements. Session musician based in London.',
       songsInProgress: 6,
       genres: ['Blues Rock', 'Synthpop'],
+      location: 'London, UK',
+      tracksInProgress: [
+        {'title': 'String Theory (Guitar Lead Loop)', 'bpm': '105', 'key': 'G Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'sunnie.day',
@@ -94,6 +120,11 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Vocalist and topliner. Specializing in warm, airy harmonies and uplifting hooks. Collaborating worldwide.',
       songsInProgress: 15,
       genres: ['House', 'Vocal Trance'],
+      location: 'Miami, USA',
+      tracksInProgress: [
+        {'title': 'Golden Hour (Adlib Session v2)', 'bpm': '126', 'key': 'C Maj'},
+        {'title': 'Lost in the Groove (Chorus Vocal)', 'bpm': '122', 'key': 'A Min'},
+      ],
     ),
     CreatorProfile(
       name: 'kidsonny',
@@ -105,6 +136,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Drummer and percussion designer. Crafting unique organic rhythms and acoustic fusions.',
       songsInProgress: 11,
       genres: ['IDM', 'Acoustic Fusion'],
+      location: 'Berlin, Germany',
+      tracksInProgress: [
+        {'title': 'Pulse (Organic Loop Stems)', 'bpm': '130', 'key': 'B Min'},
+      ],
     ),
     CreatorProfile(
       name: 'Luna Eclipse',
@@ -116,6 +151,11 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Synthwave explorer. Crafting nostalgic retro tracks with heavy analog baselines. Obsessed with 80s aesthetics.',
       songsInProgress: 14,
       genres: ['Synthwave', 'Cyberpunk'],
+      location: 'Oslo, Norway',
+      tracksInProgress: [
+        {'title': 'Resonance Shift (Bass ARP Synth)', 'bpm': '112', 'key': 'A Min'},
+        {'title': 'Midnight Drive (FM Bell Melodies)', 'bpm': '118', 'key': 'D Min'},
+      ],
     ),
     CreatorProfile(
       name: 'Marcus Vox',
@@ -127,6 +167,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Deep baritone vocalist and voice actor. Specializing in soulful spoken word, deep house overlays, and ambient hooks.',
       songsInProgress: 5,
       genres: ['Soulful House', 'Spoken Word'],
+      location: 'Chicago, USA',
+      tracksInProgress: [
+        {'title': 'Soulful Spoken (Poem Vocal Stems)', 'bpm': '118', 'key': 'A Min'},
+      ],
     ),
     CreatorProfile(
       name: 'Chloe Keys',
@@ -138,6 +182,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Classical pianist turned electronic composer. Mixing delicate keys with heavy industrial sub-bass.',
       songsInProgress: 19,
       genres: ['Neo-Classical', 'Ambient Techno'],
+      location: 'Paris, France',
+      tracksInProgress: [
+        {'title': 'Ambient Keys (Reversed Piano)', 'bpm': '90', 'key': 'F Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'DJ Spark',
@@ -149,6 +197,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Club DJ and EDM producer from Berlin. Creating high-energy tech house and driving techno tracks.',
       songsInProgress: 25,
       genres: ['Tech House', 'Techno'],
+      location: 'Berlin, Germany',
+      tracksInProgress: [
+        {'title': 'Tech House Build (Main Kick/Bass)', 'bpm': '126', 'key': 'C Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'Elena Rose',
@@ -160,6 +212,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Folk singer-songwriter. Strumming my way through melancholic lyrics and rustic melodies.',
       songsInProgress: 9,
       genres: ['Indie Folk', 'Acoustic'],
+      location: 'Dublin, Ireland',
+      tracksInProgress: [
+        {'title': 'Forest Acoustic (Fingerpicking Guitar)', 'bpm': '86', 'key': 'G Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'Bax Beatbox',
@@ -171,6 +227,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Professional beatboxer and organic sound designer. I create full song beats using 100% vocal frequencies.',
       songsInProgress: 7,
       genres: ['Hip Hop', 'Experimental'],
+      location: 'New York, USA',
+      tracksInProgress: [
+        {'title': 'Voice Percussion (Trap Hat Beats)', 'bpm': '138', 'key': 'C Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'Zoe Synth',
@@ -182,6 +242,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Eurorack enthusiast. Building complex generative soundscapes and algorithmic textures.',
       songsInProgress: 18,
       genres: ['Modular Ambient', 'Glitch'],
+      location: 'Geneva, Switzerland',
+      tracksInProgress: [
+        {'title': 'Modular Drone (Sustaining Pad)', 'bpm': '80', 'key': 'F Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'Leo Bass',
@@ -193,6 +257,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Groove-oriented electric bassist. Adding funk and drive to modern pop and hip-hop sessions.',
       songsInProgress: 12,
       genres: ['Funk', 'R&B', 'Neo-Soul'],
+      location: 'Tokyo, Japan',
+      tracksInProgress: [
+        {'title': 'Funk slap grooves (Bass track)', 'bpm': '108', 'key': 'A Min'},
+      ],
     ),
     CreatorProfile(
       name: 'Aiden Sparks',
@@ -204,6 +272,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Sound designer and cinematic producer. Transforming ambient street noises into rhythmic tracks.',
       songsInProgress: 16,
       genres: ['Cinematic', 'IDM'],
+      location: 'Vancouver, Canada',
+      tracksInProgress: [
+        {'title': 'Street Foley Beats (Texture stems)', 'bpm': '120', 'key': 'C Maj'},
+      ],
     ),
     CreatorProfile(
       name: 'Vera Harmonics',
@@ -215,8 +287,19 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       bio: 'Classical harpist exploring electronic effects pedals, shimmer delays, and loop stations.',
       songsInProgress: 10,
       genres: ['Neo-Classical', 'Ambient Dream'],
+      location: 'Vienna, Austria',
+      tracksInProgress: [
+        {'title': 'Dream Harp (Reverb stems)', 'bpm': '84', 'key': 'G Maj'},
+      ],
     )
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Keep it random and fresh on every screen visit
+    _randomStartOffset = Random().nextInt(_allCreators.length);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,43 +328,9 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
             child: SafeArea(
               child: CustomScrollView(
                 slivers: [
-                  // App Bar / Top Navigation
+                  // App Bar / Top Navigation (identical to landing page header)
                   SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          const Text(
-                            'Back to Home',
-                            style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFD03BFF), Color(0xFF00FFCC)],
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.waves, color: Colors.black, size: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Studduo',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: _buildMainNavigation(context),
                   ),
 
                   // Directory Header
@@ -317,7 +366,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                     ),
                   ),
 
-                  // Creators Grid
+                  // Creators Grid (Infinite Loop Layout)
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                     sliver: filteredCreators.isEmpty
@@ -341,10 +390,12 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                final creator = filteredCreators[index];
-                                return _buildCreatorCard(creator);
+                                // Loop infinitely over matching creators
+                                final adjustedIndex = (index + _randomStartOffset) % filteredCreators.length;
+                                final creator = filteredCreators[adjustedIndex];
+                                return _buildCreatorCard(context, creator);
                               },
-                              childCount: filteredCreators.length,
+                              // childCount omitted to run infinitely
                             ),
                           ),
                   ),
@@ -355,6 +406,110 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Identical to landing page main navigation bar
+  Widget _buildMainNavigation(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF07070B).withOpacity(0.8),
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Logo & Back link
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD03BFF), Color(0xFF00FFCC)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.waves,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Studduo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Outfit',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Back arrow shortcut
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.grey, size: 18),
+            tooltip: 'Return to Landing Page',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          const Spacer(),
+          // CTA button
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6C3BF5),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 4,
+              shadowColor: const Color(0xFF6C3BF5).withOpacity(0.4),
+            ),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const DashboardScreen()),
+              );
+            },
+            child: const Text(
+              'Start Right Now',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          const SizedBox(width: 12),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: BorderSide(color: Colors.white.withOpacity(0.2)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const DashboardScreen()),
+              );
+            },
+            icon: const Icon(Icons.person_outline, size: 16),
+            label: const Text(
+              'Login',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
         ],
@@ -446,7 +601,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
     );
   }
 
-  Widget _buildCreatorCard(CreatorProfile creator) {
+  Widget _buildCreatorCard(BuildContext context, CreatorProfile creator) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF13131A),
@@ -587,33 +742,53 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Action Vibe check button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 32,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00FFCC).withOpacity(0.1),
-                        foregroundColor: const Color(0xFF00FFCC),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: () {
-                        // Play preview vibration synth sounds
-                        final randNotes = ['C', 'G', 'Am', 'F'];
-                        final note = randNotes[Random().nextInt(randNotes.length)];
-                        SynthEngine.playChord(note);
-                        SynthEngine.playDrum('hat');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Previewing vibe sound signature for @${creator.username} in key of $note!'),
-                            duration: const Duration(seconds: 1),
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 32,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF00FFCC).withOpacity(0.1),
+                              foregroundColor: const Color(0xFF00FFCC),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              // Play preview vibration synth sounds
+                              final randNotes = ['C', 'G', 'Am', 'F'];
+                              final note = randNotes[Random().nextInt(randNotes.length)];
+                              SynthEngine.playChord(note);
+                              SynthEngine.playDrum('hat');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Previewing vibe sound signature for @${creator.username} in key of $note!'),
+                                  duration: const Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.volume_up_outlined, size: 12),
+                            label: const Text('Vibe Check', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.volume_up_outlined, size: 12),
-                      label: const Text('Vibe Check', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                    ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Details Button
+                      SizedBox(
+                        height: 32,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          onPressed: () => _showCreatorDetailSheet(context, creator),
+                          child: const Icon(Icons.zoom_in_map, size: 14),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -621,6 +796,335 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // GORGEOUS EXPANDED GLASSMORPHIC DETAILS MODAL
+  void _showCreatorDetailSheet(BuildContext context, CreatorProfile creator) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.85,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              builder: (context, scrollController) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0D0D14),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    border: Border(top: BorderSide(color: Colors.white10)),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Subdued float particles inside sheet
+                      const Positioned.fill(
+                        child: FloatingParticlesBackground(),
+                      ),
+                      Positioned.fill(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
+                          children: [
+                            // Pull handle bar
+                            Center(
+                              child: Container(
+                                width: 40,
+                                height: 4,
+                                margin: const EdgeInsets.only(bottom: 24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                            // Profile header section
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Left visual profile cover
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.network(
+                                    creator.imageUrl,
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                // Right profile details text
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF6C3BF5).withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(color: const Color(0xFF6C3BF5).withOpacity(0.4)),
+                                            ),
+                                            child: Text(
+                                              creator.role.toUpperCase(),
+                                              style: const TextStyle(
+                                                color: Color(0xFFD03BFF),
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 1.0,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Icon(Icons.location_on_outlined, size: 12, color: Colors.white.withOpacity(0.4)),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            creator.location,
+                                            style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10.5),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        creator.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Outfit',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '@${creator.username}',
+                                        style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 13, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      // Status line
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 6,
+                                            height: 6,
+                                            decoration: const BoxDecoration(color: Color(0xFF3DDC84), shape: BoxShape.circle),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              creator.status,
+                                              style: const TextStyle(color: Colors.white70, fontSize: 11.5, fontStyle: FontStyle.italic),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            const Divider(color: Colors.white10),
+                            const SizedBox(height: 20),
+
+                            // Double columns details layout
+                            LayoutBuilder(
+                              builder: (context, detailsConstraints) {
+                                bool stackDetails = detailsConstraints.maxWidth < 700;
+                                final leftCol = Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('ARTIST BIOGRAPHY', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      creator.bio,
+                                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.6),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    const Text('GENRES & TAGS', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    const SizedBox(height: 10),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: creator.genres.map((g) => Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.04),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: Colors.white.withOpacity(0.05)),
+                                        ),
+                                        child: Text(
+                                          g,
+                                          style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                        ),
+                                      )).toList(),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    const Text('COMMUNITY ENDORSEMENTS', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.02),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.white.withOpacity(0.03)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.star, color: Color(0xFFFFD700), size: 16),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              '"Professional, creative, and extremely fast with vocal tuning overlays!"',
+                                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11.5, fontStyle: FontStyle.italic),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+
+                                final rightCol = Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('ACTIVE MULTI-TRACK STEMS', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    const SizedBox(height: 12),
+                                    ...creator.tracksInProgress.map((track) => Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF13131A),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.white.withOpacity(0.03)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.audiotrack, color: Color(0xFF00FFCC), size: 18),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  track['title']!,
+                                                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${track['bpm']} BPM • Key: ${track['key']!}',
+                                                  style: const TextStyle(color: Colors.grey, fontSize: 10),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Mini Audio waveform visuals
+                                          Container(
+                                            width: 40,
+                                            height: 16,
+                                            alignment: Alignment.centerRight,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Container(width: 3, height: 10, color: const Color(0xFFD03BFF).withOpacity(0.4)),
+                                                Container(width: 3, height: 14, color: const Color(0xFFD03BFF)),
+                                                Container(width: 3, height: 6, color: const Color(0xFFD03BFF).withOpacity(0.4)),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                    const SizedBox(height: 24),
+                                    
+                                    // Massive Interaction CTAs
+                                    Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [const Color(0xFF6C3BF5).withOpacity(0.15), const Color(0xFFD03BFF).withOpacity(0.05)],
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(color: const Color(0xFF6C3BF5).withOpacity(0.2)),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Work together on a song',
+                                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Invite @${creator.username} to your active DAW studio session. Split sheet will be calculated 50/50 automatically.',
+                                            style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, height: 1.4),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 42,
+                                            child: ElevatedButton.icon(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(0xFF6C3BF5),
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Inviting @${creator.username} to your workspace... invite notification sent!'),
+                                                    backgroundColor: const Color(0xFF6C3BF5),
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(Icons.offline_bolt_outlined, size: 16),
+                                              label: const Text('Start Live Studio Session', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+
+                                if (stackDetails) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      leftCol,
+                                      const SizedBox(height: 32),
+                                      rightCol,
+                                    ],
+                                  );
+                                } else {
+                                  return Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(flex: 5, child: leftCol),
+                                      const SizedBox(width: 32),
+                                      Expanded(flex: 5, child: rightCol),
+                                    ],
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
