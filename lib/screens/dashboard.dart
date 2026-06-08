@@ -29,6 +29,40 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // Active navigation view: 'capture', 'library', 'collab', 'vault', 'workspace'
   String _activeView = 'library';
+  String _selectedContactName = 'Aria North';
+  final TextEditingController _messageController = TextEditingController();
+  final List<Map<String, dynamic>> _mockMessages = [
+    {
+      'contact': 'Aria North',
+      'sender': 'Aria North',
+      'text': 'Hey! Did you have a chance to look at the chorus vocals for Glass House?',
+      'time': '10:24 AM',
+    },
+    {
+      'contact': 'Aria North',
+      'sender': 'me',
+      'text': 'Yes! Sounds incredible. I added some subtle tape saturation and a light stereo delay.',
+      'time': '10:28 AM',
+    },
+    {
+      'contact': 'Aria North',
+      'sender': 'Aria North',
+      'text': 'Ooh that sounds warm. Can we bounce a draft mix? I want to test it in my car.',
+      'time': '10:30 AM',
+    },
+    {
+      'contact': 'kai.wav',
+      'sender': 'kai.wav',
+      'text': 'Lofi drum stems are ready. Bpm is 78.',
+      'time': 'Yesterday',
+    },
+    {
+      'contact': 'Chloe Keys',
+      'sender': 'Chloe Keys',
+      'text': 'Sure, I can lay down the Rhodes chords tonight.',
+      'time': '2 days ago',
+    },
+  ];
   String _vaultSearchQuery = '';
   String _selectedGenre = 'Synthwave';
   String _selectedCountry = 'Global';
@@ -113,6 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _tabController.dispose();
     _titleController.dispose();
     _searchController.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 
@@ -314,6 +349,27 @@ class _DashboardScreenState extends State<DashboardScreen>
                     isSelected: _activeView == 'collab',
                     onTap: () {
                       setState(() => _activeView = 'collab');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+
+                  _buildSidebarNavItem(
+                    icon: Icons.chat_bubble_outline,
+                    label: 'Messages',
+                    isSelected: _activeView == 'messages',
+                    badgeCount: 3,
+                    onTap: () {
+                      setState(() => _activeView = 'messages');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+
+                  _buildSidebarNavItem(
+                    icon: Icons.group_outlined,
+                    label: 'Team Members',
+                    isSelected: _activeView == 'team',
+                    onTap: () {
+                      setState(() => _activeView = 'team');
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
@@ -715,6 +771,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       return _buildStatusView();
     } else if (_activeView == 'legals') {
       return _buildLegalsView();
+    } else if (_activeView == 'messages') {
+      return _buildDMsMessagesView();
+    } else if (_activeView == 'team') {
+      return _buildTeamMembersView();
     } else if (_activeView == 'account') {
       return _buildAccountView();
     } else if (_activeView == 'profile') {
@@ -5551,6 +5611,460 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDMsMessagesView() {
+    final activeMessages = _mockMessages.where((msg) => msg['contact'] == _selectedContactName).toList();
+    final List<String> contacts = ['Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Luna Eclipse', 'Zoe Synth'];
+
+    return Row(
+      children: [
+        // Left Column - Contacts List
+        Container(
+          width: 280,
+          decoration: BoxDecoration(
+            color: const Color(0xFF13131A),
+            border: Border(right: BorderSide(color: Colors.white.withOpacity(0.05))),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  'DMs & Messages',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+                ),
+              ),
+              const Divider(color: Colors.white10, height: 1),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: contacts.length,
+                  itemBuilder: (context, index) {
+                    final contact = contacts[index];
+                    final isSelected = contact == _selectedContactName;
+                    
+                    // Find last message snippet
+                    final lastMsg = _mockMessages.lastWhere(
+                      (msg) => msg['contact'] == contact,
+                      orElse: () => {'text': 'Click to start conversation...', 'time': ''},
+                    );
+
+                    return InkWell(
+                      onTap: () => setState(() => _selectedContactName = contact),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        color: isSelected ? const Color(0xFF6C3BF5).withOpacity(0.15) : Colors.transparent,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: const Color(0xFF6C3BF5),
+                              child: Text(contact[0], style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        contact,
+                                        style: TextStyle(
+                                          color: isSelected ? Colors.white : Colors.white70,
+                                          fontSize: 13,
+                                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        ),
+                                      ),
+                                      Text(
+                                        lastMsg['time'] ?? '',
+                                        style: const TextStyle(color: Colors.grey, fontSize: 9),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    lastMsg['text'] ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: isSelected ? const Color(0xFF00FFCC) : Colors.grey,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Right Column - Active Chat Thread
+        Expanded(
+          child: Container(
+            color: const Color(0xFF0D0D14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Header of active contact
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF13131A),
+                    border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: const Color(0xFF00FFCC),
+                        child: Text(_selectedContactName[0], style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _selectedContactName,
+                              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(color: Color(0xFF00FFCC), shape: BoxShape.circle),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text('Online & in workspace', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Messages thread
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(24),
+                    itemCount: activeMessages.length,
+                    itemBuilder: (context, index) {
+                      final msg = activeMessages[index];
+                      final isMe = msg['sender'] == 'me';
+
+                      return Align(
+                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          constraints: const BoxConstraints(maxWidth: 450),
+                          decoration: BoxDecoration(
+                            color: isMe ? const Color(0xFF6C3BF5) : const Color(0xFF1E1E28),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
+                              bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+                            ),
+                            border: Border.all(color: Colors.white.withOpacity(0.02)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                msg['text'] ?? '',
+                                style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
+                              ),
+                              const SizedBox(height: 4),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Text(
+                                  msg['time'] ?? '',
+                                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                
+                // Typing Box
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF13131A),
+                    border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.music_note, color: Color(0xFFD03BFF), size: 20),
+                        tooltip: 'Share track draft',
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.attach_file, color: Colors.grey, size: 20),
+                        tooltip: 'Attach stems/samples',
+                        onPressed: () {},
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A1A24),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                          ),
+                          child: TextField(
+                            controller: _messageController,
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            decoration: const InputDecoration(
+                              hintText: 'Write a response...',
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            ),
+                            onSubmitted: (val) {
+                              if (val.trim().isEmpty) return;
+                              setState(() {
+                                _mockMessages.add({
+                                  'contact': _selectedContactName,
+                                  'sender': 'me',
+                                  'text': val,
+                                  'time': 'Just now',
+                                });
+                                _messageController.clear();
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: const Color(0xFF6C3BF5),
+                        child: IconButton(
+                          icon: const Icon(Icons.send, color: Colors.white, size: 16),
+                          onPressed: () {
+                            final val = _messageController.text;
+                            if (val.trim().isEmpty) return;
+                            setState(() {
+                              _mockMessages.add({
+                                'contact': _selectedContactName,
+                                'sender': 'me',
+                                'text': val,
+                                'time': 'Just now',
+                              });
+                              _messageController.clear();
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeamMembersView() {
+    final List<Map<String, dynamic>> team = [
+      {
+        'name': 'Aria North',
+        'role': 'Lead Vocalist & Songwriter',
+        'avatar': 'A',
+        'status': 'In melody session 🎧',
+        'online': true,
+        'projects': 'Glass House, Bloom',
+      },
+      {
+        'name': 'kai.wav',
+        'role': 'Beatmaker & Co-Producer',
+        'avatar': 'K',
+        'status': 'Arranging drums 🥁',
+        'online': true,
+        'projects': 'Rainy Sundays, Chilled Waves',
+      },
+      {
+        'name': 'Chloe Keys',
+        'role': 'Pianist & String Arranger',
+        'avatar': 'C',
+        'status': 'Recording acoustic grand',
+        'online': true,
+        'projects': 'Ambient Keys',
+      },
+      {
+        'name': 'DJ Spark',
+        'role': 'Mixing & Audio Engineer',
+        'avatar': 'S',
+        'status': 'Away',
+        'online': false,
+        'projects': 'Tech House Build',
+      },
+      {
+        'name': 'Bax Beatbox',
+        'role': 'Sound Designer / Vocal Effects',
+        'avatar': 'B',
+        'status': 'Modulating layers',
+        'online': true,
+        'projects': 'Voice Percussion v1',
+      },
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(24.0),
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '👥 Team Workspace',
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Collaborators and roles on your active song projects.',
+                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                ),
+              ],
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6C3BF5),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Invitation link copied to clipboard!')),
+                );
+              },
+              icon: const Icon(Icons.add, size: 16),
+              label: const Text('Invite Member', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        
+        LayoutBuilder(
+          builder: (context, constraints) {
+            bool isMobile = constraints.maxWidth < 800;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isMobile ? 1 : 3,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: isMobile ? 2.0 : 1.35,
+              ),
+              itemCount: team.length,
+              itemBuilder: (context, index) {
+                final member = team[index];
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF13131A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: member['online'] ? const Color(0xFF00FFCC).withOpacity(0.15) : Colors.white10,
+                            child: Text(member['avatar'], style: TextStyle(color: member['online'] ? const Color(0xFF00FFCC) : Colors.grey, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  member['name'],
+                                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  member['role'],
+                                  style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Shared tracks: ${member['projects']}',
+                              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11),
+                            ),
+                            const Spacer(),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: member['online'] ? const Color(0xFF00FFCC) : Colors.grey,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    member['status'],
+                                    style: const TextStyle(color: Colors.grey, fontSize: 10.5, fontStyle: FontStyle.italic),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        ),
+      ],
     );
   }
 }
