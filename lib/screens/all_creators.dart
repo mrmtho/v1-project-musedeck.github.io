@@ -327,83 +327,88 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
           // Main content
           Positioned.fill(
             child: SafeArea(
-              child: CustomScrollView(
-                slivers: [
-                  // App Bar / Top Navigation (identical to landing page header)
-                  SliverToBoxAdapter(
-                    child: _buildMainNavigation(context),
-                  ),
+              child: Column(
+                children: [
+                  // Sticky main navigation
+                  _buildMainNavigation(context),
 
-                  // Directory Header
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Studduo Community',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Connect, brainstorm, and build song ideas with ${_allCreators.length} active creators online.',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          
-                          // Search & Filters Row
-                          _buildSearchAndFilters(),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Creators Grid (Infinite Loop Layout)
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                    sliver: filteredCreators.isEmpty
-                        ? const SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 80),
-                              child: Center(
-                                child: Text(
-                                  'No creators found matching your query.',
-                                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  // Scrollable body
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
+                        // Directory Header
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Studduo Community',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Outfit',
+                                  ),
                                 ),
-                              ),
-                            ),
-                          )
-                        : SliverGrid(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: _getResponsiveGridColumns(context),
-                              crossAxisSpacing: 24,
-                              mainAxisSpacing: 24,
-                              childAspectRatio: 0.76,
-                            ),
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                // Loop infinitely over matching creators
-                                final adjustedIndex = (index + _randomStartOffset) % filteredCreators.length;
-                                final creator = filteredCreators[adjustedIndex];
-                                return _buildCreatorCard(context, creator);
-                              },
-                              // childCount omitted to run infinitely
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Connect, brainstorm, and build song ideas with ${_allCreators.length} active creators online.',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 32),
+                                
+                                // Search & Filters Row
+                                _buildSearchAndFilters(),
+                              ],
                             ),
                           ),
-                  ),
+                        ),
 
-                  // Footer Space
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 80),
+                        // Creators Grid (Infinite Loop Layout)
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          sliver: filteredCreators.isEmpty
+                              ? const SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 80),
+                                    child: Center(
+                                      child: Text(
+                                        'No creators found matching your query.',
+                                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SliverGrid(
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: _getResponsiveGridColumns(context),
+                                    crossAxisSpacing: 24,
+                                    mainAxisSpacing: 24,
+                                    childAspectRatio: 0.76,
+                                  ),
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      // Loop infinitely over matching creators
+                                      final adjustedIndex = (index + _randomStartOffset) % filteredCreators.length;
+                                      final creator = filteredCreators[adjustedIndex];
+                                      return _buildCreatorCard(context, creator);
+                                    },
+                                    // childCount omitted to run infinitely
+                                  ),
+                                ),
+                        ),
+
+                        // Footer Space
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: 80),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

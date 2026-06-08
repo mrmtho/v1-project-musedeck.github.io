@@ -150,45 +150,52 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
           // Pleasingly floating particle background behind the content
           const Positioned.fill(child: FloatingParticlesBackground()),
 
-          // Scrollable hero content
+          // Main layout containing fixed header and scrollable content
           Positioned.fill(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Top Header
-                  _buildHeader(context),
+            child: Column(
+              children: [
+                // Top Header (Fixed at the top)
+                _buildHeader(context),
 
-                  // Main Content Area (Max width wrapper for desktop elegance)
-                  Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        children: [
-                          // Hero Section
-                          _buildHeroSection(),
-                          const SizedBox(height: 100),
+                // Scrollable hero content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Main Content Area (Max width wrapper for desktop elegance)
+                        Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 1200),
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Column(
+                              children: [
+                                // Hero Section
+                                _buildHeroSection(),
+                                const SizedBox(height: 100),
 
-                          // Value Propositions Section
-                          _buildValuePropsSection(),
-                          const SizedBox(height: 100),
+                                // Value Propositions Section
+                                _buildValuePropsSection(),
+                                const SizedBox(height: 100),
 
-                          // Social Proof Section (Pinterest layout & profile preview)
-                          _buildSocialProofSection(),
-                          const SizedBox(height: 80),
+                                // Social Proof Section (Pinterest layout & profile preview)
+                                _buildSocialProofSection(),
+                                const SizedBox(height: 80),
 
-                          // Listen Everywhere Banner
-                          // _buildListenEverywhereSection(),
-                          const SizedBox(height: 100),
-                        ],
-                      ),
+                                // Listen Everywhere Banner
+                                // _buildListenEverywhereSection(),
+                                const SizedBox(height: 100),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Footer Section
+                        _buildFooterSection(),
+                      ],
                     ),
                   ),
-
-                  // Footer Section
-                  _buildFooterSection(),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
