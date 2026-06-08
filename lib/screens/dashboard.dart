@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import '../models/song.dart';
 import '../providers/song_provider.dart';
 import '../widgets/chord_progression_editor.dart';
@@ -14,7 +15,8 @@ import '../utils/synth_engine.dart';
 import 'landing_page.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final Widget? child;
+  const DashboardScreen({super.key, this.child});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -28,7 +30,31 @@ class _DashboardScreenState extends State<DashboardScreen>
   String? _activeSongId;
 
   // Active navigation view: 'capture', 'library', 'collab', 'vault', 'workspace'
-  String _activeView = 'library';
+  String _activeViewInternal = 'library';
+  String get _activeView => _activeViewInternal;
+  set _activeView(String val) {
+    if (_activeViewInternal != val) {
+      _activeViewInternal = val;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/dashboard/$val');
+        }
+      });
+    }
+  }
+
+  void _syncActiveViewFromRoute() {
+    try {
+      final String path = GoRouterState.of(context).uri.path;
+      if (path.startsWith('/dashboard/')) {
+        final view = path.replaceFirst('/dashboard/', '');
+        if (_activeViewInternal != view) {
+          _activeViewInternal = view;
+        }
+      }
+    } catch (_) {}
+  }
+
   String _selectedContactName = 'Aria North';
   final TextEditingController _messageController = TextEditingController();
 
@@ -310,11 +336,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           // Logo Header (Clicking routes user back to Landing Page)
           GestureDetector(
             onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const LandingPageScreen(),
-                ),
-              );
+              context.go('/');
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -647,11 +669,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               indent: 12,
               onTap: () {
                 if (isDrawer) Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const LandingPageScreen(),
-                  ),
-                );
+                context.go('/');
               },
             ),
           ],
@@ -866,12 +884,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildMainContent(
-    SongProvider provider,
-    Song? activeSong,
-    bool showSidebar,
-  ) {
-    if (_activeView == 'workspace') {
+  Widget buildViewByName(String viewName) {
+    final provider = Provider.of<SongProvider>(context, listen: false);
+    final activeSong = provider.activeSong;
+    final bool showSidebar = MediaQuery.of(context).size.width >= 950;
+
+    if (viewName == 'workspace') {
       if (activeSong == null) {
         if (provider.songs.isNotEmpty) {
           // Select first song if none is active
@@ -890,41 +908,49 @@ class _DashboardScreenState extends State<DashboardScreen>
         );
       }
       return _buildWorkspaceView(provider, activeSong, showSidebar);
-    } else if (_activeView == 'mixer') {
+    } else if (viewName == 'mixer') {
       return _buildEmptyMixerView();
-    } else if (_activeView == 'capture') {
+    } else if (viewName == 'capture') {
       return _buildCaptureInboxView(provider);
-    } else if (_activeView == 'collab') {
+    } else if (viewName == 'collab') {
       return _buildCollaborationsView(provider);
-    } else if (_activeView == 'vault') {
+    } else if (viewName == 'vault') {
       return _buildTheVaultView(provider);
-    } else if (_activeView == 'news') {
+    } else if (viewName == 'news') {
       return _buildIndustryNewsView();
-    } else if (_activeView == 'charts') {
+    } else if (viewName == 'charts') {
       return _buildChartsView();
-    } else if (_activeView == 'projects') {
+    } else if (viewName == 'projects') {
       return _buildProjectsView(provider);
-    } else if (_activeView == 'company') {
+    } else if (viewName == 'company') {
       return _buildCompanyView();
-    } else if (_activeView == 'status') {
+    } else if (viewName == 'status') {
       return _buildStatusView();
-    } else if (_activeView == 'legals') {
+    } else if (viewName == 'legals') {
       return _buildLegalsView();
-    } else if (_activeView == 'messages') {
+    } else if (viewName == 'messages') {
       return _buildDMsMessagesView();
-    } else if (_activeView == 'team') {
+    } else if (viewName == 'team') {
       return _buildTeamMembersView();
-    } else if (_activeView == 'calendar') {
+    } else if (viewName == 'calendar') {
       return _buildCalendarView(provider);
-    } else if (_activeView == 'account') {
+    } else if (viewName == 'account') {
       return _buildAccountView();
-    } else if (_activeView == 'profile') {
+    } else if (viewName == 'profile') {
       return _buildProfileView();
-    } else if (_activeView == 'preferences') {
+    } else if (viewName == 'preferences') {
       return _buildPreferencesView();
     } else {
       return _buildSongLibraryView(provider);
     }
+  }
+
+  Widget _buildMainContent(
+    SongProvider provider,
+    Song? activeSong,
+    bool showSidebar,
+  ) {
+    return buildViewByName(_activeView);
   }
 
   // View: Capture Inbox (Inbox)
@@ -2226,6 +2252,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    _syncActiveViewFromRoute();
     final provider = Provider.of<SongProvider>(context);
     final songs = provider.songs;
     final activeSong = provider.activeSong;
@@ -2280,11 +2307,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ),
                     Expanded(
-                      child: _buildMainContent(
-                        provider,
-                        activeSong,
-                        showSidebar,
-                      ),
+                      child: widget.child ?? buildViewByName(_activeView),
                     ),
                   ],
                 ),
@@ -7258,4 +7281,16 @@ class AutomationCurvePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class DashboardViewContainer extends StatelessWidget {
+  final String viewName;
+  const DashboardViewContainer({super.key, required this.viewName});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<_DashboardScreenState>();
+    if (state == null) return const SizedBox();
+    return state.buildViewByName(viewName);
+  }
 }

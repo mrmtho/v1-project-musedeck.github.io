@@ -1,7 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'providers/song_provider.dart';
 import 'screens/landing_page.dart';
+import 'screens/all_creators.dart';
+import 'screens/dashboard.dart';
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const LandingPageScreen(),
+    ),
+    GoRoute(
+      path: '/creators',
+      builder: (context, state) => const AllCreatorsScreen(),
+    ),
+    ShellRoute(
+      builder: (context, state, child) {
+        return DashboardScreen(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: '/dashboard',
+          redirect: (context, state) => '/dashboard/library',
+        ),
+        GoRoute(
+          path: '/dashboard/:view',
+          builder: (context, state) {
+            final view = state.pathParameters['view'] ?? 'library';
+            return DashboardViewContainer(viewName: view);
+          },
+        ),
+      ],
+    ),
+  ],
+);
 
 void main() {
   runApp(
@@ -19,9 +54,10 @@ class MuseDeckApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'MuseDeck',
       debugShowCheckedModeBanner: false,
+      routerConfig: _router,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
@@ -53,7 +89,6 @@ class MuseDeckApp extends StatelessWidget {
           overlayColor: Color(0x2900FFCC),
         ),
       ),
-      home: const LandingPageScreen(),
     );
   }
 }

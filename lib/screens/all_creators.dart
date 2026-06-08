@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'dashboard.dart';
 import 'landing_page.dart';
 import '../widgets/floating_particles_background.dart';
@@ -482,9 +483,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
           // Logo link
           GestureDetector(
             onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LandingPageScreen()),
-              );
+              context.go('/');
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -533,9 +532,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
               shadowColor: const Color(0xFF6C3BF5).withOpacity(0.4),
             ),
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const DashboardScreen()),
-              );
+              context.go('/dashboard');
             },
             child: const Text(
               'Start Right Now',
@@ -553,9 +550,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const DashboardScreen()),
-              );
+              context.go('/dashboard');
             },
             icon: const Icon(Icons.person_outline, size: 16),
             label: const Text(

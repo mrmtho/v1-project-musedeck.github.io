@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'dashboard.dart';
 import '../widgets/floating_particles_background.dart';
 import 'all_creators.dart';
@@ -150,9 +151,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
   }
 
   void _navigateToDashboard() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const DashboardScreen()),
-    );
+    context.go('/dashboard');
   }
 
   @override
@@ -745,11 +744,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
               ),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const AllCreatorsScreen(),
-                  ),
-                );
+                context.go('/creators');
               },
               child: const Text(
                 'View all creators',
