@@ -3323,8 +3323,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               // Header spacer matching ruler
               Container(
                 height: 28,
-                color: const Color(0xFF1A1E25),
                 decoration: const BoxDecoration(
+                  color: Color(0xFF1A1E25),
                   border: Border(bottom: BorderSide(color: colorGrid), right: BorderSide(color: colorGrid)),
                 ),
                 alignment: Alignment.centerLeft,
