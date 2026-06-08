@@ -20,7 +20,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+class _DashboardScreenState extends State<DashboardScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
@@ -46,12 +47,32 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   int _dawBars = 1;
   int _dawBeats = 1;
   int _dawTicks = 0;
-  
+
   final List<Map<String, dynamic>> _dawTracks = [
-    {'name': 'Vocal Mic In', 'type': 'Audio', 'color': const Color(0xFF4D8DFF), 'icon': Icons.mic},
-    {'name': 'Chords Synth', 'type': 'Instrument', 'color': const Color(0xFFD03BFF), 'icon': Icons.keyboard},
-    {'name': 'Backing Drums', 'type': 'Audio', 'color': const Color(0xFF00FFCC), 'icon': Icons.audiotrack},
-    {'name': 'Synth Bass', 'type': 'MIDI', 'color': const Color(0xFFFFD700), 'icon': Icons.music_note},
+    {
+      'name': 'Vocal Mic In',
+      'type': 'Audio',
+      'color': const Color(0xFF4D8DFF),
+      'icon': Icons.mic,
+    },
+    {
+      'name': 'Chords Synth',
+      'type': 'Instrument',
+      'color': const Color(0xFFD03BFF),
+      'icon': Icons.keyboard,
+    },
+    {
+      'name': 'Backing Drums',
+      'type': 'Audio',
+      'color': const Color(0xFF00FFCC),
+      'icon': Icons.audiotrack,
+    },
+    {
+      'name': 'Synth Bass',
+      'type': 'MIDI',
+      'color': const Color(0xFFFFD700),
+      'icon': Icons.music_note,
+    },
   ];
 
   late List<double> _dawVolumes;
@@ -61,18 +82,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   late List<bool> _dawRecordArms;
   late List<bool> _dawMonitors;
   late List<Map<String, bool>> _dawEffectsBypasses;
-  
+
   double _masterVolume = 0.8;
   double _bottomPanelHeight = 240.0;
   bool _bottomPanelCollapsed = false;
-  String _bottomPanelTab = 'piano_roll'; // 'piano_roll', 'plugin_editor', 'automation', 'ai_assistant'
+  String _bottomPanelTab =
+      'piano_roll'; // 'piano_roll', 'plugin_editor', 'automation', 'ai_assistant'
   int _selectedTrackIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     // Initialize DAW track parameters
     _dawVolumes = List.filled(_dawTracks.length, 0.7);
     _dawPans = List.filled(_dawTracks.length, 0.0); // -1.0 to 1.0 (L to R)
@@ -80,12 +102,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     _dawSolos = List.filled(_dawTracks.length, false);
     _dawRecordArms = List.filled(_dawTracks.length, false);
     _dawMonitors = List.filled(_dawTracks.length, false);
-    _dawEffectsBypasses = List.generate(_dawTracks.length, (_) => {
-      'EQ': false,
-      'Comp': false,
-      'Reverb': true,
-      'Delay': true,
-    });
+    _dawEffectsBypasses = List.generate(
+      _dawTracks.length,
+      (_) => {'EQ': false, 'Comp': false, 'Reverb': true, 'Delay': true},
+    );
   }
 
   @override
@@ -111,7 +131,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     }
   }
 
-  Widget _buildSidebar(SongProvider provider, List<Song> songs, Song? activeSong, {bool isDrawer = false}) {
+  Widget _buildSidebar(
+    SongProvider provider,
+    List<Song> songs,
+    Song? activeSong, {
+    bool isDrawer = false,
+  }) {
     return Container(
       width: 260,
       color: const Color(0xFF13131A),
@@ -122,15 +147,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           GestureDetector(
             onTap: () {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const LandingPageScreen(),
+                ),
               );
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.03))),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +177,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.blur_on, color: Colors.black, size: 20),
+                          child: const Icon(
+                            Icons.blur_on,
+                            color: Colors.black,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         const Text(
@@ -159,11 +195,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFD03BFF).withOpacity(0.2),
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: const Color(0xFFD03BFF).withOpacity(0.4), width: 0.8),
+                            border: Border.all(
+                              color: const Color(0xFFD03BFF).withOpacity(0.4),
+                              width: 0.8,
+                            ),
                           ),
                           child: const Text(
                             'v0.01',
@@ -190,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               ),
             ),
           ),
-          
+
           // Scrollable Sidebar Nav Items to prevent vertical overflow
           Expanded(
             child: SingleChildScrollView(
@@ -203,7 +245,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     icon: Icons.palette_outlined,
                     label: 'Playground',
                     isExpanded: _playgroundExpanded,
-                    onTap: () => setState(() => _playgroundExpanded = !_playgroundExpanded),
+                    onTap: () => setState(
+                      () => _playgroundExpanded = !_playgroundExpanded,
+                    ),
                   ),
                   if (_playgroundExpanded) ...[
                     _buildSidebarNavItem(
@@ -238,9 +282,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       },
                     ),
                   ],
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // 2. MIXER CONSOLE
                   _buildSidebarNavItem(
                     icon: Icons.tune,
@@ -251,7 +295,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
-                  
+
                   // 3. PROJECTS
                   _buildSidebarNavItem(
                     icon: Icons.folder_open,
@@ -262,7 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
-                  
+
                   // 4. NETWORK (Collaborators)
                   _buildSidebarNavItem(
                     icon: Icons.people_outline,
@@ -273,15 +317,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // 5. INDUSTRY
                   _buildSidebarHeader(
                     icon: Icons.business_center_outlined,
                     label: 'Industry',
                     isExpanded: _industryExpanded,
-                    onTap: () => setState(() => _industryExpanded = !_industryExpanded),
+                    onTap: () =>
+                        setState(() => _industryExpanded = !_industryExpanded),
                   ),
                   if (_industryExpanded) ...[
                     _buildSidebarNavItem(
@@ -305,9 +350,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       },
                     ),
                   ],
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // 6. MORE
                   _buildSidebarHeader(
                     icon: Icons.more_horiz_outlined,
@@ -408,7 +453,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               onTap: () {
                 if (isDrawer) Navigator.of(context).pop();
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const LandingPageScreen(),
+                  ),
                 );
               },
             ),
@@ -442,7 +489,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 Icon(
                   icon,
                   size: 18,
-                  color: isSelected ? const Color(0xFF00FFCC) : Colors.grey[400],
+                  color: isSelected
+                      ? const Color(0xFF00FFCC)
+                      : Colors.grey[400],
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -450,14 +499,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     label,
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.grey[400],
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       fontSize: 13,
                     ),
                   ),
                 ),
                 if (badgeCount != null && badgeCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFF5252),
                       borderRadius: BorderRadius.circular(10),
@@ -494,11 +548,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: Colors.white.withOpacity(0.35),
-              ),
+              Icon(icon, size: 16, color: Colors.white.withOpacity(0.35)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -512,7 +562,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
               ),
               Icon(
-                isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                isExpanded
+                    ? Icons.keyboard_arrow_down
+                    : Icons.keyboard_arrow_right,
                 size: 14,
                 color: Colors.white.withOpacity(0.35),
               ),
@@ -529,7 +581,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E2E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text(
             'Changelog - v0.01',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -539,8 +593,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text(
-                '🎉 Welcome to MuseDeck!',
-                style: TextStyle(color: Color(0xFF00FFCC), fontWeight: FontWeight.bold, fontSize: 13),
+                '🎉 Welcome to Studduo!',
+                style: TextStyle(
+                  color: Color(0xFF00FFCC),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
               SizedBox(height: 8),
               Text(
@@ -555,7 +613,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Great', style: TextStyle(color: Color(0xFF00FFCC))),
+              child: const Text(
+                'Great',
+                style: TextStyle(color: Color(0xFF00FFCC)),
+              ),
             ),
           ],
         );
@@ -569,7 +630,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E2E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text(
             'MuseDeck Workspace Settings',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -579,17 +642,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             children: [
               ListTile(
                 leading: const Icon(Icons.settings, color: Colors.grey),
-                title: const Text('Audio Preferences', style: TextStyle(color: Colors.white, fontSize: 13)),
+                title: const Text(
+                  'Audio Preferences',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
                 leading: const Icon(Icons.backup, color: Colors.grey),
-                title: const Text('Backup Workspace Data', style: TextStyle(color: Colors.white, fontSize: 13)),
+                title: const Text(
+                  'Backup Workspace Data',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
                 leading: const Icon(Icons.help_outline, color: Colors.grey),
-                title: const Text('Interactive Guide', style: TextStyle(color: Colors.white, fontSize: 13)),
+                title: const Text(
+                  'Interactive Guide',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
                 onTap: () => Navigator.pop(context),
               ),
             ],
@@ -599,16 +671,27 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildMainContent(SongProvider provider, Song? activeSong, bool showSidebar) {
+  Widget _buildMainContent(
+    SongProvider provider,
+    Song? activeSong,
+    bool showSidebar,
+  ) {
     if (_activeView == 'workspace') {
       if (activeSong == null) {
         if (provider.songs.isNotEmpty) {
           // Select first song if none is active
           provider.selectSong(provider.songs.first);
-          return _buildWorkspaceView(provider, provider.songs.first, showSidebar);
+          return _buildWorkspaceView(
+            provider,
+            provider.songs.first,
+            showSidebar,
+          );
         }
         return const Center(
-          child: Text('Create or select a song to open workspace', style: TextStyle(color: Colors.white)),
+          child: Text(
+            'Create or select a song to open workspace',
+            style: TextStyle(color: Colors.white),
+          ),
         );
       }
       return _buildWorkspaceView(provider, activeSong, showSidebar);
@@ -650,7 +733,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '🎙️ Capture Inbox',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -673,7 +760,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     'mock_record_inbox.wav',
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Captured audio memo to inbox!'), backgroundColor: Color(0xFFD03BFF)),
+                    const SnackBar(
+                      content: Text('Captured audio memo to inbox!'),
+                      backgroundColor: Color(0xFFD03BFF),
+                    ),
                   );
                 },
               ),
@@ -700,7 +790,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Captured photo scan reference!'), backgroundColor: Color(0xFFFFD700)),
+                    const SnackBar(
+                      content: Text('Captured photo scan reference!'),
+                      backgroundColor: Color(0xFFFFD700),
+                    ),
                   );
                 },
               ),
@@ -710,14 +803,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         const SizedBox(height: 32),
         const Text(
           'Unorganized Inbox Ideas',
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
         if (provider.inbox.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 40),
             child: Center(
-              child: Text('Inbox is clean! All ideas sorted.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              child: Text(
+                'Inbox is clean! All ideas sorted.',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
             ),
           )
         else
@@ -761,43 +861,70 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         children: [
                           Text(
                             item.title,
-                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             item.content,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(
                         'UNORGANIZED',
-                        style: TextStyle(color: Colors.grey, fontSize: 8, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                        backgroundColor: const Color(
+                          0xFF00FFCC,
+                        ).withOpacity(0.15),
                         foregroundColor: const Color(0xFF00FFCC),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
-                      onPressed: () => _showSortCaptureDialog(context, provider, item),
+                      onPressed: () =>
+                          _showSortCaptureDialog(context, provider, item),
                       icon: const Icon(Icons.sort, size: 14),
-                      label: const Text('Sort / Workspace', style: TextStyle(fontSize: 11)),
+                      label: const Text(
+                        'Sort / Workspace',
+                        style: TextStyle(fontSize: 11),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.redAccent,
+                        size: 18,
+                      ),
                       onPressed: () => provider.deleteCaptureItem(item.id),
                     ),
                   ],
@@ -836,7 +963,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               const SizedBox(height: 12),
               Text(
                 label,
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -853,21 +984,30 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E2E),
-          title: const Text('Quick Note Capture', style: TextStyle(color: Colors.white)),
+          title: const Text(
+            'Quick Note Capture',
+            style: TextStyle(color: Colors.white),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleCtrl,
                 style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.grey)),
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: noteCtrl,
                 maxLines: 3,
                 style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: const InputDecoration(labelText: 'Write thoughts...', labelStyle: TextStyle(color: Colors.grey)),
+                decoration: const InputDecoration(
+                  labelText: 'Write thoughts...',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
             ],
           ),
@@ -877,10 +1017,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FFCC), foregroundColor: Colors.black),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00FFCC),
+                foregroundColor: Colors.black,
+              ),
               onPressed: () {
                 if (titleCtrl.text.isNotEmpty && noteCtrl.text.isNotEmpty) {
-                  provider.addCaptureItem(titleCtrl.text, 'text', noteCtrl.text);
+                  provider.addCaptureItem(
+                    titleCtrl.text,
+                    'text',
+                    noteCtrl.text,
+                  );
                   Navigator.pop(context);
                 }
               },
@@ -892,7 +1039,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  void _showSortCaptureDialog(BuildContext context, SongProvider provider, CaptureItem item) {
+  void _showSortCaptureDialog(
+    BuildContext context,
+    SongProvider provider,
+    CaptureItem item,
+  ) {
     final titleCtrl = TextEditingController(text: item.title);
     SongGroupType selectedGroup = SongGroupType.single;
 
@@ -903,7 +1054,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: const Color(0xFF1E1E2E),
-              title: const Text('Sort to Song Workspace', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Sort to Song Workspace',
+                style: TextStyle(color: Colors.white),
+              ),
               content: SizedBox(
                 width: 320,
                 child: Column(
@@ -912,12 +1066,18 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     TextField(
                       controller: titleCtrl,
                       style: const TextStyle(color: Colors.white, fontSize: 13),
-                      decoration: const InputDecoration(labelText: 'New Song Title', labelStyle: TextStyle(color: Colors.grey)),
+                      decoration: const InputDecoration(
+                        labelText: 'New Song Title',
+                        labelStyle: TextStyle(color: Colors.grey),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Group Into:', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      child: Text(
+                        'Group Into:',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     DropdownButton<SongGroupType>(
@@ -932,7 +1092,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         );
                       }).toList(),
                       onChanged: (val) {
-                        if (val != null) setDialogState(() => selectedGroup = val);
+                        if (val != null)
+                          setDialogState(() => selectedGroup = val);
                       },
                     ),
                   ],
@@ -941,12 +1102,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00FFCC), foregroundColor: Colors.black),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFCC),
+                    foregroundColor: Colors.black,
+                  ),
                   onPressed: () {
-                    provider.convertCaptureToSong(item.id, titleCtrl.text, selectedGroup);
+                    provider.convertCaptureToSong(
+                      item.id,
+                      titleCtrl.text,
+                      selectedGroup,
+                    );
                     Navigator.pop(context);
                     setState(() {
                       _activeView = 'workspace';
@@ -991,20 +1162,32 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   const Text(
                     '🎵 Song Library',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00FFCC),
                       foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                     onPressed: () {
-                      provider.createNewSong(title: 'New Workspace #${songs.length + 1}');
+                      provider.createNewSong(
+                        title: 'New Workspace #${songs.length + 1}',
+                      );
                       setState(() => _activeView = 'workspace');
                     },
                     icon: const Icon(Icons.add, size: 16),
-                    label: const Text('New Song Workspace', style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      'New Song Workspace',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -1012,10 +1195,38 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               Expanded(
                 child: ListView(
                   children: [
-                    _buildLibrarySection(provider, songs, SongGroupType.single, '💿 Singles', columns, aspectRatio),
-                    _buildLibrarySection(provider, songs, SongGroupType.ep, '📼 EPs', columns, aspectRatio),
-                    _buildLibrarySection(provider, songs, SongGroupType.album, '🎸 Albums', columns, aspectRatio),
-                    _buildLibrarySection(provider, songs, SongGroupType.liveSet, '🎤 Live Sets', columns, aspectRatio),
+                    _buildLibrarySection(
+                      provider,
+                      songs,
+                      SongGroupType.single,
+                      '💿 Singles',
+                      columns,
+                      aspectRatio,
+                    ),
+                    _buildLibrarySection(
+                      provider,
+                      songs,
+                      SongGroupType.ep,
+                      '📼 EPs',
+                      columns,
+                      aspectRatio,
+                    ),
+                    _buildLibrarySection(
+                      provider,
+                      songs,
+                      SongGroupType.album,
+                      '🎸 Albums',
+                      columns,
+                      aspectRatio,
+                    ),
+                    _buildLibrarySection(
+                      provider,
+                      songs,
+                      SongGroupType.liveSet,
+                      '🎤 Live Sets',
+                      columns,
+                      aspectRatio,
+                    ),
                     const SizedBox(height: 40),
                     _buildFooterSection(),
                   ],
@@ -1045,7 +1256,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     return fallbackCovers[hash % fallbackCovers.length];
   }
 
-  Widget _buildLibrarySection(SongProvider provider, List<Song> allSongs, SongGroupType type, String sectionTitle, int columns, double aspectRatio) {
+  Widget _buildLibrarySection(
+    SongProvider provider,
+    List<Song> allSongs,
+    SongGroupType type,
+    String sectionTitle,
+    int columns,
+    double aspectRatio,
+  ) {
     final filtered = allSongs.where((s) => s.groupType == type).toList();
     if (filtered.isEmpty) return const SizedBox();
 
@@ -1056,7 +1274,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           padding: const EdgeInsets.symmetric(vertical: 12.0),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Color(0xFF00FFCC),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         GridView.builder(
@@ -1101,17 +1323,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     song.title,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 IconButton(
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
-                                  icon: const Icon(Icons.archive_outlined, color: Colors.grey, size: 16),
+                                  icon: const Icon(
+                                    Icons.archive_outlined,
+                                    color: Colors.grey,
+                                    size: 16,
+                                  ),
                                   onPressed: () {
                                     provider.archiveSong(song.id);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Archived "${song.title}" to The Vault!')),
+                                      SnackBar(
+                                        content: Text(
+                                          'Archived "${song.title}" to The Vault!',
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -1120,13 +1354,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             const SizedBox(height: 3),
                             Text(
                               '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
-                              style: const TextStyle(color: Colors.grey, fontSize: 10),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 10,
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Status:', style: TextStyle(color: Colors.grey, fontSize: 9)),
+                                const Text(
+                                  'Status:',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 9,
+                                  ),
+                                ),
                                 Text(
                                   songStatusToString(song.status),
                                   style: TextStyle(
@@ -1144,14 +1387,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       ),
                       Expanded(
                         child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                          borderRadius: const BorderRadius.vertical(
+                            bottom: Radius.circular(16),
+                          ),
                           child: Image.network(
                             _getSongThumbnail(song),
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: const Color(0xFF252535),
-                              child: const Icon(Icons.broken_image, color: Colors.grey),
-                            ),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  color: const Color(0xFF252535),
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                           ),
                         ),
                       ),
@@ -1178,7 +1427,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           children: List.generate(stages.length, (index) {
             final isCompleted = index <= currentIndex;
             final isCurrent = index == currentIndex;
-            
+
             return Row(
               children: [
                 Container(
@@ -1187,7 +1436,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   decoration: BoxDecoration(
                     color: isCurrent
                         ? const Color(0xFF00FFCC)
-                        : (isCompleted ? const Color(0xFFD03BFF) : Colors.white10),
+                        : (isCompleted
+                              ? const Color(0xFFD03BFF)
+                              : Colors.white10),
                     shape: BoxShape.circle,
                     boxShadow: isCurrent
                         ? [
@@ -1217,14 +1468,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   // View: Collaborations Panel
   Widget _buildCollaborationsView(SongProvider provider) {
-    final songs = provider.songs.where((s) => s.collaborators.isNotEmpty && !s.isArchived).toList();
+    final songs = provider.songs
+        .where((s) => s.collaborators.isNotEmpty && !s.isArchived)
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.all(24.0),
       children: [
         const Text(
           '👥 Collaborations',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -1236,7 +1493,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 40),
             child: Center(
-              child: Text('No active collaboration workspaces.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              child: Text(
+                'No active collaboration workspaces.',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
             ),
           )
         else
@@ -1265,70 +1525,108 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           children: [
                             Text(
                               song.title,
-                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'BPM: ${song.bpm} • Key: ${song.keySignature} • Time: ${song.timeSignature}',
-                              style: const TextStyle(color: Colors.grey, fontSize: 11),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                            backgroundColor: const Color(
+                              0xFF00FFCC,
+                            ).withOpacity(0.15),
                             foregroundColor: const Color(0xFF00FFCC),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
                           ),
                           onPressed: () {
                             provider.selectSong(song);
                             setState(() => _activeView = 'workspace');
                           },
                           icon: const Icon(Icons.exit_to_app, size: 14),
-                          label: const Text('Open Workspace', style: TextStyle(fontSize: 11)),
+                          label: const Text(
+                            'Open Workspace',
+                            style: TextStyle(fontSize: 11),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     const Divider(color: Colors.white10),
                     const SizedBox(height: 12),
-                    const Text('Collaborators & Split shares', style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Collaborators & Split shares',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: song.collaborators.map((c) {
-                        final int splitShare = (100 / (song.collaborators.length + 1)).round();
-                        return Chip(
-                          backgroundColor: const Color(0xFF1E1E2E),
-                          side: BorderSide.none,
-                          label: Text(
-                            '$c ($splitShare%)',
-                            style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 11),
-                          ),
-                          avatar: CircleAvatar(
-                            backgroundColor: const Color(0xFFD03BFF),
-                            child: Text(
-                              c[0],
-                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                      children:
+                          song.collaborators.map((c) {
+                            final int splitShare =
+                                (100 / (song.collaborators.length + 1)).round();
+                            return Chip(
+                              backgroundColor: const Color(0xFF1E1E2E),
+                              side: BorderSide.none,
+                              label: Text(
+                                '$c ($splitShare%)',
+                                style: const TextStyle(
+                                  color: Color(0xFF00FFCC),
+                                  fontSize: 11,
+                                ),
+                              ),
+                              avatar: CircleAvatar(
+                                backgroundColor: const Color(0xFFD03BFF),
+                                child: Text(
+                                  c[0],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList()..add(
+                            Chip(
+                              backgroundColor: const Color(0xFF1E1E2E),
+                              side: BorderSide.none,
+                              label: Text(
+                                'Me (${(100 / (song.collaborators.length + 1) + (100 % (song.collaborators.length + 1))).round()}%)',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              avatar: const CircleAvatar(
+                                backgroundColor: Color(0xFF00FFCC),
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.black,
+                                  size: 10,
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      }).toList()
-                        ..add(
-                          Chip(
-                            backgroundColor: const Color(0xFF1E1E2E),
-                            side: BorderSide.none,
-                            label: Text(
-                              'Me (${(100 / (song.collaborators.length + 1) + (100 % (song.collaborators.length + 1))).round()}%)',
-                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                            ),
-                            avatar: const CircleAvatar(
-                              backgroundColor: Color(0xFF00FFCC),
-                              child: Icon(Icons.person, color: Colors.black, size: 10),
-                            ),
-                          ),
-                        ),
                     ),
                   ],
                 ),
@@ -1344,7 +1642,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   // View: The Vault (Archived ideas)
   Widget _buildTheVaultView(SongProvider provider) {
     final songs = provider.songs
-        .where((s) => s.isArchived && s.title.toLowerCase().contains(_vaultSearchQuery.toLowerCase()))
+        .where(
+          (s) =>
+              s.isArchived &&
+              s.title.toLowerCase().contains(_vaultSearchQuery.toLowerCase()),
+        )
         .toList();
 
     return ListView(
@@ -1352,7 +1654,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '🗃️ The Vault (Archived Ideas)',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -1389,7 +1695,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 40),
             child: Center(
-              child: Text('No archived ideas match search.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              child: Text(
+                'No archived ideas match search.',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
             ),
           )
         else
@@ -1399,7 +1708,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             itemCount: songs.length,
             itemBuilder: (context, index) {
               final song = songs[index];
-              final lastModStr = DateFormat('MMMM dd, yyyy').format(song.lastModified);
+              final lastModStr = DateFormat(
+                'MMMM dd, yyyy',
+              ).format(song.lastModified);
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
@@ -1421,7 +1732,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           width: 44,
                           height: 44,
                           color: const Color(0xFF252535),
-                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 16),
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -1432,12 +1747,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         children: [
                           Text(
                             song.title,
-                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Archived: $lastModStr • ${song.bpm} BPM',
-                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -1446,26 +1768,46 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       children: [
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD03BFF).withOpacity(0.15),
+                            backgroundColor: const Color(
+                              0xFFD03BFF,
+                            ).withOpacity(0.15),
                             foregroundColor: const Color(0xFFD03BFF),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
                           onPressed: () {
                             provider.restoreSong(song.id);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Restored "${song.title}" to active library!')),
+                              SnackBar(
+                                content: Text(
+                                  'Restored "${song.title}" to active library!',
+                                ),
+                              ),
                             );
                           },
                           icon: const Icon(Icons.unarchive, size: 14),
-                          label: const Text('Restore', style: TextStyle(fontSize: 11)),
+                          label: const Text(
+                            'Restore',
+                            style: TextStyle(fontSize: 11),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: const Icon(Icons.delete_forever, color: Colors.redAccent, size: 18),
+                          icon: const Icon(
+                            Icons.delete_forever,
+                            color: Colors.redAccent,
+                            size: 18,
+                          ),
                           onPressed: () {
                             provider.deleteSong(song.id);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Permanently deleted "${song.title}"')),
+                              SnackBar(
+                                content: Text(
+                                  'Permanently deleted "${song.title}"',
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -1483,7 +1825,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
 
   // View: Song Workspace Panel (Edit song contents - Chords, Lyrics, metronome etc.)
-  Widget _buildWorkspaceView(SongProvider provider, Song activeSong, bool showSidebar) {
+  Widget _buildWorkspaceView(
+    SongProvider provider,
+    Song activeSong,
+    bool showSidebar,
+  ) {
     final bool stackPanels = MediaQuery.of(context).size.width < 850;
 
     return Scaffold(
@@ -1521,7 +1867,18 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             _buildMetadataDropdown(
               label: 'Key',
               value: activeSong.keySignature,
-              items: ['C Maj', 'G Maj', 'D Maj', 'A Maj', 'E Maj', 'F Maj', 'A Min', 'E Min', 'D Min', 'B Min'],
+              items: [
+                'C Maj',
+                'G Maj',
+                'D Maj',
+                'A Maj',
+                'E Maj',
+                'F Maj',
+                'A Min',
+                'E Min',
+                'D Min',
+                'B Min',
+              ],
               onChanged: (val) {
                 if (val != null) {
                   provider.updateActiveSongMetadata(keySignature: val);
@@ -1550,15 +1907,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   const ChordProgressionEditor(),
                   const SizedBox(height: 16),
-                  const SizedBox(
-                    height: 400,
-                    child: LyricEditor(),
-                  ),
+                  const SizedBox(height: 400, child: LyricEditor()),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 480,
-                    child: _buildTabsPanel(),
-                  ),
+                  SizedBox(height: 480, child: _buildTabsPanel()),
                 ],
               ),
             )
@@ -1640,17 +1991,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label: ', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+          Text(
+            '$label: ',
+            style: const TextStyle(color: Colors.grey, fontSize: 10),
+          ),
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               dropdownColor: const Color(0xFF1E1E2E),
               value: value,
-              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
               items: items.map((val) {
-                return DropdownMenuItem<String>(
-                  value: val,
-                  child: Text(val),
-                );
+                return DropdownMenuItem<String>(value: val, child: Text(val));
               }).toList(),
               onChanged: onChanged,
             ),
@@ -1677,12 +2032,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
         return Scaffold(
           backgroundColor: const Color(0xFF0D0D14),
-          drawer: !showSidebar ? Drawer(child: _buildSidebar(provider, songs, activeSong, isDrawer: true)) : null,
+          drawer: !showSidebar
+              ? Drawer(
+                  child: _buildSidebar(
+                    provider,
+                    songs,
+                    activeSong,
+                    isDrawer: true,
+                  ),
+                )
+              : null,
           body: Row(
             children: [
               // Left Sidebar
               if (showSidebar) _buildSidebar(provider, songs, activeSong),
-              
+
               // Main Content
               Expanded(
                 child: Column(
@@ -1697,10 +2061,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             onPressed: () => Scaffold.of(context).openDrawer(),
                           ),
                         ),
-                        title: const Text('MuseDeck', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        title: const Text(
+                          'MuseDeck',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     Expanded(
-                      child: _buildMainContent(provider, activeSong, showSidebar),
+                      child: _buildMainContent(
+                        provider,
+                        activeSong,
+                        showSidebar,
+                      ),
                     ),
                   ],
                 ),
@@ -1718,30 +2093,34 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         'title': 'Synth Design is Reaching a New Golden Age',
         'source': 'Pitchfork',
         'time': '2 hours ago',
-        'desc': 'How bedroom producers and modular synthesis enthusiasts are driving the hardware design revival. We look at the latest semi-modular releases from Moog and Behringer.',
+        'desc':
+            'How bedroom producers and modular synthesis enthusiasts are driving the hardware design revival. We look at the latest semi-modular releases from Moog and Behringer.',
         'image': 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625',
       },
       {
         'title': 'Billboard Hot 100: Synthwave and Retro Beats Take Over',
         'source': 'Billboard',
         'time': '5 hours ago',
-        'desc': 'Analysis of this week\'s charts shows a massive surge in analog-sounding basslines and heavy 80s gated reverb snare drums in mainstream pop.',
+        'desc':
+            'Analysis of this week\'s charts shows a massive surge in analog-sounding basslines and heavy 80s gated reverb snare drums in mainstream pop.',
         'image': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4',
       },
       {
         'title': 'The Rise of AI Collaborations in Modern Songwriting',
         'source': 'Sound on Sound',
         'time': '1 day ago',
-        'desc': 'A look at how tools like MuseDeck are allowing songwriters to brainstorm chord progression templates and sync draft memos collaboratively.',
+        'desc':
+            'A look at how tools like MuseDeck are allowing songwriters to brainstorm chord progression templates and sync draft memos collaboratively.',
         'image': 'https://images.unsplash.com/photo-1507838153414-b4b713384a76',
       },
       {
         'title': 'How Live Streaming Changed Indie Concert Touring Forever',
         'source': 'NME',
         'time': '3 days ago',
-        'desc': 'Even as physical venues return to full capacity, hybrid digital tickets and live stream archives are generating up to 40% of total tour revenues for independent artists.',
+        'desc':
+            'Even as physical venues return to full capacity, hybrid digital tickets and live stream archives are generating up to 40% of total tour revenues for independent artists.',
         'image': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a',
-      }
+      },
     ];
 
     return ListView(
@@ -1749,7 +2128,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '📰 Industry News',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -1782,7 +2165,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     flex: 5,
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
                         image: DecorationImage(
                           image: NetworkImage(news['image']!),
                           fit: BoxFit.cover,
@@ -1792,14 +2177,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         alignment: Alignment.topLeft,
                         child: Container(
                           margin: const EdgeInsets.all(12),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFD03BFF),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             news['source']!,
-                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1820,20 +2212,31 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 news['title']!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 news['desc']!,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.grey, fontSize: 11, height: 1.4),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 11,
+                                  height: 1.4,
+                                ),
                               ),
                             ],
                           ),
                           Text(
                             news['time']!,
-                            style: const TextStyle(color: Colors.grey, fontSize: 9),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 9,
+                            ),
                           ),
                         ],
                       ),
@@ -1853,23 +2256,107 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   Widget _buildChartsView() {
     final Map<String, List<Map<String, dynamic>>> genreCharts = {
       'Synthwave': [
-        {'rank': 1, 'change': 'new', 'title': 'Resonance Shift', 'artist': 'Laserhawk', 'bpm': 112, 'key': 'A Min'},
-        {'rank': 2, 'change': '+1', 'title': 'Glow Rider', 'artist': 'Kavinsky', 'bpm': 118, 'key': 'D Min'},
-        {'rank': 3, 'change': '-1', 'title': 'Turbo Drive', 'artist': 'FM-84', 'bpm': 120, 'key': 'C Maj'},
-        {'rank': 4, 'change': '+3', 'title': 'Outrun Sunset', 'artist': 'The Midnight', 'bpm': 105, 'key': 'G Maj'},
+        {
+          'rank': 1,
+          'change': 'new',
+          'title': 'Resonance Shift',
+          'artist': 'Laserhawk',
+          'bpm': 112,
+          'key': 'A Min',
+        },
+        {
+          'rank': 2,
+          'change': '+1',
+          'title': 'Glow Rider',
+          'artist': 'Kavinsky',
+          'bpm': 118,
+          'key': 'D Min',
+        },
+        {
+          'rank': 3,
+          'change': '-1',
+          'title': 'Turbo Drive',
+          'artist': 'FM-84',
+          'bpm': 120,
+          'key': 'C Maj',
+        },
+        {
+          'rank': 4,
+          'change': '+3',
+          'title': 'Outrun Sunset',
+          'artist': 'The Midnight',
+          'bpm': 105,
+          'key': 'G Maj',
+        },
       ],
       'Pop': [
-        {'rank': 1, 'change': '=', 'title': 'Neon Hearts', 'artist': 'Dua Lipa', 'bpm': 122, 'key': 'C Maj'},
-        {'rank': 2, 'change': 'new', 'title': 'Midnight Dance', 'artist': 'The Weeknd', 'bpm': 120, 'key': 'A Min'},
-        {'rank': 3, 'change': '+2', 'title': 'Rainy Day', 'artist': 'Taylor Swift', 'bpm': 98, 'key': 'F Maj'},
-        {'rank': 4, 'change': '-1', 'title': 'Golden Summer', 'artist': 'Harry Styles', 'bpm': 115, 'key': 'D Min'},
+        {
+          'rank': 1,
+          'change': '=',
+          'title': 'Neon Hearts',
+          'artist': 'Dua Lipa',
+          'bpm': 122,
+          'key': 'C Maj',
+        },
+        {
+          'rank': 2,
+          'change': 'new',
+          'title': 'Midnight Dance',
+          'artist': 'The Weeknd',
+          'bpm': 120,
+          'key': 'A Min',
+        },
+        {
+          'rank': 3,
+          'change': '+2',
+          'title': 'Rainy Day',
+          'artist': 'Taylor Swift',
+          'bpm': 98,
+          'key': 'F Maj',
+        },
+        {
+          'rank': 4,
+          'change': '-1',
+          'title': 'Golden Summer',
+          'artist': 'Harry Styles',
+          'bpm': 115,
+          'key': 'D Min',
+        },
       ],
       'Techno': [
-        {'rank': 1, 'change': '+2', 'title': 'Acid Pulse', 'artist': 'Charlotte de Witte', 'bpm': 135, 'key': 'E Min'},
-        {'rank': 2, 'change': '-1', 'title': 'Industrial Noise', 'artist': 'Amelie Lens', 'bpm': 138, 'key': 'A Min'},
-        {'rank': 3, 'change': 'new', 'title': 'Dark Space', 'artist': 'Carl Cox', 'bpm': 130, 'key': 'D Min'},
-        {'rank': 4, 'change': '=', 'title': 'Modulation Loop', 'artist': 'Enrico Sangiuliano', 'bpm': 132, 'key': 'C Maj'},
-      ]
+        {
+          'rank': 1,
+          'change': '+2',
+          'title': 'Acid Pulse',
+          'artist': 'Charlotte de Witte',
+          'bpm': 135,
+          'key': 'E Min',
+        },
+        {
+          'rank': 2,
+          'change': '-1',
+          'title': 'Industrial Noise',
+          'artist': 'Amelie Lens',
+          'bpm': 138,
+          'key': 'A Min',
+        },
+        {
+          'rank': 3,
+          'change': 'new',
+          'title': 'Dark Space',
+          'artist': 'Carl Cox',
+          'bpm': 130,
+          'key': 'D Min',
+        },
+        {
+          'rank': 4,
+          'change': '=',
+          'title': 'Modulation Loop',
+          'artist': 'Enrico Sangiuliano',
+          'bpm': 132,
+          'key': 'C Maj',
+        },
+      ],
     };
 
     final chartsList = genreCharts[_selectedGenre] ?? genreCharts['Synthwave']!;
@@ -1885,7 +2372,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               children: [
                 const Text(
                   '📈 Music Charts',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -1955,7 +2446,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     alignment: Alignment.center,
                     child: Text(
                       '$rank',
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1965,7 +2460,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       if (change != '=' && change != 'new')
                         Text(
                           change.substring(1),
-                          style: TextStyle(color: changeColor, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: changeColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                     ],
                   ),
@@ -1991,21 +2490,33 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       children: [
                         Text(
                           track['title']!,
-                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${track['artist']} • $bpm BPM • Key: $key',
-                          style: const TextStyle(color: Colors.grey, fontSize: 11),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00FFCC).withOpacity(0.15),
+                      backgroundColor: const Color(
+                        0xFF00FFCC,
+                      ).withOpacity(0.15),
                       foregroundColor: const Color(0xFF00FFCC),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                     onPressed: () {
                       final List<String> chords;
@@ -2024,13 +2535,18 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Previewing vibe of "${track['title']}" in $key ($bpm BPM)'),
+                          content: Text(
+                            'Previewing vibe of "${track['title']}" in $key ($bpm BPM)',
+                          ),
                           duration: const Duration(seconds: 1),
                         ),
                       );
                     },
                     icon: const Icon(Icons.audiotrack, size: 14),
-                    label: const Text('Vibe Check', style: TextStyle(fontSize: 11)),
+                    label: const Text(
+                      'Vibe Check',
+                      style: TextStyle(fontSize: 11),
+                    ),
                   ),
                 ],
               ),
@@ -2042,8 +2558,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       ],
     );
   }
-
-
 
   Widget _buildFilterDropdown({
     required String value,
@@ -2061,12 +2575,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         child: DropdownButton<String>(
           dropdownColor: const Color(0xFF1E1E2E),
           value: value,
-          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           items: items.map((val) {
-            return DropdownMenuItem<String>(
-              value: val,
-              child: Text(val),
-            );
+            return DropdownMenuItem<String>(value: val, child: Text(val));
           }).toList(),
           onChanged: onChanged,
         ),
@@ -2115,7 +2630,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   Text(
                     '© 2026 Studduo. All rights reserved.',
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                    ),
                   ),
                   DropdownButton<String>(
                     dropdownColor: const Color(0xFF13131A),
@@ -2128,7 +2646,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           children: [
                             Icon(Icons.language, size: 16, color: Colors.grey),
                             SizedBox(width: 8),
-                            Text('English', style: TextStyle(color: Colors.white, fontSize: 12)),
+                            Text(
+                              'English',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -2158,11 +2682,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                Icons.waves,
-                color: Colors.black,
-                size: 20,
-              ),
+              child: const Icon(Icons.waves, color: Colors.black, size: 20),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -2181,7 +2701,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
             'AI Powered Workstation for Music Artists',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 13,
+              height: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -2218,16 +2742,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         children: [
           Text(
             title,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 16),
-          ...links.map((link) => Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  link,
-                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+          ...links.map(
+            (link) => Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Text(
+                link,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 12,
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       );
     }
@@ -2237,8 +2770,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildCol('Company', ['About Us', 'Contact Us', 'Operational Status']),
-        buildCol('Resources', ['Help Center', 'Pricing', 'Blog', 'Community', 'Download Android', 'Download iOS', 'Download Huawei']),
-        buildCol('Legal', ['Terms and Conditions', 'Privacy Policy', 'Cookie Policy']),
+        buildCol('Resources', [
+          'Help Center',
+          'Pricing',
+          'Blog',
+          'Community',
+          'Download Android',
+          'Download iOS',
+          'Download Huawei',
+        ]),
+        buildCol('Legal', [
+          'Terms and Conditions',
+          'Privacy Policy',
+          'Cookie Policy',
+        ]),
       ],
     );
   }
@@ -2250,7 +2795,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '📂 Projects & Assets',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2272,8 +2821,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Cloud Storage Space', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                  Text('4.2 GB of 10.0 GB (42%)', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Cloud Storage Space',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '4.2 GB of 10.0 GB (42%)',
+                    style: TextStyle(
+                      color: Color(0xFF00FFCC),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -2299,57 +2862,110 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           mainAxisSpacing: 16,
           childAspectRatio: 1.6,
           children: [
-            _buildProjectFolderCard(Icons.audiotrack, 'Stems & Multi-tracks', '14 files', const Color(0xFFD03BFF)),
-            _buildProjectFolderCard(Icons.album, 'Mixdowns & Masters', '8 files', const Color(0xFF00FFCC)),
-            _buildProjectFolderCard(Icons.library_music, 'Samples & Loops', '32 files', const Color(0xFFFFD700)),
+            _buildProjectFolderCard(
+              Icons.audiotrack,
+              'Stems & Multi-tracks',
+              '14 files',
+              const Color(0xFFD03BFF),
+            ),
+            _buildProjectFolderCard(
+              Icons.album,
+              'Mixdowns & Masters',
+              '8 files',
+              const Color(0xFF00FFCC),
+            ),
+            _buildProjectFolderCard(
+              Icons.library_music,
+              'Samples & Loops',
+              '32 files',
+              const Color(0xFFFFD700),
+            ),
           ],
         ),
         const SizedBox(height: 32),
         const Text(
           'Recent Multi-track Files',
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
-        ...provider.songs.take(3).map((song) => Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF13131A),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.03)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.insert_drive_file_outlined, color: Colors.white.withOpacity(0.5), size: 24),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ...provider.songs
+            .take(3)
+            .map(
+              (song) => Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13131A),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.03)),
+                ),
+                child: Row(
                   children: [
-                    Text('${song.title} - Mixdown.wav', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text('Last modified: 1 day ago • 38.4 MB', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                    Icon(
+                      Icons.insert_drive_file_outlined,
+                      color: Colors.white.withOpacity(0.5),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${song.title} - Mixdown.wav',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Last modified: 1 day ago • 38.4 MB',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.4),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.download_outlined,
+                        color: Color(0xFF00FFCC),
+                        size: 18,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Downloading stem package for "${song.title}"...',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.download_outlined, color: Color(0xFF00FFCC), size: 18),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Downloading stem package for "${song.title}"...')),
-                  );
-                },
-              ),
-            ],
-          ),
-        )),
+            ),
         const SizedBox(height: 40),
         _buildFooterSection(),
       ],
     );
   }
 
-  Widget _buildProjectFolderCard(IconData icon, String title, String subtitle, Color color) {
+  Widget _buildProjectFolderCard(
+    IconData icon,
+    String title,
+    String subtitle,
+    Color color,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF13131A),
@@ -2378,9 +2994,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -2398,7 +3027,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '🏢 About Studduo',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2418,26 +3051,42 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             children: [
               const Text(
                 'Our Philosophy',
-                style: TextStyle(color: Color(0xFF00FFCC), fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Color(0xFF00FFCC),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 'Studduo was born from the belief that great music needs space. Not just a physical studio, but a mental space free from stressors, algorithms, and deadlines. '
                 'We design toolkits that capture transient thoughts seamlessly, allowing you to nurse them into full compositions over time.',
-                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 13,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 24),
               const Divider(color: Colors.white10),
               const SizedBox(height: 24),
               const Text(
                 'Built by Artists, for Artists',
-                style: TextStyle(color: Color(0xFFD03BFF), fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Color(0xFFD03BFF),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 'Our team consists of acoustic engineers, software developers, synth designers, and touring musicians working collectively to bridge the gap between creative spark and finished master. '
                 'Thank you for joining our community. Enjoy the quiet creative playground.',
-                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 13,
+                  height: 1.5,
+                ),
               ),
             ],
           ),
@@ -2455,7 +3104,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '🟢 Operational Status',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2471,10 +3124,30 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           mainAxisSpacing: 16,
           childAspectRatio: 2.2,
           children: [
-            _buildStatusNodeCard('Synthesizer Engine', 'Operational', '12ms latency', const Color(0xFF00FFCC)),
-            _buildStatusNodeCard('Backing Track Generator', 'Operational', '85ms latency', const Color(0xFF00FFCC)),
-            _buildStatusNodeCard('Real-time Cloud Sync', 'Operational', '45ms latency', const Color(0xFF00FFCC)),
-            _buildStatusNodeCard('Audio Recording Pipeline', 'Operational', '2ms latency', const Color(0xFF00FFCC)),
+            _buildStatusNodeCard(
+              'Synthesizer Engine',
+              'Operational',
+              '12ms latency',
+              const Color(0xFF00FFCC),
+            ),
+            _buildStatusNodeCard(
+              'Backing Track Generator',
+              'Operational',
+              '85ms latency',
+              const Color(0xFF00FFCC),
+            ),
+            _buildStatusNodeCard(
+              'Real-time Cloud Sync',
+              'Operational',
+              '45ms latency',
+              const Color(0xFF00FFCC),
+            ),
+            _buildStatusNodeCard(
+              'Audio Recording Pipeline',
+              'Operational',
+              '2ms latency',
+              const Color(0xFF00FFCC),
+            ),
           ],
         ),
         const SizedBox(height: 40),
@@ -2483,7 +3156,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildStatusNodeCard(String title, String status, String metric, Color color) {
+  Widget _buildStatusNodeCard(
+    String title,
+    String status,
+    String metric,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -2502,7 +3180,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               color: color,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(color: color.withOpacity(0.4), blurRadius: 6, spreadRadius: 1),
+                BoxShadow(
+                  color: color.withOpacity(0.4),
+                  blurRadius: 6,
+                  spreadRadius: 1,
+                ),
               ],
             ),
           ),
@@ -2512,9 +3194,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
-                Text(metric, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  status,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  metric,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
           ),
@@ -2530,7 +3232,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '⚖️ Legals & Agreement',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2548,22 +3254,44 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Terms & Conditions', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Terms & Conditions',
+                style: TextStyle(
+                  color: Color(0xFF00FFCC),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 'By using Studduo, you retain full copyright ownership of all melodies, lyrics, synthesizer presets, and rhythm arrangements generated using the platform. '
                 'We do not claim ownership, royalties, or licensing cuts from any work exported or finished using our toolkits.',
-                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12.5, height: 1.5),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 12.5,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 24),
               const Divider(color: Colors.white10),
               const SizedBox(height: 24),
-              const Text('Privacy Policy', style: TextStyle(color: Color(0xFFD03BFF), fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Privacy Policy',
+                style: TextStyle(
+                  color: Color(0xFFD03BFF),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 'We collect local sketch files and telemetry data solely to run synthesizer synthesis pipelines, synchronise backups, and diagnostic testing. '
                 'Your files are never shared with third parties or used to train general generative audio AI models without your explicit consent.',
-                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12.5, height: 1.5),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 12.5,
+                  height: 1.5,
+                ),
               ),
             ],
           ),
@@ -2581,7 +3309,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '💳 Account Subscription',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2605,19 +3337,41 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Current Tier', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text(
+                        'Current Tier',
+                        style: TextStyle(color: Colors.grey, fontSize: 11),
+                      ),
                       SizedBox(height: 4),
-                      Text('Pro Producer', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text(
+                        'Pro Producer',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF00FFCC).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+                      border: Border.all(
+                        color: const Color(0xFF00FFCC).withOpacity(0.3),
+                      ),
                     ),
-                    child: const Text('ACTIVE', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 10, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'ACTIVE',
+                      style: TextStyle(
+                        color: Color(0xFF00FFCC),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2633,15 +3387,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00FFCC),
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Redirecting to Stripe Billing Portal...')),
+                    const SnackBar(
+                      content: Text('Redirecting to Stripe Billing Portal...'),
+                    ),
                   );
                 },
-                child: const Text('Manage Billing Portal', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Manage Billing Portal',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -2658,8 +3422,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13)),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 13,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -2672,7 +3449,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '👤 Artist Profile',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2701,16 +3482,33 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
-                      child: Text('HS', style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        'HS',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 20),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('HotSnow', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(
+                        'HotSnow',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 4),
-                      Text('Indie Synthwave Producer', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        'Indie Synthwave Producer',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     ],
                   ),
                 ],
@@ -2729,15 +3527,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD03BFF),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profile changes saved successfully!')),
+                      const SnackBar(
+                        content: Text('Profile changes saved successfully!'),
+                      ),
                     );
                   },
-                  child: const Text('Update Profile Info', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Update Profile Info',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -2771,7 +3579,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Color(0xFFD03BFF)),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
           ),
         ],
@@ -2786,7 +3597,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         const Text(
           '⚙️ Workstation Preferences',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -2804,16 +3619,44 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Audio Settings', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 14, fontWeight: FontWeight.bold)),
+              const Text(
+                'Audio Settings',
+                style: TextStyle(
+                  color: Color(0xFF00FFCC),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 16),
-              _buildPreferenceDropdown('Sample Rate', '48,000 Hz', ['44,100 Hz', '48,000 Hz', '96,000 Hz']),
-              _buildPreferenceDropdown('Buffer Size', '256 samples', ['64 samples', '128 samples', '256 samples', '512 samples']),
+              _buildPreferenceDropdown('Sample Rate', '48,000 Hz', [
+                '44,100 Hz',
+                '48,000 Hz',
+                '96,000 Hz',
+              ]),
+              _buildPreferenceDropdown('Buffer Size', '256 samples', [
+                '64 samples',
+                '128 samples',
+                '256 samples',
+                '512 samples',
+              ]),
               const SizedBox(height: 24),
               const Divider(color: Colors.white10),
               const SizedBox(height: 24),
-              const Text('Workstation Metronome', style: TextStyle(color: Color(0xFFD03BFF), fontSize: 14, fontWeight: FontWeight.bold)),
+              const Text(
+                'Workstation Metronome',
+                style: TextStyle(
+                  color: Color(0xFFD03BFF),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 16),
-              _buildPreferenceDropdown('Click Sound', 'Woodblock', ['Beep', 'Woodblock', 'Rimshot', 'Hi-hat']),
+              _buildPreferenceDropdown('Click Sound', 'Woodblock', [
+                'Beep',
+                'Woodblock',
+                'Rimshot',
+                'Hi-hat',
+              ]),
               const SizedBox(height: 24),
               const Divider(color: Colors.white10),
               const SizedBox(height: 24),
@@ -2823,9 +3666,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Enable AI Co-Pilot Suggestions', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text(
+                        'Enable AI Co-Pilot Suggestions',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 4),
-                      Text('Auto-generate matching chord paths as you type lyrics', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text(
+                        'Auto-generate matching chord paths as you type lyrics',
+                        style: TextStyle(color: Colors.grey, fontSize: 11),
+                      ),
                     ],
                   ),
                   Switch(
@@ -2844,13 +3697,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildPreferenceDropdown(String label, String value, List<String> items) {
+  Widget _buildPreferenceDropdown(
+    String label,
+    String value,
+    List<String> items,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -2862,8 +3722,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: DropdownButton<String>(
                 dropdownColor: const Color(0xFF1E1E2E),
                 value: value,
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                items: items.map((val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                items: items
+                    .map(
+                      (val) => DropdownMenuItem<String>(
+                        value: val,
+                        child: Text(val),
+                      ),
+                    )
+                    .toList(),
                 onChanged: (_) {},
               ),
             ),
@@ -2912,24 +3783,51 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   children: [
                     Text(
                       songTitle,
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        Text('Norway Mix', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
+                        Text(
+                          'Norway Mix',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 10,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 1,
+                          ),
                           decoration: BoxDecoration(
                             color: colorAccent.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: colorAccent.withOpacity(0.3), width: 0.5),
+                            border: Border.all(
+                              color: colorAccent.withOpacity(0.3),
+                              width: 0.5,
+                            ),
                           ),
-                          child: const Text('v0.01', style: TextStyle(color: colorAccent, fontSize: 8, fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'v0.01',
+                            style: TextStyle(
+                              color: colorAccent,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.cloud_done_outlined, color: Colors.greenAccent.withOpacity(0.5), size: 12),
+                        Icon(
+                          Icons.cloud_done_outlined,
+                          color: Colors.greenAccent.withOpacity(0.5),
+                          size: 12,
+                        ),
                       ],
                     ),
                   ],
@@ -2937,7 +3835,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 const Spacer(),
                 // Musical Metadata Display
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: colorSecondaryPanel,
                     borderRadius: BorderRadius.circular(6),
@@ -2960,12 +3861,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.undo, color: Colors.white.withOpacity(0.7), size: 18),
+                      icon: Icon(
+                        Icons.undo,
+                        color: Colors.white.withOpacity(0.7),
+                        size: 18,
+                      ),
                       onPressed: () {},
                       tooltip: 'Undo',
                     ),
                     IconButton(
-                      icon: Icon(Icons.redo, color: Colors.white.withOpacity(0.7), size: 18),
+                      icon: Icon(
+                        Icons.redo,
+                        color: Colors.white.withOpacity(0.7),
+                        size: 18,
+                      ),
                       onPressed: () {},
                       tooltip: 'Redo',
                     ),
@@ -2974,13 +3883,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorAccent,
                         foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Saving project automatically to cloud sync...')),
+                          const SnackBar(
+                            content: Text(
+                              'Saving project automatically to cloud sync...',
+                            ),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.cloud_upload_outlined, size: 14),
@@ -3046,7 +3967,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     _buildTransportButton(
                       icon: Icons.loop,
                       isSelected: _dawLooping,
-                      onPressed: () => setState(() => _dawLooping = !_dawLooping),
+                      onPressed: () =>
+                          setState(() => _dawLooping = !_dawLooping),
                       tooltip: 'Loop Region',
                     ),
                   ],
@@ -3054,7 +3976,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 const SizedBox(width: 20),
                 // Position Counter
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(6),
@@ -3092,7 +4017,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 // Mode Switcher Header
                 Container(
                   color: colorBg,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
                       // View switcher Segmented Control
@@ -3105,20 +4033,36 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         ),
                         child: Row(
                           children: [
-                            _buildSwitcherSegment('track', 'Arrangement Timeline', Icons.linear_scale),
-                            _buildSwitcherSegment('mixer', 'Mixer Console', Icons.tune),
+                            _buildSwitcherSegment(
+                              'track',
+                              'Arrangement Timeline',
+                              Icons.linear_scale,
+                            ),
+                            _buildSwitcherSegment(
+                              'mixer',
+                              'Mixer Console',
+                              Icons.tune,
+                            ),
                           ],
                         ),
                       ),
                       const Spacer(),
                       // Metronome & Settings
                       IconButton(
-                        icon: Icon(Icons.notifications_active_outlined, color: Colors.white.withOpacity(0.5), size: 16),
+                        icon: Icon(
+                          Icons.notifications_active_outlined,
+                          color: Colors.white.withOpacity(0.5),
+                          size: 16,
+                        ),
                         onPressed: () {},
                         tooltip: 'Metronome sound',
                       ),
                       IconButton(
-                        icon: Icon(Icons.settings, color: Colors.white.withOpacity(0.5), size: 16),
+                        icon: Icon(
+                          Icons.settings,
+                          color: Colors.white.withOpacity(0.5),
+                          size: 16,
+                        ),
                         onPressed: () {},
                         tooltip: 'Settings',
                       ),
@@ -3156,23 +4100,37 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     children: [
                       IconButton(
                         icon: Icon(
-                          _bottomPanelCollapsed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          _bottomPanelCollapsed
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
                           size: 14,
                           color: Colors.white70,
                         ),
-                        onPressed: () => setState(() => _bottomPanelCollapsed = !_bottomPanelCollapsed),
+                        onPressed: () => setState(
+                          () => _bottomPanelCollapsed = !_bottomPanelCollapsed,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       _buildBottomPanelTab('piano_roll', '🎹 Piano Roll'),
-                      _buildBottomPanelTab('plugin_editor', '🔌 FX Plugin Editor'),
-                      _buildBottomPanelTab('automation', '📈 Automation Curves'),
+                      _buildBottomPanelTab(
+                        'plugin_editor',
+                        '🔌 FX Plugin Editor',
+                      ),
+                      _buildBottomPanelTab(
+                        'automation',
+                        '📈 Automation Curves',
+                      ),
                       _buildBottomPanelTab('ai_assistant', '✨ AI Co-Pilot'),
                       const Spacer(),
                       if (!_bottomPanelCollapsed)
                         GestureDetector(
                           onPanUpdate: (details) {
                             setState(() {
-                              _bottomPanelHeight = (details.globalPosition.dy - 500).clamp(160, 450);
+                              _bottomPanelHeight =
+                                  (details.globalPosition.dy - 500).clamp(
+                                    160,
+                                    450,
+                                  );
                             });
                           },
                           child: MouseRegion(
@@ -3180,7 +4138,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                             child: Container(
                               width: 50,
                               color: colorGrid.withOpacity(0.5),
-                              child: const Icon(Icons.drag_handle, size: 12, color: Colors.white30),
+                              child: const Icon(
+                                Icons.drag_handle,
+                                size: 12,
+                                color: Colors.white30,
+                              ),
                             ),
                           ),
                         ),
@@ -3211,12 +4173,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 8, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.3),
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 3),
         Text(
           value,
-          style: const TextStyle(color: Color(0xFF4D8DFF), fontSize: 11, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Color(0xFF4D8DFF),
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
@@ -3245,7 +4215,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: Material(
-          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+          color: isSelected
+              ? activeColor.withOpacity(0.15)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           child: InkWell(
             borderRadius: BorderRadius.circular(6),
@@ -3269,9 +4241,23 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       padding: const EdgeInsets.only(left: 16),
       child: Row(
         children: [
-          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 9, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.35),
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(width: 4),
-          Text(val, style: const TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.bold)),
+          Text(
+            val,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -3290,7 +4276,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, color: isSelected ? const Color(0xFF4D8DFF) : Colors.grey[400], size: 14),
+              Icon(
+                icon,
+                color: isSelected ? const Color(0xFF4D8DFF) : Colors.grey[400],
+                size: 14,
+              ),
               const SizedBox(width: 8),
               Text(
                 label,
@@ -3325,11 +4315,21 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 height: 28,
                 decoration: const BoxDecoration(
                   color: Color(0xFF1A1E25),
-                  border: Border(bottom: BorderSide(color: colorGrid), right: BorderSide(color: colorGrid)),
+                  border: Border(
+                    bottom: BorderSide(color: colorGrid),
+                    right: BorderSide(color: colorGrid),
+                  ),
                 ),
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: const Text('Track List', style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Track List',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               // Track headers
               Expanded(
@@ -3341,11 +4341,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       final track = _dawTracks[index];
                       final isSelected = _selectedTrackIndex == index;
                       return GestureDetector(
-                        onTap: () => setState(() => _selectedTrackIndex = index),
+                        onTap: () =>
+                            setState(() => _selectedTrackIndex = index),
                         child: Container(
                           height: 72,
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF222833) : Colors.transparent,
+                            color: isSelected
+                                ? const Color(0xFF222833)
+                                : Colors.transparent,
                             border: const Border(
                               bottom: BorderSide(color: colorGrid, width: 0.8),
                               right: BorderSide(color: colorGrid, width: 1.5),
@@ -3368,42 +4371,84 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Icon(track['icon'] as IconData, size: 14, color: Colors.white.withOpacity(0.6)),
+                                  Icon(
+                                    track['icon'] as IconData,
+                                    size: 14,
+                                    color: Colors.white.withOpacity(0.6),
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       track['name'] as String,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
-                                      _buildTrackControlToggle('M', _dawMutes[index], () {
-                                        setState(() => _dawMutes[index] = !_dawMutes[index]);
-                                      }),
-                                      _buildTrackControlToggle('S', _dawSolos[index], () {
-                                        setState(() => _dawSolos[index] = !_dawSolos[index]);
-                                      }),
-                                      _buildTrackControlToggle('R', _dawRecordArms[index], () {
-                                        setState(() => _dawRecordArms[index] = !_dawRecordArms[index]);
-                                      }, color: const Color(0xFFFF4D5A)),
-                                      _buildTrackControlToggle('I', _dawMonitors[index], () {
-                                        setState(() => _dawMonitors[index] = !_dawMonitors[index]);
-                                      }, color: const Color(0xFF4D8DFF)),
+                                      _buildTrackControlToggle(
+                                        'M',
+                                        _dawMutes[index],
+                                        () {
+                                          setState(
+                                            () => _dawMutes[index] =
+                                                !_dawMutes[index],
+                                          );
+                                        },
+                                      ),
+                                      _buildTrackControlToggle(
+                                        'S',
+                                        _dawSolos[index],
+                                        () {
+                                          setState(
+                                            () => _dawSolos[index] =
+                                                !_dawSolos[index],
+                                          );
+                                        },
+                                      ),
+                                      _buildTrackControlToggle(
+                                        'R',
+                                        _dawRecordArms[index],
+                                        () {
+                                          setState(
+                                            () => _dawRecordArms[index] =
+                                                !_dawRecordArms[index],
+                                          );
+                                        },
+                                        color: const Color(0xFFFF4D5A),
+                                      ),
+                                      _buildTrackControlToggle(
+                                        'I',
+                                        _dawMonitors[index],
+                                        () {
+                                          setState(
+                                            () => _dawMonitors[index] =
+                                                !_dawMonitors[index],
+                                          );
+                                        },
+                                        color: const Color(0xFF4D8DFF),
+                                      ),
                                     ],
                                   ),
                                   // Tiny meter indicator
                                   Container(
                                     width: 50,
                                     height: 6,
-                                    decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(3)),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black38,
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
                                     alignment: Alignment.centerLeft,
                                     child: Container(
                                       width: _dawMutes[index] ? 0 : 35,
@@ -3457,13 +4502,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                   return Container(
                                     height: 72,
                                     decoration: const BoxDecoration(
-                                      border: Border(bottom: BorderSide(color: colorGrid, width: 0.6)),
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: colorGrid,
+                                          width: 0.6,
+                                        ),
+                                      ),
                                     ),
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
                                     child: Stack(
                                       children: [
                                         // Grid Background divisions lines
-                                        Positioned.fill(child: CustomPaint(painter: GridVerticalLinePainter(colorGrid))),
+                                        Positioned.fill(
+                                          child: CustomPaint(
+                                            painter: GridVerticalLinePainter(
+                                              colorGrid,
+                                            ),
+                                          ),
+                                        ),
                                         // Mock Clips
                                         if (index == 0)
                                           _buildArrangementClip(
@@ -3487,7 +4545,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                             endBar: 15,
                                             color: track['color'] as Color,
                                             isAudio: true,
-                                            label: 'BPM Backing Groove_Full.wav',
+                                            label:
+                                                'BPM Backing Groove_Full.wav',
                                           ),
                                         if (index == 3)
                                           _buildArrangementClip(
@@ -3516,7 +4575,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                       Positioned(
                                         top: 0,
                                         left: -4,
-                                        child: Icon(Icons.arrow_drop_down, color: Colors.redAccent, size: 10),
+                                        child: Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.redAccent,
+                                          size: 10,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -3537,7 +4600,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildTrackControlToggle(String label, bool value, VoidCallback onTap, {Color? color}) {
+  Widget _buildTrackControlToggle(
+    String label,
+    bool value,
+    VoidCallback onTap, {
+    Color? color,
+  }) {
     final activeColor = color ?? const Color(0xFFE2E212);
     return GestureDetector(
       onTap: onTap,
@@ -3592,9 +4660,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               Positioned.fill(
                 child: Opacity(
                   opacity: 0.45,
-                  child: CustomPaint(
-                    painter: AudioClipWavePainter(color),
-                  ),
+                  child: CustomPaint(painter: AudioClipWavePainter(color)),
                 ),
               ),
             // MIDI mock note strips
@@ -3602,9 +4668,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               Positioned.fill(
                 child: Opacity(
                   opacity: 0.35,
-                  child: CustomPaint(
-                    painter: MidiClipNotesPainter(color),
-                  ),
+                  child: CustomPaint(painter: MidiClipNotesPainter(color)),
                 ),
               ),
             // Clip title label
@@ -3613,7 +4677,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               left: 8,
               child: Text(
                 label,
-                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -3650,14 +4718,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Row(
                         children: [
-                          Icon(track['icon'] as IconData, size: 12, color: Colors.white70),
+                          Icon(
+                            track['icon'] as IconData,
+                            size: 12,
+                            color: Colors.white70,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               track['name'] as String,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -3669,7 +4745,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       height: 18,
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 6),
-                      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(
+                        color: Colors.black45,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         track['type'] == 'Audio' ? 'Mic In 1' : 'Inst Synth 1',
@@ -3678,7 +4757,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     ),
                     const SizedBox(height: 12),
                     // Inserts FX rack
-                    const Text('INSERTS', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'INSERTS',
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 7,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     _buildEffectsInsertSlot(index, 'EQ'),
                     _buildEffectsInsertSlot(index, 'Comp'),
@@ -3686,7 +4772,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     _buildEffectsInsertSlot(index, 'Delay'),
                     const SizedBox(height: 12),
                     // Sends Section
-                    const Text('SENDS', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'SENDS',
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 7,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -3701,19 +4794,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('C', style: TextStyle(color: Colors.grey, fontSize: 8)),
+                        const Text(
+                          'C',
+                          style: TextStyle(color: Colors.grey, fontSize: 8),
+                        ),
                         const SizedBox(width: 4),
                         Container(
                           width: 24,
                           height: 24,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white24, width: 1.5),
+                            border: Border.all(
+                              color: Colors.white24,
+                              width: 1.5,
+                            ),
                           ),
                           child: Transform.rotate(
                             angle: _dawPans[index] * 1.5,
                             child: const Center(
-                              child: Divider(color: Color(0xFF4D8DFF), endIndent: 10, thickness: 2),
+                              child: Divider(
+                                color: Color(0xFF4D8DFF),
+                                endIndent: 10,
+                                thickness: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -3734,11 +4837,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 activeTrackColor: const Color(0xFF4D8DFF),
                                 inactiveTrackColor: Colors.black26,
                                 thumbColor: Colors.grey[350],
-                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                                thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6,
+                                ),
                               ),
                               child: Slider(
                                 value: _dawVolumes[index],
-                                onChanged: (val) => setState(() => _dawVolumes[index] = val),
+                                onChanged: (val) =>
+                                    setState(() => _dawVolumes[index] = val),
                               ),
                             ),
                           ),
@@ -3747,13 +4853,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           Container(
                             width: 6,
                             height: 120,
-                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(3)),
+                            decoration: BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                             alignment: Alignment.bottomCenter,
                             child: Container(
-                              height: _dawMutes[index] ? 0 : (_dawVolumes[index] * 110),
+                              height: _dawMutes[index]
+                                  ? 0
+                                  : (_dawVolumes[index] * 110),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Colors.green, Colors.yellow, Colors.red],
+                                  colors: [
+                                    Colors.green,
+                                    Colors.yellow,
+                                    Colors.red,
+                                  ],
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
                                 ),
@@ -3767,7 +4882,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     const SizedBox(height: 4),
                     // Fader db text
                     Text(
-                      _dawMutes[index] ? '-inf dB' : '${((_dawVolumes[index] - 0.7) * 20).toStringAsFixed(1)} dB',
+                      _dawMutes[index]
+                          ? '-inf dB'
+                          : '${((_dawVolumes[index] - 0.7) * 20).toStringAsFixed(1)} dB',
                       style: const TextStyle(color: Colors.grey, fontSize: 8),
                     ),
                     const SizedBox(height: 12),
@@ -3781,9 +4898,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         _buildTrackControlToggle('S', _dawSolos[index], () {
                           setState(() => _dawSolos[index] = !_dawSolos[index]);
                         }),
-                        _buildTrackControlToggle('R', _dawRecordArms[index], () {
-                          setState(() => _dawRecordArms[index] = !_dawRecordArms[index]);
-                        }, color: const Color(0xFFFF4D5A)),
+                        _buildTrackControlToggle(
+                          'R',
+                          _dawRecordArms[index],
+                          () {
+                            setState(
+                              () => _dawRecordArms[index] =
+                                  !_dawRecordArms[index],
+                            );
+                          },
+                          color: const Color(0xFFFF4D5A),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -3809,7 +4934,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 children: [
                   Icon(Icons.waves, size: 12, color: Color(0xFFFF4D5A)),
                   SizedBox(width: 4),
-                  Text('MASTER OUT', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                  Text(
+                    'MASTER OUT',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -3817,13 +4949,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               Container(
                 height: 18,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 alignment: Alignment.center,
-                child: const Text('Stereo Master', style: TextStyle(color: Colors.grey, fontSize: 8)),
+                child: const Text(
+                  'Stereo Master',
+                  style: TextStyle(color: Colors.grey, fontSize: 8),
+                ),
               ),
               const SizedBox(height: 12),
               // Master FX inserts
-              const Text('MASTER FX', style: TextStyle(color: Colors.white30, fontSize: 7, fontWeight: FontWeight.bold)),
+              const Text(
+                'MASTER FX',
+                style: TextStyle(
+                  color: Colors.white30,
+                  fontSize: 7,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 4),
               _buildMasterFxSlot('Bus Compressor', true),
               _buildMasterFxSlot('EQ Master', true),
@@ -3844,11 +4989,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           activeTrackColor: const Color(0xFFFF4D5A),
                           inactiveTrackColor: Colors.black26,
                           thumbColor: Colors.grey[300],
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                          thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 7,
+                          ),
                         ),
                         child: Slider(
                           value: _masterVolume,
-                          onChanged: (val) => setState(() => _masterVolume = val),
+                          onChanged: (val) =>
+                              setState(() => _masterVolume = val),
                         ),
                       ),
                     ),
@@ -3867,15 +5015,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               const SizedBox(height: 4),
               Text(
                 '${((_masterVolume - 0.8) * 20).toStringAsFixed(1)} dB',
-                style: const TextStyle(color: Colors.grey, fontSize: 8, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               // Master solo & mute safe toggles
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTrackControlToggle('C', false, () {}, color: Colors.blueAccent),
-                  _buildTrackControlToggle('L', true, () {}, color: Colors.amber),
+                  _buildTrackControlToggle(
+                    'C',
+                    false,
+                    () {},
+                    color: Colors.blueAccent,
+                  ),
+                  _buildTrackControlToggle(
+                    'L',
+                    true,
+                    () {},
+                    color: Colors.amber,
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -3900,13 +5062,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         decoration: BoxDecoration(
           color: bypass ? Colors.black38 : const Color(0xFF2E3E2F),
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: bypass ? Colors.white10 : const Color(0xFF3DDC84).withOpacity(0.3)),
+          border: Border.all(
+            color: bypass
+                ? Colors.white10
+                : const Color(0xFF3DDC84).withOpacity(0.3),
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
           fxName,
           style: TextStyle(
-            color: bypass ? Colors.white.withOpacity(0.35) : const Color(0xFF3DDC84),
+            color: bypass
+                ? Colors.white.withOpacity(0.35)
+                : const Color(0xFF3DDC84),
             fontSize: 8,
             fontWeight: FontWeight.bold,
           ),
@@ -3922,7 +5090,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       decoration: BoxDecoration(
         color: active ? const Color(0xFF382329) : Colors.black38,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: active ? const Color(0xFFFF4D5A).withOpacity(0.3) : Colors.white10),
+        border: Border.all(
+          color: active
+              ? const Color(0xFFFF4D5A).withOpacity(0.3)
+              : Colors.white10,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -3951,7 +5123,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           child: Transform.rotate(
             angle: value * 3.14,
             child: const Center(
-              child: Divider(color: Colors.white30, endIndent: 8, thickness: 1.5),
+              child: Divider(
+                color: Colors.white30,
+                endIndent: 8,
+                thickness: 1.5,
+              ),
             ),
           ),
         ),
@@ -3963,7 +5139,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     return Container(
       width: 6,
       height: 140,
-      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(2)),
+      decoration: BoxDecoration(
+        color: Colors.black45,
+        borderRadius: BorderRadius.circular(2),
+      ),
       alignment: Alignment.bottomCenter,
       child: Container(
         height: _dawPlaying ? (volume * 135) : 0,
@@ -4037,13 +5216,19 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 height: 20,
                 decoration: BoxDecoration(
                   color: isBlackKey ? Colors.black87 : Colors.white,
-                  border: const Border(bottom: BorderSide(color: Colors.black26)),
+                  border: const Border(
+                    bottom: BorderSide(color: Colors.black26),
+                  ),
                 ),
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 4),
                 child: Text(
                   isBlackKey ? '' : 'C${(index / 12).floor() + 3}',
-                  style: const TextStyle(color: Colors.black54, fontSize: 8, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               );
             },
@@ -4063,17 +5248,27 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   return Container(
                     height: 20,
                     decoration: const BoxDecoration(
-                      border: Border(bottom: BorderSide(color: colorGrid, width: 0.5)),
+                      border: Border(
+                        bottom: BorderSide(color: colorGrid, width: 0.5),
+                      ),
                     ),
                     child: Stack(
                       children: [
                         // Grid lines vertical
-                        Positioned.fill(child: CustomPaint(painter: GridVerticalLinePainter(colorGrid))),
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: GridVerticalLinePainter(colorGrid),
+                          ),
+                        ),
                         // Mock MIDI notes
-                        if (keyIdx == 4) _buildMidiNoteBox(2, 6, const Color(0xFFD03BFF)),
-                        if (keyIdx == 7) _buildMidiNoteBox(4, 9, const Color(0xFFD03BFF)),
-                        if (keyIdx == 11) _buildMidiNoteBox(8, 12, const Color(0xFF00FFCC)),
-                        if (keyIdx == 2) _buildMidiNoteBox(11, 15, const Color(0xFF00FFCC)),
+                        if (keyIdx == 4)
+                          _buildMidiNoteBox(2, 6, const Color(0xFFD03BFF)),
+                        if (keyIdx == 7)
+                          _buildMidiNoteBox(4, 9, const Color(0xFFD03BFF)),
+                        if (keyIdx == 11)
+                          _buildMidiNoteBox(8, 12, const Color(0xFF00FFCC)),
+                        if (keyIdx == 2)
+                          _buildMidiNoteBox(11, 15, const Color(0xFF00FFCC)),
                       ],
                     ),
                   );
@@ -4117,9 +5312,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFF2F3542)),
               ),
-              child: CustomPaint(
-                painter: ParametricEqPainter(),
-              ),
+              child: CustomPaint(painter: ParametricEqPainter()),
             ),
           ),
           const SizedBox(width: 16),
@@ -4157,9 +5350,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           Container(
             width: 24,
             height: 24,
-            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFF4D8DFF), width: 2)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFF4D8DFF), width: 2),
+            ),
             transform: Matrix4.rotationZ(pct * 3.14),
-            child: const Center(child: VerticalDivider(color: Colors.white70, thickness: 2)),
+            child: const Center(
+              child: VerticalDivider(color: Colors.white70, thickness: 2),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -4167,9 +5365,23 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(title, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 8, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(val, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                Text(
+                  val,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -4186,12 +5398,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         children: [
           Row(
             children: [
-              const Text('Automation lane:', style: TextStyle(color: Colors.white60, fontSize: 11)),
+              const Text(
+                'Automation lane:',
+                style: TextStyle(color: Colors.white60, fontSize: 11),
+              ),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(6)),
-                child: const Text('Track 1 - Volume Fader', style: TextStyle(color: Color(0xFF4D8DFF), fontSize: 10, fontWeight: FontWeight.bold)),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'Track 1 - Volume Fader',
+                  style: TextStyle(
+                    color: Color(0xFF4D8DFF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -4203,9 +5428,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFF2F3542)),
               ),
-              child: CustomPaint(
-                painter: AutomationCurvePainter(),
-              ),
+              child: CustomPaint(painter: AutomationCurvePainter()),
             ),
           ),
         ],
@@ -4219,9 +5442,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('✨ AI Co-Pilot Assistant Tools', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+          const Text(
+            '✨ AI Co-Pilot Assistant Tools',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text('Cloud-Native intelligent workflows inside Studduo.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+          Text(
+            'Cloud-Native intelligent workflows inside Studduo.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 11,
+            ),
+          ),
           const SizedBox(height: 16),
           Expanded(
             child: GridView.count(
@@ -4230,10 +5466,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               mainAxisSpacing: 12,
               childAspectRatio: 2.8,
               children: [
-                _buildAiWorkflowCard(Icons.auto_awesome, 'Generate Chords', 'Builds premium harmonic progressions'),
-                _buildAiWorkflowCard(Icons.graphic_eq, 'Mix Assistant', 'Balances relative track volumes & pans'),
-                _buildAiWorkflowCard(Icons.analytics_outlined, 'Stem Separator', 'Extracts vocals & backing stems'),
-                _buildAiWorkflowCard(Icons.star_border, 'Mastering Guide', 'Applies dynamic curves & EQ limits'),
+                _buildAiWorkflowCard(
+                  Icons.auto_awesome,
+                  'Generate Chords',
+                  'Builds premium harmonic progressions',
+                ),
+                _buildAiWorkflowCard(
+                  Icons.graphic_eq,
+                  'Mix Assistant',
+                  'Balances relative track volumes & pans',
+                ),
+                _buildAiWorkflowCard(
+                  Icons.analytics_outlined,
+                  'Stem Separator',
+                  'Extracts vocals & backing stems',
+                ),
+                _buildAiWorkflowCard(
+                  Icons.star_border,
+                  'Mastering Guide',
+                  'Applies dynamic curves & EQ limits',
+                ),
               ],
             ),
           ),
@@ -4255,7 +5507,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           borderRadius: BorderRadius.circular(10),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Starting AI processor workflow for: "$title"...')),
+              SnackBar(
+                content: Text(
+                  'Starting AI processor workflow for: "$title"...',
+                ),
+              ),
             );
           },
           child: Padding(
@@ -4269,9 +5525,24 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 2),
-                      Text(desc, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(
+                        desc,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 9,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -4295,14 +5566,18 @@ class TimelineRulerPainter extends CustomPainter {
     final paint = Paint()
       ..color = gridColor
       ..strokeWidth = 1.0;
-    
+
     double barSize = 45.0; // Bar grid horizontal spacing
     int totalBars = (size.width / barSize).ceil();
 
     for (int i = 0; i < totalBars; i++) {
       double x = i * barSize;
       // draw major line
-      canvas.drawLine(Offset(x, size.height - 12), Offset(x, size.height), paint);
+      canvas.drawLine(
+        Offset(x, size.height - 12),
+        Offset(x, size.height),
+        paint,
+      );
       // text bar number
       final textSpan = TextSpan(
         text: '${i + 1}',
@@ -4317,7 +5592,11 @@ class TimelineRulerPainter extends CustomPainter {
       // minor beats ticks
       for (int b = 1; b < 4; b++) {
         double bx = x + (b * barSize / 4);
-        canvas.drawLine(Offset(bx, size.height - 6), Offset(bx, size.height), paint);
+        canvas.drawLine(
+          Offset(bx, size.height - 6),
+          Offset(bx, size.height),
+          paint,
+        );
       }
     }
   }

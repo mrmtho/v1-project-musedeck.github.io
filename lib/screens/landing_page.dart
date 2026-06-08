@@ -44,7 +44,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
       likes: 96,
       comments: 18,
-      bio: 'Melody chaser. Story teller. Building sonic worlds that feel like home. Indie artist & producer from LA.',
+      bio:
+          'Melody chaser. Story teller. Building sonic worlds that feel like home. Indie artist & producer from LA.',
       songsInProgress: 17,
       releases: [
         {'title': 'Glass House', 'type': 'EP • 2024'},
@@ -59,7 +60,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
       likes: 128,
       comments: 24,
-      bio: 'Bedroom producer blending lofi beats with jazz chords. Always searching for the perfect vinyl crackle. Creating sounds to study, relax, or sleep to from my home studio in Seattle.',
+      bio:
+          'Bedroom producer blending lofi beats with jazz chords. Always searching for the perfect vinyl crackle. Creating sounds to study, relax, or sleep to from my home studio in Seattle.',
       songsInProgress: 8,
       releases: [
         {'title': 'Chilled Waves', 'type': 'EP • 2025'},
@@ -73,7 +75,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
       likes: 210,
       comments: 36,
-      bio: 'Multi-genre producer and sound designer. Specializing in hard-hitting trap beats, cinematic ambient soundscapes, and synth-heavy pop tracks. Let\'s build something legendary.',
+      bio:
+          'Multi-genre producer and sound designer. Specializing in hard-hitting trap beats, cinematic ambient soundscapes, and synth-heavy pop tracks. Let\'s build something legendary.',
       songsInProgress: 22,
       releases: [
         {'title': 'Neo Tokyo', 'type': 'Album • 2025'},
@@ -87,7 +90,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
       likes: 77,
       comments: 12,
-      bio: 'Guitarist and composer. Blending blues riffs with modern electronic elements. I write hooks that stay in your head all day. Session musician and co-writer based in London.',
+      bio:
+          'Guitarist and composer. Blending blues riffs with modern electronic elements. I write hooks that stay in your head all day. Session musician and co-writer based in London.',
       songsInProgress: 6,
       releases: [
         {'title': 'String Theory', 'type': 'Single • 2025'},
@@ -100,7 +104,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
       likes: 142,
       comments: 31,
-      bio: 'Vocalist and topliner. Specializing in warm, airy harmonies and uplifting hooks. Collaborating with electronic and house music producers worldwide.',
+      bio:
+          'Vocalist and topliner. Specializing in warm, airy harmonies and uplifting hooks. Collaborating with electronic and house music producers worldwide.',
       songsInProgress: 15,
       releases: [
         {'title': 'Golden Hour', 'type': 'EP • 2024'},
@@ -114,7 +119,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       imageUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61',
       likes: 88,
       comments: 17,
-      bio: 'Drummer and percussion designer. Crafting unique organic rhythms and acoustic fusions. Bridging the gap between live instruments and synthesized beats.',
+      bio:
+          'Drummer and percussion designer. Crafting unique organic rhythms and acoustic fusions. Bridging the gap between live instruments and synthesized beats.',
       songsInProgress: 11,
       releases: [
         {'title': 'Pulse', 'type': 'EP • 2024'},
@@ -141,10 +147,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       body: Stack(
         children: [
           // Pleasingly floating particle background behind the content
-          const Positioned.fill(
-            child: FloatingParticlesBackground(),
-          ),
-          
+          const Positioned.fill(child: FloatingParticlesBackground()),
+
           // Scrollable hero content
           Positioned.fill(
             child: SingleChildScrollView(
@@ -152,7 +156,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 children: [
                   // Top Header
                   _buildHeader(context),
-      
+
                   // Main Content Area (Max width wrapper for desktop elegance)
                   Center(
                     child: Container(
@@ -163,23 +167,23 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                           // Hero Section
                           _buildHeroSection(),
                           const SizedBox(height: 100),
-      
+
                           // Value Propositions Section
                           _buildValuePropsSection(),
                           const SizedBox(height: 100),
-      
+
                           // Social Proof Section (Pinterest layout & profile preview)
                           _buildSocialProofSection(),
                           const SizedBox(height: 80),
-      
+
                           // Listen Everywhere Banner
-                          _buildListenEverywhereSection(),
+                          // _buildListenEverywhereSection(),
                           const SizedBox(height: 100),
                         ],
                       ),
                     ),
                   ),
-      
+
                   // Footer Section
                   _buildFooterSection(),
                 ],
@@ -214,11 +218,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
-                  Icons.waves,
-                  color: Colors.black,
-                  size: 20,
-                ),
+                child: const Icon(Icons.waves, color: Colors.black, size: 20),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -321,21 +321,24 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               childAspectRatio: isMobile ? 1.4 : 0.85,
               children: [
                 _buildArtistCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1593697972672-b1c1902219e4',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1593697972672-b1c1902219e4',
                   title: 'Create',
                   description: 'Spark ideas in your space',
                   // subText: 'Coming up with the music in their bedroom',
                   icon: Icons.edit_note,
                 ),
                 _buildArtistCard(
-                  imageUrl: 'https://plus.unsplash.com/premium_photo-1683115179716-8463fcfca85b',
+                  imageUrl:
+                      'https://plus.unsplash.com/premium_photo-1683115179716-8463fcfca85b',
                   title: 'Produce',
                   description: 'Shape your sound with depth',
                   // subText: 'Recording/producing music in studio',
                   icon: Icons.graphic_eq,
                 ),
                 _buildArtistCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819',
                   title: 'Perform',
                   description: 'Share it. Feel it. Live it.',
                   // subText: 'Performing music on stage',
@@ -388,10 +391,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         fit: StackFit.expand,
         children: [
           // Background Image
-          Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-          ),
+          Image.network(imageUrl, fit: BoxFit.cover),
           // Gradient Overlay
           Container(
             decoration: BoxDecoration(
@@ -421,9 +421,15 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                        ),
                       ),
-                      child: Icon(icon, color: const Color(0xFF00FFCC), size: 18),
+                      child: Icon(
+                        icon,
+                        color: const Color(0xFF00FFCC),
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Text(
@@ -555,7 +561,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFF6C3BF5).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF6C3BF5).withOpacity(0.2)),
+                border: Border.all(
+                  color: const Color(0xFF6C3BF5).withOpacity(0.2),
+                ),
               ),
               child: Icon(icon, color: const Color(0xFF00FFCC), size: 24),
             ),
@@ -632,12 +640,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     children: [
                       TextSpan(text: 'People are '),
                       TextSpan(
-                        text: 'creating',
-                        style: TextStyle(
-                          color: Color(0xFF00FFCC),
-                        ),
+                        text: 'working',
+                        style: TextStyle(color: Color(0xFF00FFCC)),
                       ),
-                      TextSpan(text: ' on Craftune'),
+                      TextSpan(text: ' on Studduo'),
                     ],
                   ),
                 ),
@@ -669,23 +675,25 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
                 side: BorderSide(color: Colors.white.withOpacity(0.15)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
               onPressed: () {},
-              child: const Text('View all creators', style: TextStyle(fontSize: 12)),
+              child: const Text(
+                'View all creators',
+                style: TextStyle(fontSize: 12),
+              ),
             );
 
             if (isSmall) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  headerText,
-                  const SizedBox(height: 16),
-                  button,
-                ],
+                children: [headerText, const SizedBox(height: 16), button],
               );
             } else {
               return Row(
@@ -717,15 +725,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 5,
-                    child: _buildCreatorGrid(isMobile: false),
-                  ),
+                  Expanded(flex: 5, child: _buildCreatorGrid(isMobile: false)),
                   const SizedBox(width: 24),
-                  Expanded(
-                    flex: 4,
-                    child: _buildSelectedCreatorProfileCard(),
-                  ),
+                  Expanded(flex: 4, child: _buildSelectedCreatorProfileCard()),
                 ],
               );
             }
@@ -760,7 +762,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF1C1B26) : const Color(0xFF13131A),
+              color: isSelected
+                  ? const Color(0xFF1C1B26)
+                  : const Color(0xFF13131A),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
@@ -778,16 +782,16 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          creator.imageUrl,
-                          fit: BoxFit.cover,
-                        ),
+                        Image.network(creator.imageUrl, fit: BoxFit.cover),
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
-                              colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.7),
+                              ],
                             ),
                           ),
                         ),
@@ -834,14 +838,24 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     const SizedBox(width: 4),
                     Text(
                       '${creator.likes}',
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 10,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(Icons.mode_comment, color: Colors.grey, size: 12),
+                    const Icon(
+                      Icons.mode_comment,
+                      color: Colors.grey,
+                      size: 12,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${creator.comments}',
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 10,
+                      ),
                     ),
                   ],
                 ),
@@ -938,13 +952,19 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     backgroundColor: const Color(0xFF6C3BF5).withOpacity(0.2),
                     foregroundColor: const Color(0xFFD03BFF),
                     side: const BorderSide(color: Color(0xFF6C3BF5), width: 1),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   onPressed: () {},
-                  child: const Text('Follow', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: const Text(
+                    'Follow',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -958,7 +978,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.03),
                     borderRadius: BorderRadius.circular(12),
@@ -966,11 +989,18 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.music_note, color: Color(0xFF00FFCC), size: 16),
+                      const Icon(
+                        Icons.music_note,
+                        color: Color(0xFF00FFCC),
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         '${_selectedCreator.songsInProgress} songs in progress',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -988,18 +1018,27 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               children: [
                 const Text(
                   'Public Releases',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {},
-                  child: const Text('View all', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 12)),
+                  child: const Text(
+                    'View all',
+                    style: TextStyle(color: Color(0xFF00FFCC), fontSize: 12),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
 
-          ..._selectedCreator.releases.map((release) => _buildReleaseItem(release['title']!, release['type']!)),
+          ..._selectedCreator.releases.map(
+            (release) => _buildReleaseItem(release['title']!, release['type']!),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -1024,7 +1063,11 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 borderRadius: BorderRadius.circular(8),
                 color: const Color(0xFF6C3BF5).withOpacity(0.2),
               ),
-              child: const Icon(Icons.album, color: Color(0xFF6C3BF5), size: 20),
+              child: const Icon(
+                Icons.album,
+                color: Color(0xFF6C3BF5),
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1033,12 +1076,19 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     type,
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 11,
+                    ),
                   ),
                 ],
               ),
@@ -1088,7 +1138,11 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
             const SizedBox(width: 8),
             Text(
               name,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -1099,7 +1153,12 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       children: [
         const Text(
           'Listen everywhere',
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Outfit',
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -1165,7 +1224,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 children: [
                   Text(
                     '© 2026 Studduo. All rights reserved.',
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                    ),
                   ),
                   DropdownButton<String>(
                     dropdownColor: const Color(0xFF13131A),
@@ -1178,7 +1240,13 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                           children: [
                             Icon(Icons.language, size: 16, color: Colors.grey),
                             SizedBox(width: 8),
-                            Text('English', style: TextStyle(color: Colors.white, fontSize: 12)),
+                            Text(
+                              'English',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1208,11 +1276,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                Icons.waves,
-                color: Colors.black,
-                size: 20,
-              ),
+              child: const Icon(Icons.waves, color: Colors.black, size: 20),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -1231,7 +1295,11 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
             'AI Powered Workstation for Music Artists',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13, height: 1.5),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 13,
+              height: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -1268,16 +1336,25 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 16),
-          ...links.map((link) => Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  link,
-                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+          ...links.map(
+            (link) => Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Text(
+                link,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 12,
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       );
     }
@@ -1287,8 +1364,20 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildCol('Company', ['About Us', 'Contact Us', 'Operational Status']),
-        buildCol('Resources', ['Help Center', 'Pricing', 'Blog', 'Community', 'Download Android', 'Download iOS', 'Download Huawei']),
-        buildCol('Legal', ['Terms and Conditions', 'Privacy Policy', 'Cookie Policy']),
+        buildCol('Resources', [
+          'Help Center',
+          'Pricing',
+          'Blog',
+          'Community',
+          'Download Android',
+          'Download iOS',
+          'Download Huawei',
+        ]),
+        buildCol('Legal', [
+          'Terms and Conditions',
+          'Privacy Policy',
+          'Cookie Policy',
+        ]),
       ],
     );
   }
