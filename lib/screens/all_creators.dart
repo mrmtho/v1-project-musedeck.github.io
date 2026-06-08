@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
+import 'landing_page.dart';
 import '../widgets/floating_particles_background.dart';
 import '../utils/synth_engine.dart';
 
@@ -425,9 +426,13 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
       ),
       child: Row(
         children: [
-          // Logo & Back link
+          // Logo link
           GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const LandingPageScreen()),
+              );
+            },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Row(
@@ -460,13 +465,6 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          // Back arrow shortcut
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.grey, size: 18),
-            tooltip: 'Return to Landing Page',
-            onPressed: () => Navigator.of(context).pop(),
           ),
           const Spacer(),
           // CTA button
@@ -602,199 +600,183 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   }
 
   Widget _buildCreatorCard(BuildContext context, CreatorProfile creator) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF13131A),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.04)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Creator Image Header
-          Expanded(
-            flex: 10,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(
-                  creator.imageUrl,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.85),
-                      ],
-                    ),
-                  ),
-                ),
-                // Role Badge
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6C3BF5).withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      creator.role,
-                      style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                // Overlay active status
-                Positioned(
-                  bottom: 12,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(color: Color(0xFF00FFCC), shape: BoxShape.circle),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          creator.status,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.5,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Card Body
-          Expanded(
-            flex: 12,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _showCreatorDetailSheet(context, creator),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF13131A),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.04)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Creator Image Header
+            Expanded(
+              flex: 10,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          creator.name,
-                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(
-                        '${creator.songsInProgress} active',
-                        style: const TextStyle(color: Color(0xFFD03BFF), fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                  Image.network(
+                    creator.imageUrl,
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '@${creator.username}',
-                    style: const TextStyle(color: Colors.grey, fontSize: 11),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Text(
-                      creator.bio,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 11.5,
-                        height: 1.4,
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.85),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  
-                  // Genres Row
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: creator.genres.take(2).map((genre) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  // Role Badge
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.04),
-                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFF6C3BF5).withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        genre,
-                        style: const TextStyle(color: Colors.grey, fontSize: 9),
+                        creator.role,
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                       ),
-                    )).toList(),
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  
-                  // Action buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 32,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF00FFCC).withOpacity(0.1),
-                              foregroundColor: const Color(0xFF00FFCC),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  // Overlay active status
+                  Positioned(
+                    bottom: 12,
+                    left: 16,
+                    right: 16,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(color: Color(0xFF00FFCC), shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            creator.status,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.5,
+                              fontStyle: FontStyle.italic,
                             ),
-                            onPressed: () {
-                              // Play preview vibration synth sounds
-                              final randNotes = ['C', 'G', 'Am', 'F'];
-                              final note = randNotes[Random().nextInt(randNotes.length)];
-                              SynthEngine.playChord(note);
-                              SynthEngine.playDrum('hat');
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Previewing vibe sound signature for @${creator.username} in key of $note!'),
-                                  duration: const Duration(seconds: 1),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.volume_up_outlined, size: 12),
-                            label: const Text('Vibe Check', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Details Button
-                      SizedBox(
-                        height: 32,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                          ),
-                          onPressed: () => _showCreatorDetailSheet(context, creator),
-                          child: const Icon(Icons.zoom_in_map, size: 14),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            
+            // Card Body
+            Expanded(
+              flex: 12,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            creator.name,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Text(
+                          '${creator.songsInProgress} active',
+                          style: const TextStyle(color: Color(0xFFD03BFF), fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '@${creator.username}',
+                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Text(
+                        creator.bio,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 11.5,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    // Genres Row
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: creator.genres.take(2).map((genre) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.04),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          genre,
+                          style: const TextStyle(color: Colors.grey, fontSize: 9),
+                        ),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Action Vibe check button (full width)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 32,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00FFCC).withOpacity(0.1),
+                          foregroundColor: const Color(0xFF00FFCC),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        onPressed: () {
+                          // Play preview vibration synth sounds
+                          final randNotes = ['C', 'G', 'Am', 'F'];
+                          final note = randNotes[Random().nextInt(randNotes.length)];
+                          SynthEngine.playChord(note);
+                          SynthEngine.playDrum('hat');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Previewing vibe sound signature for @${creator.username} in key of $note!'),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.volume_up_outlined, size: 12),
+                        label: const Text('Vibe Check', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
