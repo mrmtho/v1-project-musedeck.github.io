@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dashboard.dart';
 import '../widgets/floating_particles_background.dart';
 import 'all_creators.dart';
@@ -129,10 +130,23 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     ),
   ];
 
+  late final ScrollController _scrollController = ScrollController();
+  late final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     _selectedCreator = _creators[0];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _navigateToDashboard() {
@@ -145,60 +159,95 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070B),
-      body: Stack(
-        children: [
-          // Pleasingly floating particle background behind the content
-          const Positioned.fill(child: FloatingParticlesBackground()),
+      body: KeyboardListener(
+        focusNode: _focusNode,
+        autofocus: true,
+        onKeyEvent: (KeyEvent event) {
+          if (event is KeyDownEvent || event is KeyRepeatEvent) {
+            if (!_scrollController.hasClients) return;
+            final double maxScroll = _scrollController.position.maxScrollExtent;
+            final double currentScroll = _scrollController.position.pixels;
+            double target = currentScroll;
 
-          // Main layout containing fixed header and scrollable content
-          Positioned.fill(
-            child: Column(
-              children: [
-                // Top Header (Fixed at the top)
-                _buildHeader(context),
+            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              target = (currentScroll + 100).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              target = (currentScroll - 100).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+              target = (currentScroll + 600).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+              target = (currentScroll - 600).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.home) {
+              target = 0.0;
+            } else if (event.logicalKey == LogicalKeyboardKey.end) {
+              target = maxScroll;
+            } else {
+              return;
+            }
 
-                // Scrollable hero content
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        // Main Content Area (Max width wrapper for desktop elegance)
-                        Center(
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 1200),
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Column(
-                              children: [
-                                // Hero Section
-                                _buildHeroSection(),
-                                const SizedBox(height: 100),
+            _scrollController.animateTo(
+              target,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOutCubic,
+            );
+          }
+        },
+        child: Stack(
+          children: [
+            // Pleasingly floating particle background behind the content
+            const Positioned.fill(child: FloatingParticlesBackground()),
 
-                                // Value Propositions Section
-                                _buildValuePropsSection(),
-                                const SizedBox(height: 100),
+            // Main layout containing fixed header and scrollable content
+            Positioned.fill(
+              child: Column(
+                children: [
+                  // Top Header (Fixed at the top)
+                  _buildHeader(context),
 
-                                // Social Proof Section (Pinterest layout & profile preview)
-                                _buildSocialProofSection(),
-                                const SizedBox(height: 80),
+                  // Scrollable hero content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        children: [
+                          // Main Content Area (Max width wrapper for desktop elegance)
+                          Center(
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 1200),
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Column(
+                                children: [
+                                  // Hero Section
+                                  _buildHeroSection(),
+                                  const SizedBox(height: 100),
 
-                                // Listen Everywhere Banner
-                                // _buildListenEverywhereSection(),
-                                const SizedBox(height: 100),
-                              ],
+                                  // Value Propositions Section
+                                  _buildValuePropsSection(),
+                                  const SizedBox(height: 100),
+
+                                  // Social Proof Section (Pinterest layout & profile preview)
+                                  _buildSocialProofSection(),
+                                  const SizedBox(height: 80),
+
+                                  // Listen Everywhere Banner
+                                  // _buildListenEverywhereSection(),
+                                  const SizedBox(height: 100),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
 
-                        // Footer Section
-                        _buildFooterSection(),
-                      ],
+                          // Footer Section
+                          _buildFooterSection(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

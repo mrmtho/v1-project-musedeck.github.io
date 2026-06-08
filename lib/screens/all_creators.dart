@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dashboard.dart';
 import 'landing_page.dart';
 import '../widgets/floating_particles_background.dart';
@@ -44,6 +45,8 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   String _searchQuery = '';
   String _selectedRoleFilter = 'All';
   late int _randomStartOffset;
+  late final ScrollController _scrollController = ScrollController();
+  late final FocusNode _focusNode = FocusNode();
 
   // 16 Detailed premium mock creators
   final List<CreatorProfile> _allCreators = const [
@@ -300,6 +303,16 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
     super.initState();
     // Keep it random and fresh on every screen visit
     _randomStartOffset = Random().nextInt(_allCreators.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -317,25 +330,59 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF07070B),
-      body: Stack(
-        children: [
-          // Floating particles background
-          const Positioned.fill(
-            child: FloatingParticlesBackground(),
-          ),
-          
-          // Main content
-          Positioned.fill(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Sticky main navigation
-                  _buildMainNavigation(context),
+      body: KeyboardListener(
+        focusNode: _focusNode,
+        autofocus: true,
+        onKeyEvent: (KeyEvent event) {
+          if (event is KeyDownEvent || event is KeyRepeatEvent) {
+            if (!_scrollController.hasClients) return;
+            final double maxScroll = _scrollController.position.maxScrollExtent;
+            final double currentScroll = _scrollController.position.pixels;
+            double target = currentScroll;
 
-                  // Scrollable body
-                  Expanded(
-                    child: CustomScrollView(
-                      slivers: [
+            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              target = (currentScroll + 100).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              target = (currentScroll - 100).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+              target = (currentScroll + 600).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+              target = (currentScroll - 600).clamp(0.0, maxScroll);
+            } else if (event.logicalKey == LogicalKeyboardKey.home) {
+              target = 0.0;
+            } else if (event.logicalKey == LogicalKeyboardKey.end) {
+              target = maxScroll;
+            } else {
+              return;
+            }
+
+            _scrollController.animateTo(
+              target,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOutCubic,
+            );
+          }
+        },
+        child: Stack(
+          children: [
+            // Floating particles background
+            const Positioned.fill(
+              child: FloatingParticlesBackground(),
+            ),
+            
+            // Main content
+            Positioned.fill(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // Sticky main navigation
+                    _buildMainNavigation(context),
+  
+                    // Scrollable body
+                    Expanded(
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        slivers: [
                         // Directory Header
                         SliverToBoxAdapter(
                           child: Padding(
@@ -416,8 +463,9 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // Identical to landing page main navigation bar
   Widget _buildMainNavigation(BuildContext context) {
