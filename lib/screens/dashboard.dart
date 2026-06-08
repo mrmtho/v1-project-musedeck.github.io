@@ -847,7 +847,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
-            'MuseDeck Workspace Settings',
+            'Studduo Workspace Settings',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: Column(
@@ -2298,7 +2298,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                         ),
                         title: const Text(
-                          'MuseDeck',
+                          'Studduo',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -2342,7 +2342,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         'source': 'Sound on Sound',
         'time': '1 day ago',
         'desc':
-            'A look at how tools like MuseDeck are allowing songwriters to brainstorm chord progression templates and sync draft memos collaboratively.',
+            'A look at how tools like Studduo are allowing songwriters to brainstorm chord progression templates and sync draft memos collaboratively.',
         'image': 'https://images.unsplash.com/photo-1507838153414-b4b713384a76',
       },
       {

@@ -46,18 +46,18 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => SongProvider()),
       ],
-      child: const MuseDeckApp(),
+      child: const StudduoApp(),
     ),
   );
 }
 
-class MuseDeckApp extends StatelessWidget {
-  const MuseDeckApp({super.key});
+class StudduoApp extends StatelessWidget {
+  const StudduoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'MuseDeck',
+      title: 'Studduo',
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: ThemeData(
