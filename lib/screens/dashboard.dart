@@ -31,6 +31,135 @@ class _DashboardScreenState extends State<DashboardScreen>
   String _activeView = 'library';
   String _selectedContactName = 'Aria North';
   final TextEditingController _messageController = TextEditingController();
+
+  // Calendar states
+  String _calendarTimelineFilter = 'week'; // 'today', 'week', 'month', 'quarter'
+  String _calendarMemberFilter = 'all'; // 'all', 'self', 'others'
+  DateTime _selectedCalendarDay = DateTime(2026, 6, 8); // Monday, June 8, 2026
+
+  late final List<Map<String, dynamic>> _calendarItems = [
+    {
+      'id': '1',
+      'title': 'Vocal Review & Melody Session',
+      'type': 'event',
+      'date': DateTime(2026, 6, 8),
+      'time': '2:00 PM - 3:30 PM',
+      'assignees': ['self', 'Aria North'],
+      'description': 'Go over the bridge section melody and check vocal takes.',
+      'color': 0xFF00FFCC,
+      'isCompleted': false,
+    },
+    {
+      'id': '2',
+      'title': 'Finalize Snare Drum Pattern',
+      'type': 'todo',
+      'date': DateTime(2026, 6, 8),
+      'time': '5:00 PM',
+      'assignees': ['self'],
+      'description': 'Adjust velocity and swing on kai\'s midi track.',
+      'color': 0xFFFFD700,
+      'isCompleted': false,
+    },
+    {
+      'id': '3',
+      'title': 'Mix Review Session',
+      'type': 'event',
+      'date': DateTime(2026, 6, 10),
+      'time': '10:00 AM - 11:30 AM',
+      'assignees': ['DJ Spark'],
+      'description': 'Final checks on stereo width and compression levels.',
+      'color': 0xFFD03BFF,
+      'isCompleted': false,
+    },
+    {
+      'id': '4',
+      'title': 'Grand Piano Recording',
+      'type': 'event',
+      'date': DateTime(2026, 6, 11),
+      'time': '4:00 PM - 6:00 PM',
+      'assignees': ['Chloe Keys', 'self'],
+      'description': 'Tracking live grand piano at Studio A.',
+      'color': 0xFF00FFCC,
+      'isCompleted': false,
+    },
+    {
+      'id': '5',
+      'title': 'Release \"Glass House\" Single',
+      'type': 'activity',
+      'date': DateTime(2026, 6, 12),
+      'time': '12:00 AM',
+      'assignees': ['self', 'Aria North'],
+      'description': 'DSP release coordination and social outreach launch.',
+      'color': 0xFFFF5722,
+      'isCompleted': false,
+    },
+    {
+      'id': '6',
+      'title': 'Fix Synth Bass EQ Notes',
+      'type': 'todo',
+      'date': DateTime(2026, 6, 12),
+      'time': '3:00 PM',
+      'assignees': ['self'],
+      'description': 'Clean up sub frequencies between 30Hz - 60Hz.',
+      'color': 0xFFFFD700,
+      'isCompleted': true,
+    },
+    {
+      'id': '7',
+      'title': 'Modulate vocal FX layers',
+      'type': 'todo',
+      'date': DateTime(2026, 6, 13),
+      'time': '11:00 AM',
+      'assignees': ['Bax Beatbox'],
+      'description': 'Pitch shift vocal chops and layer with reverb tails.',
+      'color': 0xFFFFD700,
+      'isCompleted': false,
+    },
+    {
+      'id': '8',
+      'title': 'Album Mastering Deadline',
+      'type': 'event',
+      'date': DateTime(2026, 6, 18),
+      'time': 'EOD',
+      'assignees': ['DJ Spark'],
+      'description': 'Final files submission to distribution platform.',
+      'color': 0xFFD03BFF,
+      'isCompleted': false,
+    },
+    {
+      'id': '9',
+      'title': 'Vocal Comping for \"Bloom\"',
+      'type': 'todo',
+      'date': DateTime(2026, 6, 25),
+      'time': '5:00 PM',
+      'assignees': ['Aria North'],
+      'description': 'Assemble main chorus lines from the alternative takes.',
+      'color': 0xFFFFD700,
+      'isCompleted': false,
+    },
+    {
+      'id': '10',
+      'title': 'EP \"Chilled Waves\" Launch',
+      'type': 'event',
+      'date': DateTime(2026, 7, 10),
+      'time': '12:00 AM',
+      'assignees': ['self', 'kai.wav'],
+      'description': 'EP release on all digital streaming platforms.',
+      'color': 0xFF00FFCC,
+      'isCompleted': false,
+    },
+    {
+      'id': '11',
+      'title': 'Live Set rehearsal',
+      'type': 'activity',
+      'date': DateTime(2026, 8, 5),
+      'time': '2:00 PM - 7:00 PM',
+      'assignees': ['self', 'Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Bax Beatbox'],
+      'description': 'Full rehearsal of the audio-visual performance.',
+      'color': 0xFFD03BFF,
+      'isCompleted': false,
+    },
+  ];
   final List<Map<String, dynamic>> _mockMessages = [
     {
       'contact': 'Aria North',
@@ -370,6 +499,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                     isSelected: _activeView == 'team',
                     onTap: () {
                       setState(() => _activeView = 'team');
+                      if (isDrawer) Navigator.of(context).pop();
+                    },
+                  ),
+
+                  _buildSidebarNavItem(
+                    icon: Icons.calendar_month_outlined,
+                    label: 'Calendar',
+                    isSelected: _activeView == 'calendar',
+                    onTap: () {
+                      setState(() => _activeView = 'calendar');
                       if (isDrawer) Navigator.of(context).pop();
                     },
                   ),
@@ -775,6 +914,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       return _buildDMsMessagesView();
     } else if (_activeView == 'team') {
       return _buildTeamMembersView();
+    } else if (_activeView == 'calendar') {
+      return _buildCalendarView(provider);
     } else if (_activeView == 'account') {
       return _buildAccountView();
     } else if (_activeView == 'profile') {
@@ -3145,6 +3286,775 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCalendarView(SongProvider provider) {
+    // Determine the filtered items
+    final filteredItems = _calendarItems.where((item) {
+      // 1. Filter by Team Member
+      bool memberMatch = true;
+      final assignees = List<String>.from(item['assignees']);
+      if (_calendarMemberFilter == 'self') {
+        memberMatch = assignees.contains('self');
+      } else if (_calendarMemberFilter == 'others') {
+        memberMatch = assignees.any((a) => a != 'self');
+      }
+
+      // 2. Filter by Timeline
+      bool timelineMatch = true;
+      final DateTime itemDate = item['date'] as DateTime;
+      if (_calendarTimelineFilter == 'today') {
+        timelineMatch = itemDate.year == _selectedCalendarDay.year &&
+            itemDate.month == _selectedCalendarDay.month &&
+            itemDate.day == _selectedCalendarDay.day;
+      } else if (_calendarTimelineFilter == 'week') {
+        // week of June 8 - June 14, 2026
+        final startOfWeek = DateTime(2026, 6, 8);
+        final endOfWeek = DateTime(2026, 6, 14);
+        timelineMatch = itemDate.isAfter(startOfWeek.subtract(const Duration(seconds: 1))) &&
+            itemDate.isBefore(endOfWeek.add(const Duration(days: 1)));
+      } else if (_calendarTimelineFilter == 'month') {
+        timelineMatch = itemDate.year == 2026 && itemDate.month == 6;
+      } else if (_calendarTimelineFilter == 'quarter') {
+        timelineMatch = itemDate.year == 2026 && itemDate.month >= 6 && itemDate.month <= 8;
+      }
+
+      return memberMatch && timelineMatch;
+    }).toList();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isWide = constraints.maxWidth > 900;
+
+        return ListView(
+          padding: const EdgeInsets.all(24.0),
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '📅 Production Calendar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Outfit',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Coordinate recording sessions, releases, and deadlines.',
+                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFCC),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                  onPressed: _showAddCalendarItemDialog,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('Add Activity', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Top Filter Row
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.03)),
+              ),
+              child: isWide
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildTimelineFilters(),
+                        _buildMemberFilters(),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTimelineFilters(),
+                        const SizedBox(height: 12),
+                        _buildMemberFilters(),
+                      ],
+                    ),
+            ),
+            const SizedBox(height: 24),
+
+            // Side-by-side or stacked contents
+            if (isWide)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: _buildMonthCalendarGrid(),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    flex: 5,
+                    child: _buildAgendaList(filteredItems),
+                  ),
+                ],
+              )
+            else
+              Column(
+                children: [
+                  _buildMonthCalendarGrid(),
+                  const SizedBox(height: 24),
+                  _buildAgendaList(filteredItems),
+                ],
+              ),
+            const SizedBox(height: 40),
+            _buildFooterSection(),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTimelineFilters() {
+    return Row(
+      children: [
+        const Text(
+          'Timeline: ',
+          style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            _buildFilterChip(
+              label: 'Today',
+              isSelected: _calendarTimelineFilter == 'today',
+              onTap: () => setState(() => _calendarTimelineFilter = 'today'),
+            ),
+            _buildFilterChip(
+              label: 'This Week',
+              isSelected: _calendarTimelineFilter == 'week',
+              onTap: () => setState(() => _calendarTimelineFilter = 'week'),
+            ),
+            _buildFilterChip(
+              label: 'This Month',
+              isSelected: _calendarTimelineFilter == 'month',
+              onTap: () => setState(() => _calendarTimelineFilter = 'month'),
+            ),
+            _buildFilterChip(
+              label: 'This Quarter',
+              isSelected: _calendarTimelineFilter == 'quarter',
+              onTap: () => setState(() => _calendarTimelineFilter = 'quarter'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMemberFilters() {
+    return Row(
+      children: [
+        const Text(
+          'Assignee: ',
+          style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            _buildFilterChip(
+              label: 'All Tasks',
+              isSelected: _calendarMemberFilter == 'all',
+              onTap: () => setState(() => _calendarMemberFilter = 'all'),
+            ),
+            _buildFilterChip(
+              label: 'My Tasks',
+              isSelected: _calendarMemberFilter == 'self',
+              onTap: () => setState(() => _calendarMemberFilter = 'self'),
+            ),
+            _buildFilterChip(
+              label: 'Team Tasks',
+              isSelected: _calendarMemberFilter == 'others',
+              onTap: () => setState(() => _calendarMemberFilter = 'others'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF6C3BF5).withOpacity(0.2) : const Color(0xFF1B1B22),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF00FFCC) : Colors.white.withOpacity(0.05),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF00FFCC) : Colors.white60,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 11,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMonthCalendarGrid() {
+    final List<String> weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'June 2026',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, color: Colors.grey, size: 20),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Weekdays row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekdays
+                .map((day) => Expanded(
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 8),
+          const Divider(color: Colors.white12, height: 1),
+          const SizedBox(height: 8),
+          // Days grid
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.0,
+            ),
+            itemCount: 30, // June 2026 (Starts Monday, ends Tuesday)
+            itemBuilder: (context, index) {
+              final int dayNumber = index + 1;
+              final DateTime currentDay = DateTime(2026, 6, dayNumber);
+              final bool isSelected = _selectedCalendarDay.year == 2026 &&
+                  _selectedCalendarDay.month == 6 &&
+                  _selectedCalendarDay.day == dayNumber;
+
+              final dayEvents = _calendarItems.where((item) {
+                final d = item['date'] as DateTime;
+                return d.year == 2026 && d.month == 6 && d.day == dayNumber;
+              }).toList();
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedCalendarDay = currentDay;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF6C3BF5) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(0xFF00FFCC)
+                          : dayEvents.isNotEmpty
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.transparent,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$dayNumber',
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white70,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 13,
+                        ),
+                      ),
+                      if (dayEvents.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: dayEvents.take(3).map((e) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 1),
+                              width: 4,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(e['color'] as int),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAgendaList(List<Map<String, dynamic>> items) {
+    String filterLabel = 'Agenda';
+    if (_calendarTimelineFilter == 'today') {
+      filterLabel = 'Agenda for June ${_selectedCalendarDay.day}, 2026';
+    } else if (_calendarTimelineFilter == 'week') {
+      filterLabel = 'Upcoming Activities - This Week';
+    } else if (_calendarTimelineFilter == 'month') {
+      filterLabel = 'Upcoming Activities - June 2026';
+    } else if (_calendarTimelineFilter == 'quarter') {
+      filterLabel = 'Production Roadmap - Q2 / Q3 2026';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          filterLabel,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (items.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF13131A),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.03)),
+            ),
+            child: const Center(
+              child: Column(
+                children: [
+                  Icon(Icons.event_busy_outlined, size: 40, color: Colors.grey),
+                  SizedBox(height: 12),
+                  Text(
+                    'No activities or todos found for this view.',
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final String typeStr = (item['type'] as String).toUpperCase();
+              final assignees = List<String>.from(item['assignees']);
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13131A),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: item['isCompleted'] == true
+                        ? Colors.white.withOpacity(0.01)
+                        : Color(item['color'] as int).withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (item['type'] == 'todo')
+                      Checkbox(
+                        value: item['isCompleted'] == true,
+                        activeColor: const Color(0xFF00FFCC),
+                        checkColor: Colors.black,
+                        side: BorderSide(color: Color(item['color'] as int)),
+                        onChanged: (val) {
+                          setState(() {
+                            item['isCompleted'] = val;
+                          });
+                        },
+                      ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(item['color'] as int).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Color(item['color'] as int).withOpacity(0.5), width: 0.5),
+                                ),
+                                child: Text(
+                                  typeStr,
+                                  style: TextStyle(
+                                    color: Color(item['color'] as int),
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                item['time'] as String,
+                                style: const TextStyle(color: Colors.grey, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            item['title'] as String,
+                            style: TextStyle(
+                              color: item['isCompleted'] == true ? Colors.white38 : Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              decoration: item['isCompleted'] == true ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                          if (item['description'] != '') ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              item['description'] as String,
+                              style: TextStyle(
+                                color: item['isCompleted'] == true ? Colors.white30 : Colors.white54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Date indicator
+                              Text(
+                                'Date: ${_formatDate(item['date'] as DateTime)}',
+                                style: const TextStyle(color: Colors.white30, fontSize: 10),
+                              ),
+                              // Assignees avatars row
+                              Row(
+                                children: assignees.map((a) => _buildAssigneeAvatar(a)).toList(),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime d) {
+    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildAssigneeAvatar(String assignee) {
+    String initial = assignee == 'self' ? 'Me' : assignee[0].toUpperCase();
+    Color avatarColor = assignee == 'self' ? const Color(0xFF00FFCC) : const Color(0xFF6C3BF5);
+    Color textColor = assignee == 'self' ? Colors.black : Colors.white;
+
+    return Container(
+      width: 24,
+      height: 24,
+      margin: const EdgeInsets.only(left: 4),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: avatarColor,
+        border: Border.all(color: Colors.black, width: 1),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void _showAddCalendarItemDialog() {
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+    final timeController = TextEditingController(text: '12:00 PM');
+    String type = 'event';
+    DateTime selectedDate = _selectedCalendarDay;
+    List<String> assignees = ['self'];
+    int selectedColor = 0xFF00FFCC;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF13131A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.white.withOpacity(0.05)),
+              ),
+              title: const Text(
+                '📅 Add Activity / Todo',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: titleController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Title',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Type', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: ['event', 'todo', 'activity'].map((t) {
+                        final bool isSel = type == t;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text(t.toUpperCase()),
+                            selected: isSel,
+                            selectedColor: const Color(0xFF6C3BF5),
+                            labelStyle: TextStyle(
+                              color: isSel ? Colors.white : Colors.grey,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            onSelected: (val) {
+                              if (val) setDialogState(() => type = t);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              final d = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2026, 1, 1),
+                                lastDate: DateTime(2026, 12, 31),
+                              );
+                              if (d != null) {
+                                setDialogState(() => selectedDate = d);
+                              }
+                            },
+                            child: InputDecorator(
+                              decoration: const InputDecoration(
+                                labelText: 'Date',
+                                labelStyle: TextStyle(color: Colors.grey),
+                              ),
+                              child: Text(
+                                '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: timeController,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              labelText: 'Time / Duration',
+                              labelStyle: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Assignees', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: ['self', 'Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Bax Beatbox'].map((member) {
+                        final bool isAssigned = assignees.contains(member);
+                        return FilterChip(
+                          label: Text(member == 'self' ? 'Me' : member),
+                          selected: isAssigned,
+                          onSelected: (selected) {
+                            setDialogState(() {
+                              if (selected) {
+                                assignees.add(member);
+                              } else {
+                                assignees.remove(member);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Label Color', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [0xFF00FFCC, 0xFFD03BFF, 0xFFFFD700, 0xFFFF5722].map((c) {
+                        final bool isSel = selectedColor == c;
+                        return GestureDetector(
+                          onTap: () => setDialogState(() => selectedColor = c),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(c),
+                              border: Border.all(
+                                color: isSel ? Colors.white : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: descController,
+                      maxLines: 2,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFCC),
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () {
+                    if (titleController.text.trim().isEmpty) return;
+                    setState(() {
+                      _calendarItems.add({
+                        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                        'title': titleController.text.trim(),
+                        'type': type,
+                        'date': selectedDate,
+                        'time': timeController.text.trim(),
+                        'assignees': assignees,
+                        'description': descController.text.trim(),
+                        'color': selectedColor,
+                        'isCompleted': false,
+                      });
+                    });
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Activity created successfully!')),
+                    );
+                  },
+                  child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
