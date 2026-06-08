@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'dashboard.dart';
 import '../widgets/floating_particles_background.dart';
-import 'all_creators.dart';
+import 'all_artists.dart';
 
 class LandingPageScreen extends StatefulWidget {
   const LandingPageScreen({super.key});
@@ -12,7 +12,7 @@ class LandingPageScreen extends StatefulWidget {
   State<LandingPageScreen> createState() => _LandingPageScreenState();
 }
 
-class Creator {
+class Artist {
   final String name;
   final String username;
   final String status;
@@ -23,7 +23,7 @@ class Creator {
   final int songsInProgress;
   final List<Map<String, String>> releases;
 
-  const Creator({
+  const Artist({
     required this.name,
     required this.username,
     required this.status,
@@ -37,10 +37,10 @@ class Creator {
 }
 
 class _LandingPageScreenState extends State<LandingPageScreen> {
-  late Creator _selectedCreator;
+  late Artist _selectedArtist;
 
-  final List<Creator> _creators = const [
-    Creator(
+  final List<Artist> _Artists = const [
+    Artist(
       name: 'Aria North',
       username: 'arianorth',
       status: 'Melody session at midnight 🌙',
@@ -56,7 +56,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         {'title': 'Bloom', 'type': 'EP • 2023'},
       ],
     ),
-    Creator(
+    Artist(
       name: 'kai.wav',
       username: 'kaiwav',
       status: 'Working on a new lofi EP',
@@ -71,7 +71,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         {'title': 'Rainy Sundays', 'type': 'Single • 2025'},
       ],
     ),
-    Creator(
+    Artist(
       name: 'prodbylance',
       username: 'prodbylance',
       status: 'Finishing touches on my new beat',
@@ -86,7 +86,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         {'title': 'Shattered Mirrors', 'type': 'EP • 2024'},
       ],
     ),
-    Creator(
+    Artist(
       name: 'milesonit',
       username: 'milesonit',
       status: 'Writing hooks that hit different',
@@ -100,7 +100,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         {'title': 'String Theory', 'type': 'Single • 2025'},
       ],
     ),
-    Creator(
+    Artist(
       name: 'sunnie.day',
       username: 'sunnieday',
       status: 'Vocal layering in progress',
@@ -115,7 +115,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         {'title': 'Lost in the Groove', 'type': 'Single • 2024'},
       ],
     ),
-    Creator(
+    Artist(
       name: 'kidsonny',
       username: 'kidsonny',
       status: 'Drum textures experiment',
@@ -137,7 +137,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedCreator = _creators[0];
+    _selectedArtist = _Artists[0];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -569,7 +569,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'BUILT FOR CREATORS',
+          'BUILT FOR Artists',
           style: TextStyle(
             color: Color(0xFFD03BFF),
             fontWeight: FontWeight.bold,
@@ -720,7 +720,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '1,245 creators online right now',
+                      '1,245 Artists online right now',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 12,
@@ -744,10 +744,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
               ),
               onPressed: () {
-                context.go('/creators');
+                context.go('/artists');
               },
               child: const Text(
-                'View all creators',
+                'View all Artists',
                 style: TextStyle(fontSize: 12),
               ),
             );
@@ -771,25 +771,25 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         ),
         const SizedBox(height: 32),
 
-        // Responsive grid view of creators + Profile view panel
+        // Responsive grid view of Artists + Profile view panel
         LayoutBuilder(
           builder: (context, constraints) {
             bool isMobile = constraints.maxWidth < 900;
             if (isMobile) {
               return Column(
                 children: [
-                  _buildSelectedCreatorProfileCard(),
+                  _buildSelectedArtistProfileCard(),
                   const SizedBox(height: 24),
-                  _buildCreatorGrid(isMobile: true),
+                  _buildArtistGrid(isMobile: true),
                 ],
               );
             } else {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 5, child: _buildCreatorGrid(isMobile: false)),
+                  Expanded(flex: 5, child: _buildArtistGrid(isMobile: false)),
                   const SizedBox(width: 24),
-                  Expanded(flex: 4, child: _buildSelectedCreatorProfileCard()),
+                  Expanded(flex: 4, child: _buildSelectedArtistProfileCard()),
                 ],
               );
             }
@@ -799,7 +799,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     );
   }
 
-  Widget _buildCreatorGrid({required bool isMobile}) {
+  Widget _buildArtistGrid({required bool isMobile}) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -809,15 +809,15 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         mainAxisSpacing: 12,
         childAspectRatio: 0.8,
       ),
-      itemCount: _creators.length,
+      itemCount: _Artists.length,
       itemBuilder: (context, index) {
-        final creator = _creators[index];
-        final isSelected = _selectedCreator.username == creator.username;
+        final Artist = _Artists[index];
+        final isSelected = _selectedArtist.username == Artist.username;
 
         return GestureDetector(
           onTap: () {
             setState(() {
-              _selectedCreator = creator;
+              _selectedArtist = Artist;
             });
           },
           child: AnimatedContainer(
@@ -844,7 +844,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(creator.imageUrl, fit: BoxFit.cover),
+                        Image.network(Artist.imageUrl, fit: BoxFit.cover),
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -866,12 +866,12 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   children: [
                     CircleAvatar(
                       radius: 12,
-                      backgroundImage: NetworkImage(creator.imageUrl),
+                      backgroundImage: NetworkImage(Artist.imageUrl),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        creator.name,
+                        Artist.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -885,7 +885,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  creator.status,
+                  Artist.status,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -899,7 +899,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     const Icon(Icons.favorite, color: Colors.pink, size: 12),
                     const SizedBox(width: 4),
                     Text(
-                      '${creator.likes}',
+                      '${Artist.likes}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.5),
                         fontSize: 10,
@@ -913,7 +913,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${creator.comments}',
+                      '${Artist.comments}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.5),
                         fontSize: 10,
@@ -929,7 +929,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     );
   }
 
-  Widget _buildSelectedCreatorProfileCard() {
+  Widget _buildSelectedArtistProfileCard() {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF13131A),
@@ -955,7 +955,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 child: Opacity(
                   opacity: 0.3,
                   child: Image.network(
-                    _selectedCreator.imageUrl,
+                    _selectedArtist.imageUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
@@ -971,7 +971,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   ),
                   child: CircleAvatar(
                     radius: 44,
-                    backgroundImage: NetworkImage(_selectedCreator.imageUrl),
+                    backgroundImage: NetworkImage(_selectedArtist.imageUrl),
                   ),
                 ),
               ),
@@ -988,7 +988,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _selectedCreator.name,
+                      _selectedArtist.name,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -1002,7 +1002,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '@${_selectedCreator.username}',
+                  '@${_selectedArtist.username}',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.4),
                     fontSize: 13,
@@ -1030,7 +1030,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  _selectedCreator.bio,
+                  _selectedArtist.bio,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
@@ -1058,7 +1058,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${_selectedCreator.songsInProgress} songs in progress',
+                        '${_selectedArtist.songsInProgress} songs in progress',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -1098,7 +1098,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
           ),
           const SizedBox(height: 8),
 
-          ..._selectedCreator.releases.map(
+          ..._selectedArtist.releases.map(
             (release) => _buildReleaseItem(release['title']!, release['type']!),
           ),
           const SizedBox(height: 24),

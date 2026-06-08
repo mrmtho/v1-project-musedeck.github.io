@@ -7,7 +7,7 @@ import 'landing_page.dart';
 import '../widgets/floating_particles_background.dart';
 import '../utils/synth_engine.dart';
 
-class CreatorProfile {
+class ArtistProfile {
   final String name;
   final String username;
   final String status;
@@ -20,7 +20,7 @@ class CreatorProfile {
   final String location;
   final List<Map<String, String>> tracksInProgress;
 
-  const CreatorProfile({
+  const ArtistProfile({
     required this.name,
     required this.username,
     required this.status,
@@ -35,23 +35,23 @@ class CreatorProfile {
   });
 }
 
-class AllCreatorsScreen extends StatefulWidget {
-  const AllCreatorsScreen({super.key});
+class AllArtistsScreen extends StatefulWidget {
+  const AllArtistsScreen({super.key});
 
   @override
-  State<AllCreatorsScreen> createState() => _AllCreatorsScreenState();
+  State<AllArtistsScreen> createState() => _AllArtistsScreenState();
 }
 
-class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
+class _AllArtistsScreenState extends State<AllArtistsScreen> {
   String _searchQuery = '';
   String _selectedRoleFilter = 'All';
   late int _randomStartOffset;
   late final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
 
-  // 16 Detailed premium mock creators
-  final List<CreatorProfile> _allCreators = const [
-    CreatorProfile(
+  // 16 Detailed premium mock Artists
+  final List<ArtistProfile> _allArtists = const [
+    ArtistProfile(
       name: 'Aria North',
       username: 'arianorth',
       status: 'Melody session at midnight 🌙',
@@ -68,7 +68,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Bloom (Harmony Stems)', 'bpm': '98', 'key': 'F Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'kai.wav',
       username: 'kaiwav',
       status: 'Working on a new lofi EP',
@@ -84,7 +84,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Chilled Waves (Rhodes Chords)', 'bpm': '84', 'key': 'G Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'prodbylance',
       username: 'prodbylance',
       status: 'Finishing touches on my new beat',
@@ -100,7 +100,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Shattered Mirrors (Synth Pad Layer)', 'bpm': '120', 'key': 'A Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'milesonit',
       username: 'milesonit',
       status: 'Writing hooks that hit different',
@@ -115,7 +115,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'String Theory (Guitar Lead Loop)', 'bpm': '105', 'key': 'G Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'sunnie.day',
       username: 'sunnieday',
       status: 'Vocal layering in progress',
@@ -131,7 +131,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Lost in the Groove (Chorus Vocal)', 'bpm': '122', 'key': 'A Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'kidsonny',
       username: 'kidsonny',
       status: 'Drum textures experiment',
@@ -146,7 +146,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Pulse (Organic Loop Stems)', 'bpm': '130', 'key': 'B Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Luna Eclipse',
       username: 'luna_eclipse',
       status: 'Deep dark synthwave lines tonight 🌌',
@@ -162,7 +162,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Midnight Drive (FM Bell Melodies)', 'bpm': '118', 'key': 'D Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Marcus Vox',
       username: 'marcusvox',
       status: 'Recording voice overs for podcasts',
@@ -177,7 +177,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Soulful Spoken (Poem Vocal Stems)', 'bpm': '118', 'key': 'A Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Chloe Keys',
       username: 'chloekeys',
       status: 'Writing a piano ballad 🎹',
@@ -192,7 +192,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Ambient Keys (Reversed Piano)', 'bpm': '90', 'key': 'F Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'DJ Spark',
       username: 'djspark',
       status: 'Setting up tour dates for Summer',
@@ -207,7 +207,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Tech House Build (Main Kick/Bass)', 'bpm': '126', 'key': 'C Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Elena Rose',
       username: 'elenarose',
       status: 'Acoustic sessions in the woods',
@@ -222,7 +222,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Forest Acoustic (Fingerpicking Guitar)', 'bpm': '86', 'key': 'G Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Bax Beatbox',
       username: 'baxbeatbox',
       status: 'Synthesizing vocal beats',
@@ -237,7 +237,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Voice Percussion (Trap Hat Beats)', 'bpm': '138', 'key': 'C Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Zoe Synth',
       username: 'zoesynth',
       status: 'Modulating modular grids 🎛️',
@@ -252,7 +252,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Modular Drone (Sustaining Pad)', 'bpm': '80', 'key': 'F Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Leo Bass',
       username: 'leobass',
       status: 'Slapping the low end 🎸',
@@ -267,7 +267,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Funk slap grooves (Bass track)', 'bpm': '108', 'key': 'A Min'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Aiden Sparks',
       username: 'aidensparks',
       status: 'Foley recording in the city streets',
@@ -282,7 +282,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         {'title': 'Street Foley Beats (Texture stems)', 'bpm': '120', 'key': 'C Maj'},
       ],
     ),
-    CreatorProfile(
+    ArtistProfile(
       name: 'Vera Harmonics',
       username: 'veraharmonics',
       status: 'Harp recordings with delay loops 🎼',
@@ -303,7 +303,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   void initState() {
     super.initState();
     // Keep it random and fresh on every screen visit
-    _randomStartOffset = Random().nextInt(_allCreators.length);
+    _randomStartOffset = Random().nextInt(_allArtists.length);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -319,12 +319,12 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   @override
   Widget build(BuildContext context) {
     // Filter logic
-    final filteredCreators = _allCreators.where((creator) {
-      final matchesSearch = creator.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          creator.username.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          creator.bio.toLowerCase().contains(_searchQuery.toLowerCase());
+    final filteredArtists = _allArtists.where((Artist) {
+      final matchesSearch = Artist.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          Artist.username.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          Artist.bio.toLowerCase().contains(_searchQuery.toLowerCase());
       
-      final matchesRole = _selectedRoleFilter == 'All' || creator.role == _selectedRoleFilter;
+      final matchesRole = _selectedRoleFilter == 'All' || Artist.role == _selectedRoleFilter;
 
       return matchesSearch && matchesRole;
     }).toList();
@@ -402,7 +402,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Connect, brainstorm, and build song ideas with ${_allCreators.length} active creators online.',
+                                  'Connect, brainstorm, and build song ideas with ${_allArtists.length} active Artists online.',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.5),
                                     fontSize: 14,
@@ -417,16 +417,16 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                           ),
                         ),
 
-                        // Creators Grid (Infinite Loop Layout)
+                        // Artists Grid (Infinite Loop Layout)
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                          sliver: filteredCreators.isEmpty
+                          sliver: filteredArtists.isEmpty
                               ? const SliverToBoxAdapter(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(vertical: 80),
                                     child: Center(
                                       child: Text(
-                                        'No creators found matching your query.',
+                                        'No Artists found matching your query.',
                                         style: TextStyle(color: Colors.grey, fontSize: 14),
                                       ),
                                     ),
@@ -441,10 +441,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                   ),
                                   delegate: SliverChildBuilderDelegate(
                                     (context, index) {
-                                      // Loop infinitely over matching creators
-                                      final adjustedIndex = (index + _randomStartOffset) % filteredCreators.length;
-                                      final creator = filteredCreators[adjustedIndex];
-                                      return _buildCreatorCard(context, creator);
+                                      // Loop infinitely over matching Artists
+                                      final adjustedIndex = (index + _randomStartOffset) % filteredArtists.length;
+                                      final Artist = filteredArtists[adjustedIndex];
+                                      return _buildArtistCard(context, Artist);
                                     },
                                     // childCount omitted to run infinitely
                                   ),
@@ -647,10 +647,10 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
     );
   }
 
-  Widget _buildCreatorCard(BuildContext context, CreatorProfile creator) {
+  Widget _buildArtistCard(BuildContext context, ArtistProfile Artist) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => _showCreatorDetailSheet(context, creator),
+      onTap: () => _showArtistDetailSheet(context, Artist),
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF13131A),
@@ -661,14 +661,14 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Creator Image Header
+            // Artist Image Header
             Expanded(
               flex: 10,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Image.network(
-                    creator.imageUrl,
+                    Artist.imageUrl,
                     fit: BoxFit.cover,
                   ),
                   Container(
@@ -694,7 +694,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        creator.role,
+                        Artist.role,
                         style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -714,7 +714,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            creator.status,
+                            Artist.status,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -743,25 +743,25 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            creator.name,
+                            Artist.name,
                             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                         ),
                         Text(
-                          '${creator.songsInProgress} active',
+                          '${Artist.songsInProgress} active',
                           style: const TextStyle(color: Color(0xFFD03BFF), fontSize: 10, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '@${creator.username}',
+                      '@${Artist.username}',
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                     const SizedBox(height: 8),
                     Expanded(
                       child: Text(
-                        creator.bio,
+                        Artist.bio,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -777,7 +777,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: creator.genres.take(2).map((genre) => Container(
+                      children: Artist.genres.take(2).map((genre) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.04),
@@ -810,7 +810,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                           SynthEngine.playDrum('hat');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Previewing vibe sound signature for @${creator.username} in key of $note!'),
+                              content: Text('Previewing vibe sound signature for @${Artist.username} in key of $note!'),
                               duration: const Duration(seconds: 1),
                             ),
                           );
@@ -830,7 +830,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
   }
 
   // GORGEOUS EXPANDED GLASSMORPHIC DETAILS MODAL
-  void _showCreatorDetailSheet(BuildContext context, CreatorProfile creator) {
+  void _showArtistDetailSheet(BuildContext context, ArtistProfile Artist) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -880,7 +880,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
                                   child: Image.network(
-                                    creator.imageUrl,
+                                    Artist.imageUrl,
                                     width: 140,
                                     height: 140,
                                     fit: BoxFit.cover,
@@ -902,7 +902,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                               border: Border.all(color: const Color(0xFF6C3BF5).withOpacity(0.4)),
                                             ),
                                             child: Text(
-                                              creator.role.toUpperCase(),
+                                              Artist.role.toUpperCase(),
                                               style: const TextStyle(
                                                 color: Color(0xFFD03BFF),
                                                 fontSize: 9,
@@ -915,14 +915,14 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                           Icon(Icons.location_on_outlined, size: 12, color: Colors.white.withOpacity(0.4)),
                                           const SizedBox(width: 4),
                                           Text(
-                                            creator.location,
+                                            Artist.location,
                                             style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10.5),
                                           ),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        creator.name,
+                                        Artist.name,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 26,
@@ -932,7 +932,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        '@${creator.username}',
+                                        '@${Artist.username}',
                                         style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 13, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 12),
@@ -947,7 +947,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: Text(
-                                              creator.status,
+                                              Artist.status,
                                               style: const TextStyle(color: Colors.white70, fontSize: 11.5, fontStyle: FontStyle.italic),
                                             ),
                                           ),
@@ -972,7 +972,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                     const Text('ARTIST BIOGRAPHY', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                     const SizedBox(height: 10),
                                     Text(
-                                      creator.bio,
+                                      Artist.bio,
                                       style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.6),
                                     ),
                                     const SizedBox(height: 24),
@@ -981,7 +981,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
-                                      children: creator.genres.map((g) => Container(
+                                      children: Artist.genres.map((g) => Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.04),
@@ -1025,7 +1025,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                   children: [
                                     const Text('ACTIVE MULTI-TRACK STEMS', style: TextStyle(color: Colors.white30, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                     const SizedBox(height: 12),
-                                    ...creator.tracksInProgress.map((track) => Container(
+                                    ...Artist.tracksInProgress.map((track) => Container(
                                       margin: const EdgeInsets.only(bottom: 12),
                                       padding: const EdgeInsets.all(14),
                                       decoration: BoxDecoration(
@@ -1091,7 +1091,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'Invite @${creator.username} to your active DAW studio session. Split sheet will be calculated 50/50 automatically.',
+                                            'Invite @${Artist.username} to your active DAW studio session. Split sheet will be calculated 50/50 automatically.',
                                             style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, height: 1.4),
                                           ),
                                           const SizedBox(height: 16),
@@ -1108,7 +1108,7 @@ class _AllCreatorsScreenState extends State<AllCreatorsScreen> {
                                                 Navigator.of(context).pop();
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(
-                                                    content: Text('Inviting @${creator.username} to your workspace... invite notification sent!'),
+                                                    content: Text('Inviting @${Artist.username} to your workspace... invite notification sent!'),
                                                     backgroundColor: const Color(0xFF6C3BF5),
                                                   ),
                                                 );

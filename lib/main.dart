@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'providers/song_provider.dart';
 import 'screens/landing_page.dart';
-import 'screens/all_creators.dart';
+import 'screens/all_artists.dart';
 import 'screens/dashboard.dart';
 
 final GoRouter _router = GoRouter(
@@ -14,8 +15,8 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const LandingPageScreen(),
     ),
     GoRoute(
-      path: '/creators',
-      builder: (context, state) => const AllCreatorsScreen(),
+      path: '/artists',
+      builder: (context, state) => const AllArtistsScreen(),
     ),
     ShellRoute(
       builder: (context, state, child) {
@@ -39,6 +40,7 @@ final GoRouter _router = GoRouter(
 );
 
 void main() {
+  usePathUrlStrategy(); // Remove '#' hash from URL pathing
   runApp(
     MultiProvider(
       providers: [
