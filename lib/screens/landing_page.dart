@@ -274,22 +274,26 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     );
   }
 
-  // --- HERO SECTION ---
   Widget _buildHeroSection() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double titleFontSize = (screenWidth * 0.08).clamp(36.0, 120.0);
+    final double subtitleFontSize = (titleFontSize * 0.25).clamp(15.0, 30.0);
+    final double titleLetterSpacing = (titleFontSize * -0.0125).clamp(-1.8, -0.4);
+
     return Column(
       children: [
         const SizedBox(height: 60),
         // H1 Heading
-        const Text(
+        Text(
           'Make Songs That\nMove Your Soul',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 120,
+            fontSize: titleFontSize,
             height: 1.1,
             fontWeight: FontWeight.w900,
             fontFamily: 'Outfit',
-            letterSpacing: -1.5,
+            letterSpacing: titleLetterSpacing,
           ),
         ),
         const SizedBox(height: 24),
@@ -301,7 +305,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
-              fontSize: 30,
+              fontSize: subtitleFontSize,
               height: 1.6,
             ),
           ),
