@@ -1253,44 +1253,49 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: ListView(
-                  children: [
-                    _buildLibrarySection(
-                      provider,
-                      songs,
-                      SongGroupType.single,
-                      '💿 Singles',
-                      columns,
-                      aspectRatio,
-                    ),
-                    _buildLibrarySection(
-                      provider,
-                      songs,
-                      SongGroupType.ep,
-                      '📼 EPs',
-                      columns,
-                      aspectRatio,
-                    ),
-                    _buildLibrarySection(
-                      provider,
-                      songs,
-                      SongGroupType.album,
-                      '🎸 Albums',
-                      columns,
-                      aspectRatio,
-                    ),
-                    _buildLibrarySection(
-                      provider,
-                      songs,
-                      SongGroupType.liveSet,
-                      '🎤 Live Sets',
-                      columns,
-                      aspectRatio,
-                    ),
-                    const SizedBox(height: 40),
-                    _buildFooterSection(),
-                  ],
-                ),
+                child: songs.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.music_note_outlined,
+                              size: 64,
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No active songs in library.',
+                              style: TextStyle(color: Colors.grey, fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Create a new song workspace above to get started.',
+                              style: TextStyle(color: Colors.grey, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView(
+                        children: [
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: columns,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: aspectRatio,
+                            ),
+                            itemCount: songs.length,
+                            itemBuilder: (context, index) {
+                              return _buildSongCard(provider, songs[index]);
+                            },
+                          ),
+                          const SizedBox(height: 40),
+                          _buildFooterSection(),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -1314,6 +1319,125 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
     final hash = song.id.hashCode.abs();
     return fallbackCovers[hash % fallbackCovers.length];
+  }
+
+  Widget _buildSongCard(SongProvider provider, Song song) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            provider.selectSong(song);
+            setState(() => _activeView = 'workspace');
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            song.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(
+                            Icons.archive_outlined,
+                            color: Colors.grey,
+                            size: 16,
+                          ),
+                          onPressed: () {
+                            provider.archiveSong(song.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Archived "${song.title}" to The Vault!',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Status:',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 9,
+                          ),
+                        ),
+                        Text(
+                          songStatusToString(song.status),
+                          style: TextStyle(
+                            color: _getStatusColor(song.status),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    _buildProgressNodes(song.status),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
+                  child: Image.network(
+                    _getSongThumbnail(song),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(
+                          color: const Color(0xFF252535),
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                          ),
+                        ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildLibrarySection(
@@ -1352,123 +1476,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           itemCount: filtered.length,
           itemBuilder: (context, index) {
-            final song = filtered[index];
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF13131A),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.03)),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () {
-                    provider.selectSong(song);
-                    setState(() => _activeView = 'workspace');
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    song.title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  icon: const Icon(
-                                    Icons.archive_outlined,
-                                    color: Colors.grey,
-                                    size: 16,
-                                  ),
-                                  onPressed: () {
-                                    provider.archiveSong(song.id);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Archived "${song.title}" to The Vault!',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Status:',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 9,
-                                  ),
-                                ),
-                                Text(
-                                  songStatusToString(song.status),
-                                  style: TextStyle(
-                                    color: _getStatusColor(song.status),
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            _buildProgressNodes(song.status),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(16),
-                          ),
-                          child: Image.network(
-                            _getSongThumbnail(song),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  color: const Color(0xFF252535),
-                                  child: const Icon(
-                                    Icons.broken_image,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return _buildSongCard(provider, filtered[index]);
           },
         ),
       ],
@@ -2850,173 +2858,233 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // --- PROJECTS (ASSET MANAGEMENT) VIEW ---
   Widget _buildProjectsView(SongProvider provider) {
-    return ListView(
-      padding: const EdgeInsets.all(24.0),
-      children: [
-        const Text(
-          '📂 Projects & Assets',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Manage your multi-track stems, master files, samples, and exports.',
-          style: TextStyle(color: Colors.grey, fontSize: 13),
-        ),
-        const SizedBox(height: 24),
-        // Storage Bar
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF13131A),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.03)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final songs = provider.songs.where((s) => !s.isArchived).toList();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double width = constraints.maxWidth;
+        int columns = 3;
+        double aspectRatio = 1.05;
+
+        if (width < 650) {
+          columns = 2;
+          aspectRatio = 0.85;
+        } else if (width < 1000) {
+          columns = 2;
+          aspectRatio = 1.15;
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(24.0),
+          children: [
+            const Text(
+              '📂 Projects & Assets',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Manage your multi-track stems, master files, samples, and exports.',
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            // Storage Bar
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.03)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Cloud Storage Space',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Cloud Storage Space',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '4.2 GB of 10.0 GB (42%)',
+                        style: TextStyle(
+                          color: Color(0xFF00FFCC),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    '4.2 GB of 10.0 GB (42%)',
-                    style: TextStyle(
-                      color: Color(0xFF00FFCC),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: 0.42,
+                      backgroundColor: Colors.white.withOpacity(0.05),
+                      color: const Color(0xFF00FFCC),
+                      minHeight: 8,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: 0.42,
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                  color: const Color(0xFF00FFCC),
-                  minHeight: 8,
+            ),
+            const SizedBox(height: 24),
+            // Folders Grid
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: MediaQuery.of(context).size.width < 600 ? 1 : 3,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.6,
+              children: [
+                _buildProjectFolderCard(
+                  Icons.audiotrack,
+                  'Stems & Multi-tracks',
+                  '14 files',
+                  const Color(0xFFD03BFF),
                 ),
+                _buildProjectFolderCard(
+                  Icons.album,
+                  'Mixdowns & Masters',
+                  '8 files',
+                  const Color(0xFF00FFCC),
+                ),
+                _buildProjectFolderCard(
+                  Icons.library_music,
+                  'Samples & Loops',
+                  '32 files',
+                  const Color(0xFFFFD700),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Recent Multi-track Files',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        // Folders Grid
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: MediaQuery.of(context).size.width < 600 ? 1 : 3,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.6,
-          children: [
-            _buildProjectFolderCard(
-              Icons.audiotrack,
-              'Stems & Multi-tracks',
-              '14 files',
-              const Color(0xFFD03BFF),
             ),
-            _buildProjectFolderCard(
-              Icons.album,
-              'Mixdowns & Masters',
-              '8 files',
-              const Color(0xFF00FFCC),
+            const SizedBox(height: 12),
+            ...provider.songs
+                .take(3)
+                .map(
+                  (song) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF13131A),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withOpacity(0.03)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.insert_drive_file_outlined,
+                          color: Colors.white.withOpacity(0.5),
+                          size: 24,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${song.title} - Mixdown.wav',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Last modified: 1 day ago • 38.4 MB',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.4),
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.download_outlined,
+                            color: Color(0xFF00FFCC),
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Downloading stem package for "${song.title}"...',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            const SizedBox(height: 32),
+            const Text(
+              '📁 Projects & Categorization',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            _buildProjectFolderCard(
-              Icons.library_music,
-              'Samples & Loops',
-              '32 files',
-              const Color(0xFFFFD700),
+            const SizedBox(height: 8),
+            _buildLibrarySection(
+              provider,
+              songs,
+              SongGroupType.single,
+              '💿 Singles',
+              columns,
+              aspectRatio,
             ),
+            _buildLibrarySection(
+              provider,
+              songs,
+              SongGroupType.ep,
+              '📼 EPs',
+              columns,
+              aspectRatio,
+            ),
+            _buildLibrarySection(
+              provider,
+              songs,
+              SongGroupType.album,
+              '🎸 Albums',
+              columns,
+              aspectRatio,
+            ),
+            _buildLibrarySection(
+              provider,
+              songs,
+              SongGroupType.liveSet,
+              '🎤 Live Sets',
+              columns,
+              aspectRatio,
+            ),
+            const SizedBox(height: 40),
+            _buildFooterSection(),
           ],
-        ),
-        const SizedBox(height: 32),
-        const Text(
-          'Recent Multi-track Files',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        ...provider.songs
-            .take(3)
-            .map(
-              (song) => Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF13131A),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.03)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.insert_drive_file_outlined,
-                      color: Colors.white.withOpacity(0.5),
-                      size: 24,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${song.title} - Mixdown.wav',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Last modified: 1 day ago • 38.4 MB',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.4),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.download_outlined,
-                        color: Color(0xFF00FFCC),
-                        size: 18,
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Downloading stem package for "${song.title}"...',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        const SizedBox(height: 40),
-        _buildFooterSection(),
-      ],
+        );
+      },
     );
   }
 
