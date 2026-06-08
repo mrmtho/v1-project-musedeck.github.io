@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import '../widgets/floating_particles_background.dart';
+import 'all_creators.dart';
 
 class LandingPageScreen extends StatefulWidget {
   const LandingPageScreen({super.key});
@@ -687,7 +688,13 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AllCreatorsScreen(),
+                  ),
+                );
+              },
               child: const Text(
                 'View all creators',
                 style: TextStyle(fontSize: 12),
