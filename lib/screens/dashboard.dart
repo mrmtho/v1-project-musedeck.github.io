@@ -2234,9 +2234,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   Widget _buildTopNavBar(NavigationState navState, NavigationNotifier navNotifier) {
     return Container(
       height: 56,
-      color: StudioTheme.primaryPanel,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
+        color: StudioTheme.primaryPanel,
         border: Border(
           bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
         ),
