@@ -2233,8 +2233,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildTopNavBar(NavigationState navState, NavigationNotifier navNotifier) {
     return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      height: 76,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: StudioTheme.primaryPanel,
         border: Border(
@@ -2242,6 +2242,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         ),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Left: Logo
           GestureDetector(
@@ -2251,27 +2252,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
                       ),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.blur_on,
                       color: Colors.black,
-                      size: 16,
+                      size: 20,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   const Text(
                     'Studduo',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1.2,
                     ),
                   ),
                 ],
@@ -2279,11 +2280,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
           ),
           
-          const SizedBox(width: 40),
-          
-          // Center: Tab Groups
+          // Center: Tab Groups (Centered in the remaining horizontal space)
           Expanded(
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildTabGroup(
                   groupLabel: 'PROJECT',
@@ -2295,7 +2295,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   navState: navState,
                   navNotifier: navNotifier,
                 ),
-                const SizedBox(width: 32),
+                const SizedBox(width: 48),
                 _buildTabGroup(
                   groupLabel: 'CONTINUOUS',
                   tabs: {
@@ -2319,9 +2319,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               // Cloud Sync Status Indicator
               const Tooltip(
                 message: 'All files up to date',
-                child: Icon(Icons.cloud_done, color: StudioTheme.success, size: 18),
+                child: Icon(Icons.cloud_done, color: StudioTheme.success, size: 20),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               
               // Profile Avatar
               GestureDetector(
@@ -2334,11 +2334,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       border: Border.all(color: StudioTheme.accent.withOpacity(0.5), width: 1.5),
                     ),
                     child: const CircleAvatar(
-                      radius: 14,
+                      radius: 16,
                       backgroundColor: StudioTheme.secondaryPanel,
                       child: Text(
                         'JD',
-                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -2359,17 +2359,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Tabs row
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: tabs.entries.map((entry) {
             final tabKey = entry.key;
             final tabTitle = entry.value;
             final isSelected = navState.activeTab == tabKey;
             
             return Padding(
-              padding: const EdgeInsets.only(right: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: GestureDetector(
                 onTap: () => navNotifier.selectTab(tabKey),
                 child: MouseRegion(
@@ -2382,14 +2383,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 13,
+                          fontSize: 15,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 6),
                       Container(
-                        height: 2,
-                        width: 16,
-                        color: isSelected ? StudioTheme.activeTabIndicator : Colors.transparent,
+                        height: 3,
+                        width: 24,
+                        decoration: BoxDecoration(
+                          color: isSelected ? StudioTheme.activeTabIndicator : Colors.transparent,
+                          borderRadius: BorderRadius.circular(1.5),
+                        ),
                       ),
                     ],
                   ),
@@ -2400,17 +2405,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         ),
         
         // Group label beneath tabs
-        const SizedBox(height: 2),
-        Padding(
-          padding: const EdgeInsets.only(left: 2.0),
-          child: Text(
-            groupLabel,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.25),
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.0,
-            ),
+        const SizedBox(height: 6),
+        Text(
+          groupLabel,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.35),
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
           ),
         ),
       ],
