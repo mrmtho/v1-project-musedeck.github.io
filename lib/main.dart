@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as legacy;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'providers/song_provider.dart';
@@ -42,11 +43,13 @@ final GoRouter _router = GoRouter(
 void main() {
   usePathUrlStrategy(); // Remove '#' hash from URL pathing
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => SongProvider()),
-      ],
-      child: const StudduoApp(),
+    ProviderScope(
+      child: legacy.MultiProvider(
+        providers: [
+          legacy.ChangeNotifierProvider(create: (_) => SongProvider()),
+        ],
+        child: const StudduoApp(),
+      ),
     ),
   );
 }

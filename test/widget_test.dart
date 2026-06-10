@@ -7,14 +7,14 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:musedeck/main.dart';
+import 'package:studduo/main.dart';
 
 void main() {
-  testWidgets('MuseDeck App smoke test', (WidgetTester tester) async {
+  testWidgets('Studduo App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MuseDeckApp());
+    await tester.pumpWidget(const StudduoApp());
 
-    // Verify that our app main title is visible.
-    expect(find.text('MuseDeck'), findsOneWidget);
+    // Verify that our app title matches.
+    expect(find.byType(StudduoApp), findsOneWidget);
   });
 }

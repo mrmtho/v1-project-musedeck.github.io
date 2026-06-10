@@ -1,11 +1,14 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as legacy;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../models/song.dart';
 import '../providers/song_provider.dart';
+import '../providers/navigation_provider.dart';
+import '../theme/studio_theme.dart';
 import '../widgets/chord_progression_editor.dart';
 import '../widgets/creative_timeline.dart';
 import '../widgets/inspiration_board.dart';
@@ -14,15 +17,15 @@ import '../widgets/rhythmic_memo_recorder.dart';
 import '../utils/synth_engine.dart';
 import 'landing_page.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   final Widget? child;
   const DashboardScreen({super.key, this.child});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _titleController = TextEditingController();
@@ -321,7 +324,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
-  Widget _buildSidebar(
+  Widget _buildContextualSidebar(
+    NavigationState navState,
+    NavigationNotifier navNotifier,
     SongProvider provider,
     List<Song> songs,
     Song? activeSong, {
@@ -333,348 +338,324 @@ class _DashboardScreenState extends State<DashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Logo Header (Clicking routes user back to Landing Page)
-          GestureDetector(
-            onTap: () {
-              context.go('/');
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 24,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.blur_on,
-                            color: Colors.black,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Studduo',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFD03BFF).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: const Color(0xFFD03BFF).withOpacity(0.4),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: const Text(
-                            'v0.01',
-                            style: TextStyle(
-                              color: Color(0xFFD03BFF),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'AI Powered Workstation for Music Artists',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 10.5,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
+          // Sidebar header (Project info or selector)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
               ),
             ),
+            child: Row(
+              children: [
+                Icon(
+                  navState.activeTab == 'create' || navState.activeTab == 'produce' || navState.activeTab == 'release'
+                      ? Icons.folder_open
+                      : Icons.work_history,
+                  size: 16,
+                  color: StudioTheme.accent,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    activeSong != null ? activeSong.title : 'No Project Selected',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-
-          // Scrollable Sidebar Nav Items to prevent vertical overflow
+          
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 1. PLAYGROUND
-                  _buildSidebarHeader(
-                    icon: Icons.palette_outlined,
-                    label: 'Playground',
-                    isExpanded: _playgroundExpanded,
-                    onTap: () => setState(
-                      () => _playgroundExpanded = !_playgroundExpanded,
-                    ),
-                  ),
-                  if (_playgroundExpanded) ...[
-                    _buildSidebarNavItem(
-                      icon: Icons.mic_none,
-                      label: 'Capture',
-                      isSelected: _activeView == 'capture',
-                      badgeCount: provider.inbox.length,
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'capture');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.library_music_outlined,
-                      label: 'Song Library',
-                      isSelected: _activeView == 'library',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'library');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.archive_outlined,
-                      label: 'Vault',
-                      isSelected: _activeView == 'vault',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'vault');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-
-                  const SizedBox(height: 8),
-
-                  // 2. MIXER CONSOLE
-                  _buildSidebarNavItem(
-                    icon: Icons.tune,
-                    label: 'Mixer Console',
-                    isSelected: _activeView == 'mixer',
-                    onTap: () {
-                      setState(() => _activeView = 'mixer');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  // 3. PROJECTS
-                  _buildSidebarNavItem(
-                    icon: Icons.folder_open,
-                    label: 'Projects',
-                    isSelected: _activeView == 'projects',
-                    onTap: () {
-                      setState(() => _activeView = 'projects');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  // 4. NETWORK (Collaborators)
-                  _buildSidebarNavItem(
-                    icon: Icons.people_outline,
-                    label: 'Network',
-                    isSelected: _activeView == 'collab',
-                    onTap: () {
-                      setState(() => _activeView = 'collab');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  _buildSidebarNavItem(
-                    icon: Icons.chat_bubble_outline,
-                    label: 'Messages',
-                    isSelected: _activeView == 'messages',
-                    badgeCount: 3,
-                    onTap: () {
-                      setState(() => _activeView = 'messages');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  _buildSidebarNavItem(
-                    icon: Icons.group_outlined,
-                    label: 'Team Members',
-                    isSelected: _activeView == 'team',
-                    onTap: () {
-                      setState(() => _activeView = 'team');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  _buildSidebarNavItem(
-                    icon: Icons.calendar_month_outlined,
-                    label: 'Calendar',
-                    isSelected: _activeView == 'calendar',
-                    onTap: () {
-                      setState(() => _activeView = 'calendar');
-                      if (isDrawer) Navigator.of(context).pop();
-                    },
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // 5. INDUSTRY
-                  _buildSidebarHeader(
-                    icon: Icons.business_center_outlined,
-                    label: 'Industry',
-                    isExpanded: _industryExpanded,
-                    onTap: () =>
-                        setState(() => _industryExpanded = !_industryExpanded),
-                  ),
-                  if (_industryExpanded) ...[
-                    _buildSidebarNavItem(
-                      icon: Icons.newspaper_outlined,
-                      label: 'News',
-                      isSelected: _activeView == 'news',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'news');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.bar_chart_outlined,
-                      label: 'Charts',
-                      isSelected: _activeView == 'charts',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'charts');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-
-                  const SizedBox(height: 8),
-
-                  // 6. MORE
-                  _buildSidebarHeader(
-                    icon: Icons.more_horiz_outlined,
-                    label: 'More',
-                    isExpanded: _moreExpanded,
-                    onTap: () => setState(() => _moreExpanded = !_moreExpanded),
-                  ),
-                  if (_moreExpanded) ...[
-                    _buildSidebarNavItem(
-                      icon: Icons.info_outline,
-                      label: 'Company',
-                      isSelected: _activeView == 'company',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'company');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.notifications_none,
-                      label: 'Updates',
-                      isSelected: false,
-                      indent: 12,
-                      onTap: () {
-                        if (isDrawer) Navigator.of(context).pop();
-                        _showUpdatesDialog(context);
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.check_circle_outline,
-                      label: 'Status',
-                      isSelected: _activeView == 'status',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'status');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                    _buildSidebarNavItem(
-                      icon: Icons.gavel,
-                      label: 'Legals',
-                      isSelected: _activeView == 'legals',
-                      indent: 12,
-                      onTap: () {
-                        setState(() => _activeView = 'legals');
-                        if (isDrawer) Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ],
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: _buildSidebarContentForTab(navState, navNotifier, provider, songs, activeSong, isDrawer),
             ),
           ),
+          
+          // Workspace info or user sync status at the bottom of sidebar
           const Divider(color: Colors.white10, height: 1),
-          // 7. USER (positioned at the bottom left)
-          _buildSidebarHeader(
-            icon: Icons.person_outline,
-            label: 'User',
-            isExpanded: _userExpanded,
-            onTap: () => setState(() => _userExpanded = !_userExpanded),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                const Icon(Icons.cloud_done, color: StudioTheme.success, size: 14),
+                const SizedBox(width: 8),
+                Text(
+                  'Cloud Synced',
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+                ),
+              ],
+            ),
           ),
-          if (_userExpanded) ...[
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarContentForTab(
+    NavigationState navState,
+    NavigationNotifier navNotifier,
+    SongProvider provider,
+    List<Song> songs,
+    Song? activeSong,
+    bool isDrawer,
+  ) {
+    switch (navState.activeTab) {
+      case 'create':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Song Sandbox'),
             _buildSidebarNavItem(
-              icon: Icons.account_box_outlined,
-              label: 'Account',
-              isSelected: _activeView == 'account',
-              indent: 12,
-              onTap: () {
-                setState(() => _activeView = 'account');
-                if (isDrawer) Navigator.of(context).pop();
-              },
+              icon: Icons.mic_none,
+              label: 'Voice Notes',
+              isSelected: navState.activeSubSection == 'voice_notes',
+              onTap: () => navNotifier.selectSubSection('voice_notes'),
             ),
             _buildSidebarNavItem(
-              icon: Icons.person_pin_outlined,
-              label: 'Profile',
-              isSelected: _activeView == 'profile',
-              indent: 12,
-              onTap: () {
-                setState(() => _activeView = 'profile');
-                if (isDrawer) Navigator.of(context).pop();
-              },
+              icon: Icons.edit_note,
+              label: 'Lyrics',
+              isSelected: navState.activeSubSection == 'lyrics',
+              onTap: () => navNotifier.selectSubSection('lyrics'),
             ),
             _buildSidebarNavItem(
-              icon: Icons.settings_outlined,
-              label: 'Preferences',
-              isSelected: _activeView == 'preferences',
-              indent: 12,
-              onTap: () {
-                setState(() => _activeView = 'preferences');
-                if (isDrawer) Navigator.of(context).pop();
-              },
+              icon: Icons.music_note,
+              label: 'Chords',
+              isSelected: navState.activeSubSection == 'chords',
+              onTap: () => navNotifier.selectSubSection('chords'),
             ),
             _buildSidebarNavItem(
-              icon: Icons.logout,
-              label: 'Logout',
-              isSelected: false,
-              indent: 12,
-              onTap: () {
-                if (isDrawer) Navigator.of(context).pop();
-                context.go('/');
-              },
+              icon: Icons.lightbulb_outline,
+              label: 'Mood Board',
+              isSelected: navState.activeSubSection == 'mood_board',
+              onTap: () => navNotifier.selectSubSection('mood_board'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.check_box_outlined,
+              label: 'Tasks',
+              isSelected: navState.activeSubSection == 'tasks',
+              onTap: () => navNotifier.selectSubSection('tasks'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.notes,
+              label: 'Notes',
+              isSelected: navState.activeSubSection == 'notes',
+              onTap: () => navNotifier.selectSubSection('notes'),
+            ),
+            const SizedBox(height: 12),
+            _buildContextualSidebarHeader('AI Ideas'),
+            _buildSidebarNavItem(
+              icon: Icons.chat_bubble_outline,
+              label: 'AI Lyric Ideas',
+              isSelected: navState.activeSubSection == 'ai_lyrics',
+              onTap: () => navNotifier.selectSubSection('ai_lyrics'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.auto_awesome,
+              label: 'AI Concepts',
+              isSelected: navState.activeSubSection == 'ai_concepts',
+              onTap: () => navNotifier.selectSubSection('ai_concepts'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.insights,
+              label: 'AI Melody Ideas',
+              isSelected: navState.activeSubSection == 'ai_melody',
+              onTap: () => navNotifier.selectSubSection('ai_melody'),
+            ),
+            const SizedBox(height: 12),
+            _buildContextualSidebarHeader('Score Editor'),
+            _buildSidebarNavItem(
+              icon: Icons.menu_book,
+              label: 'Score & Lead Sheet',
+              isSelected: navState.activeSubSection == 'score',
+              onTap: () => navNotifier.selectSubSection('score'),
             ),
           ],
-          const SizedBox(height: 12),
-        ],
+        );
+      case 'produce':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Source Selection'),
+            _buildSidebarNavItem(
+              icon: Icons.folder_open,
+              label: 'Song Sandbox',
+              isSelected: navState.activeSubSection == 'song_sandbox',
+              onTap: () => navNotifier.selectSubSection('song_sandbox'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.archive_outlined,
+              label: 'The Vault',
+              isSelected: navState.activeSubSection == 'vault',
+              onTap: () => navNotifier.selectSubSection('vault'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.album_outlined,
+              label: 'Released Catalog',
+              isSelected: navState.activeSubSection == 'released_catalog',
+              onTap: () => navNotifier.selectSubSection('released_catalog'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.add_to_photos_outlined,
+              label: 'Additional Sources',
+              isSelected: navState.activeSubSection == 'additional_sources',
+              onTap: () => navNotifier.selectSubSection('additional_sources'),
+            ),
+            const SizedBox(height: 12),
+            _buildContextualSidebarHeader('Workspaces'),
+            _buildSidebarNavItem(
+              icon: Icons.timeline,
+              label: 'Arrangement Timeline',
+              isSelected: navState.activeSubSection == 'timeline',
+              onTap: () => navNotifier.selectSubSection('timeline'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.tune,
+              label: 'Mixer Console',
+              isSelected: navState.activeSubSection == 'mixer',
+              onTap: () => navNotifier.selectSubSection('mixer'),
+            ),
+          ],
+        );
+      case 'release':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Release Checklist'),
+            _buildSidebarNavItem(
+              icon: Icons.gavel,
+              label: 'Legal & Splits',
+              isSelected: navState.activeSubSection == 'legal',
+              onTap: () => navNotifier.selectSubSection('legal'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.cloud_upload_outlined,
+              label: 'Distribution',
+              isSelected: navState.activeSubSection == 'distribution',
+              onTap: () => navNotifier.selectSubSection('distribution'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.image_outlined,
+              label: 'Marketing & Cover',
+              isSelected: navState.activeSubSection == 'marketing',
+              onTap: () => navNotifier.selectSubSection('marketing'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.video_library_outlined,
+              label: 'Content & Reels',
+              isSelected: navState.activeSubSection == 'content',
+              onTap: () => navNotifier.selectSubSection('content'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.rocket_launch_outlined,
+              label: 'Launch & Pre-save',
+              isSelected: navState.activeSubSection == 'launch',
+              onTap: () => navNotifier.selectSubSection('launch'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.analytics_outlined,
+              label: 'Post Release',
+              isSelected: navState.activeSubSection == 'post_release',
+              onTap: () => navNotifier.selectSubSection('post_release'),
+            ),
+          ],
+        );
+      case 'earnings':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Financial Console'),
+            _buildSidebarNavItem(
+              icon: Icons.account_balance_wallet_outlined,
+              label: 'Overview',
+              isSelected: navState.activeSubSection == 'overview',
+              onTap: () => navNotifier.selectSubSection('overview'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.trending_up,
+              label: 'Income Tracking',
+              isSelected: navState.activeSubSection == 'income',
+              onTap: () => navNotifier.selectSubSection('income'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.trending_down,
+              label: 'Expense Log',
+              isSelected: navState.activeSubSection == 'expenses',
+              onTap: () => navNotifier.selectSubSection('expenses'),
+            ),
+          ],
+        );
+      case 'messages':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Direct Messages'),
+            ..._mockMessages.map((m) {
+              final contact = m['contact'] as String;
+              final isSelected = _selectedContactName == contact;
+              return _buildSidebarNavItem(
+                icon: Icons.person_outline,
+                label: contact,
+                isSelected: isSelected,
+                onTap: () {
+                  setState(() {
+                    _selectedContactName = contact;
+                  });
+                  navNotifier.selectSubSection('chat');
+                },
+              );
+            }).toList(),
+          ],
+        );
+      case 'industry':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Discovery Hub'),
+            _buildSidebarNavItem(
+              icon: Icons.newspaper_outlined,
+              label: 'News Feed',
+              isSelected: navState.activeSubSection == 'news',
+              onTap: () => navNotifier.selectSubSection('news'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.bar_chart_outlined,
+              label: 'Charts & Trends',
+              isSelected: navState.activeSubSection == 'charts',
+              onTap: () => navNotifier.selectSubSection('charts'),
+            ),
+          ],
+        );
+      default:
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              'No menu items',
+              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _buildContextualSidebarHeader(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 12, top: 16, bottom: 6),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.3),
+          fontSize: 9.5,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -885,7 +866,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget buildViewByName(String viewName) {
-    final provider = Provider.of<SongProvider>(context, listen: false);
+    final provider = legacy.Provider.of<SongProvider>(context, listen: false);
     final activeSong = provider.activeSong;
     final bool showSidebar = MediaQuery.of(context).size.width >= 950;
 
@@ -2250,10 +2231,928 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  Widget _buildTopNavBar(NavigationState navState, NavigationNotifier navNotifier) {
+    return Container(
+      height: 56,
+      color: StudioTheme.primaryPanel,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.03)),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Left: Logo
+          GestureDetector(
+            onTap: () => context.go('/'),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00FFCC), Color(0xFFD03BFF)],
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.blur_on,
+                      color: Colors.black,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Studduo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(width: 40),
+          
+          // Center: Tab Groups
+          Expanded(
+            child: Row(
+              children: [
+                _buildTabGroup(
+                  groupLabel: 'PROJECT',
+                  tabs: {
+                    'create': 'Create',
+                    'produce': 'Produce',
+                    'release': 'Release',
+                  },
+                  navState: navState,
+                  navNotifier: navNotifier,
+                ),
+                const SizedBox(width: 32),
+                _buildTabGroup(
+                  groupLabel: 'CONTINUOUS',
+                  tabs: {
+                    'messages': 'Messages',
+                    'calendar': 'Calendar',
+                    'team': 'Team',
+                    'earnings': 'Earnings',
+                    'catalog': 'Catalog',
+                    'industry': 'Industry',
+                  },
+                  navState: navState,
+                  navNotifier: navNotifier,
+                ),
+              ],
+            ),
+          ),
+          
+          // Right: Controls
+          Row(
+            children: [
+              // Cloud Sync Status Indicator
+              const Tooltip(
+                message: 'All files up to date',
+                child: Icon(Icons.cloud_done, color: StudioTheme.success, size: 18),
+              ),
+              const SizedBox(width: 16),
+              
+              // Profile Avatar
+              GestureDetector(
+                onTap: () => navNotifier.selectTab('account'),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: StudioTheme.accent.withOpacity(0.5), width: 1.5),
+                    ),
+                    child: const CircleAvatar(
+                      radius: 14,
+                      backgroundColor: StudioTheme.secondaryPanel,
+                      child: Text(
+                        'JD',
+                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabGroup({
+    required String groupLabel,
+    required Map<String, String> tabs,
+    required NavigationState navState,
+    required NavigationNotifier navNotifier,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Tabs row
+        Row(
+          children: tabs.entries.map((entry) {
+            final tabKey = entry.key;
+            final tabTitle = entry.value;
+            final isSelected = navState.activeTab == tabKey;
+            
+            return Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: GestureDetector(
+                onTap: () => navNotifier.selectTab(tabKey),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        tabTitle,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Container(
+                        height: 2,
+                        width: 16,
+                        color: isSelected ? StudioTheme.activeTabIndicator : Colors.transparent,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        
+        // Group label beneath tabs
+        const SizedBox(height: 2),
+        Padding(
+          padding: const EdgeInsets.only(left: 2.0),
+          child: Text(
+            groupLabel,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.25),
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMainContentForTab(NavigationState navState, SongProvider provider) {
+    final activeSong = provider.activeSong;
+    final bool showSidebar = MediaQuery.of(context).size.width >= 950;
+    
+    switch (navState.activeTab) {
+      case 'create':
+        switch (navState.activeSubSection) {
+          case 'voice_notes':
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: RhythmicMemoRecorder(),
+            );
+          case 'lyrics':
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: LyricEditor(),
+            );
+          case 'chords':
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: ChordProgressionEditor(),
+            );
+          case 'mood_board':
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: InspirationBoard(),
+            );
+          case 'tasks':
+            // Display Roadmap / CreativeTimeline
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: CreativeTimeline(),
+            );
+          case 'notes':
+            return _buildProjectNotesView(activeSong);
+          case 'ai_lyrics':
+            return _buildAIAssistantPanelView('lyrics');
+          case 'ai_concepts':
+            return _buildAIAssistantPanelView('concepts');
+          case 'ai_melody':
+            return _buildAIAssistantPanelView('melody');
+          case 'score':
+            return _buildScoreEditorView();
+          default:
+            return const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: LyricEditor(),
+            );
+        }
+      case 'produce':
+        switch (navState.activeSubSection) {
+          case 'song_sandbox':
+            return _buildSongLibraryView(provider);
+          case 'vault':
+            return _buildTheVaultView(provider);
+          case 'released_catalog':
+            return _buildReleasedCatalogGridView();
+          case 'additional_sources':
+            return _buildAdditionalSourcesView();
+          case 'timeline':
+            if (activeSong == null) {
+              return const Center(child: Text('Select a song in sandbox to display the timeline'));
+            }
+            return _buildWorkspaceView(provider, activeSong, showSidebar);
+          case 'mixer':
+            return _buildEmptyMixerView();
+          default:
+            if (activeSong != null) {
+              return _buildWorkspaceView(provider, activeSong, showSidebar);
+            }
+            return _buildSongLibraryView(provider);
+        }
+      case 'release':
+        return _buildReleaseChecklistView(navState.activeSubSection);
+      case 'earnings':
+        return _buildEarningsDashboardView(navState.activeSubSection);
+      case 'messages':
+        return _buildDMsMessagesView();
+      case 'calendar':
+        return _buildCalendarView(provider);
+      case 'team':
+        return _buildTeamMembersView();
+      case 'catalog':
+        return _buildReleasedCatalogGridView();
+      case 'industry':
+        if (navState.activeSubSection == 'charts') {
+          return _buildChartsView();
+        }
+        return _buildIndustryNewsView();
+      case 'account':
+        return _buildAccountView();
+      default:
+        return _buildSongLibraryView(provider);
+    }
+  }
+
+  Widget _buildProjectNotesView(Song? activeSong) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '📝 Project Notes - ${activeSong?.title ?? 'Sandbox'}',
+            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Keep track of ideas, reference links, and production logs.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: StudioTheme.primaryPanel,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.04)),
+              ),
+              child: const TextField(
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                decoration: InputDecoration(
+                  hintText: 'Start jotting down thoughts here...',
+                  border: InputBorder.none,
+                ),
+                style: TextStyle(color: Colors.white, fontSize: 14, height: 1.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIAssistantPanelView(String mode) {
+    String title = "AI Lyric Ideator";
+    String description = "Generate lyric ideas based on genre, mood, and prompt.";
+    String promptHint = "e.g., A melancholy verse about neon lights and fading summers...";
+    if (mode == 'concepts') {
+      title = "AI Song Concept Generator";
+      description = "Brainstorm core structures, themes, and sound architectures.";
+      promptHint = "e.g., Cyberpunk meets 80s synth-pop with a dramatic orchestral climax...";
+    } else if (mode == 'melody') {
+      title = "AI Melody Generator";
+      description = "Generate MIDI notation options and outline lead lines.";
+      promptHint = "e.g., An energetic arpeggiated bassline in G minor at 120 bpm...";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: StudioTheme.accent, size: 24),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: const TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: StudioTheme.primaryPanel,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.04)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Describe your inspiration',
+                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: promptHint,
+                    fillColor: StudioTheme.secondaryPanel,
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Creativity Temp', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                          Slider(value: 0.7, onChanged: (v) {}),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Structure Length', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                          Slider(value: 0.5, onChanged: (v) {}),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('AI is processing ideas... (Simulation)'),
+                        backgroundColor: StudioTheme.accent,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.bolt, color: Colors.black),
+                  label: const Text('Generate with AI', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: StudioTheme.activeTabIndicator,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Generated History',
+            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: ListView(
+              children: [
+                _buildAIHistoryCard(
+                  'Verse 1: Chasing Shadows',
+                  'Fading traces under neon stars / Driving down this road of steel and glass...',
+                  'Generated 20 mins ago',
+                ),
+                _buildAIHistoryCard(
+                  'Bassline Hook: Retro Dreamer',
+                  'Pattern: G2 - G2 - G3 - G2 - F2 - D2 (16th notes with gate multiplier)',
+                  'Generated 1 hour ago',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIHistoryCard(String title, String excerpt, String date) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: StudioTheme.primaryPanel.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.02)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(date, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            excerpt,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreEditorView() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '🎼 Score & Lead Sheet Editor',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Write and edit sheet notation, chord charts, and lead sheets.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 10)],
+              ),
+              child: CustomPaint(
+                painter: SheetMusicPainter(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReleasedCatalogGridView() {
+    final catalog = [
+      {'title': 'Glass House', 'type': 'Single', 'date': 'June 12, 2026', 'streams': '124.5k', 'cover': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'},
+      {'title': 'Retro Dreamer', 'type': 'EP', 'date': 'April 20, 2026', 'streams': '842.1k', 'cover': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4'},
+      {'title': 'Neon Summers', 'type': 'Album', 'date': 'November 15, 2025', 'streams': '3.2M', 'cover': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a'},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '💿 Released Catalog',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Monitor and manage your officially released discography.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: catalog.length,
+              itemBuilder: (context, index) {
+                final item = catalog[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    color: StudioTheme.primaryPanel,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                            image: DecorationImage(
+                              image: NetworkImage(item['cover']!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(item['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: StudioTheme.accent.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(item['type']!, style: const TextStyle(color: StudioTheme.accent, fontSize: 9, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text('Released: ${item['date']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                            const SizedBox(height: 4),
+                            Text('Streams: ${item['streams']}', style: const TextStyle(color: StudioTheme.success, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdditionalSourcesView() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📁 Additional Production Sources',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Pull assets from sample libraries, collaborator submissions, or external files.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(child: _buildSourceActionCard(Icons.library_music, 'Sample Packs', 'Browse loop & synth packs')),
+              const SizedBox(width: 16),
+              Expanded(child: _buildSourceActionCard(Icons.folder_shared, 'Collaborator Stems', 'View stems shared by co-producers')),
+              const SizedBox(width: 16),
+              Expanded(child: _buildSourceActionCard(Icons.upload_file, 'Local Files', 'Import custom audio WAV/MIDI files')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSourceActionCard(IconData icon, String title, String desc) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: StudioTheme.primaryPanel,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 28, color: StudioTheme.accent),
+          const SizedBox(height: 16),
+          Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(height: 6),
+          Text(desc, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReleaseChecklistView(String section) {
+    final Map<String, List<Map<String, dynamic>>> checklistData = {
+      'legal': [
+        {'title': 'Split sheets signed by all co-writers', 'done': true},
+        {'title': 'Producer agreement signed', 'done': false},
+        {'title': 'Sample clearances approved', 'done': true},
+      ],
+      'distribution': [
+        {'title': 'Metadata forms complete (ISRC/ISWC)', 'done': false},
+        {'title': 'Distributor selected (DistroKid/TuneCore)', 'done': true},
+        {'title': 'High-res audio mastering files uploaded', 'done': false},
+      ],
+      'marketing': [
+        {'title': 'Cover artwork approved (3000x3000px)', 'done': true},
+        {'title': 'Press release & artist bio updated', 'done': false},
+        {'title': 'Social promo templates exported', 'done': false},
+      ],
+      'content': [
+        {'title': 'Teaser loops exported for Instagram/TikTok', 'done': true},
+        {'title': 'Lyrics video created & scheduled', 'done': false},
+        {'title': 'Behind-the-scenes recording footage edited', 'done': false},
+      ],
+      'launch': [
+        {'title': 'Release date scheduled with 3-week lead time', 'done': true},
+        {'title': 'Spotify Pre-save link active', 'done': true},
+        {'title': 'Launch announcement post scheduled', 'done': false},
+      ],
+      'post_release': [
+        {'title': 'Submit to editorial playlist pitches', 'done': false},
+        {'title': 'Monitor stream statistics on day 1', 'done': false},
+        {'title': 'Activate digital marketing ads', 'done': false},
+      ],
+    };
+
+    final items = checklistData[section] ?? checklistData['legal']!;
+    
+    double progress = items.where((i) => i['done'] as bool).length / items.length;
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '✅ Release Readiness Checklist',
+                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Complete details for: ${section.toUpperCase()}',
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('${(progress * 100).toInt()}% Done', style: const TextStyle(color: StudioTheme.success, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: 120,
+                    height: 6,
+                    decoration: BoxDecoration(color: StudioTheme.secondaryPanel, borderRadius: BorderRadius.circular(3)),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        width: 120 * progress,
+                        height: 6,
+                        decoration: BoxDecoration(color: StudioTheme.success, borderRadius: BorderRadius.circular(3)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final done = item['done'] as bool;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: StudioTheme.primaryPanel,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: CheckboxListTile(
+                    value: done,
+                    onChanged: (val) {
+                      setState(() {
+                        item['done'] = val ?? false;
+                      });
+                    },
+                    title: Text(
+                      item['title'] as String,
+                      style: TextStyle(
+                        color: done ? Colors.white70 : Colors.white,
+                        decoration: done ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    activeColor: StudioTheme.success,
+                    checkColor: Colors.black,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningsDashboardView(String section) {
+    if (section == 'income') {
+      return _buildTransactionsView('Income Streams', [
+        {'title': 'Spotify Streaming Royalties', 'amount': '+\$1,240.50', 'date': 'June 8, 2026'},
+        {'title': 'Apple Music Royalties', 'amount': '+\$410.20', 'date': 'June 5, 2026'},
+        {'title': 'Bandcamp Merch Sales', 'amount': '+\$215.00', 'date': 'May 28, 2026'},
+      ], StudioTheme.success);
+    } else if (section == 'expenses') {
+      return _buildTransactionsView('Production Expenses', [
+        {'title': 'Vocal Tuning (Contractor)', 'amount': '-\$250.00', 'date': 'June 7, 2026'},
+        {'title': 'Studio A Booking (2 hours)', 'amount': '-\$160.00', 'date': 'June 2, 2026'},
+        {'title': 'Mastering Plugin License', 'amount': '-\$99.00', 'date': 'May 20, 2026'},
+      ], StudioTheme.record);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📊 Financial Overview',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Keep track of your creative studio income, licensing royalties, and project expenses.',
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(child: _buildFinancialStatCard('Gross Income', '\$2,450.80', '+18.2% this mo', StudioTheme.success)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildFinancialStatCard('Total Expenses', '\$509.00', '+5.4% this mo', StudioTheme.record)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildFinancialStatCard('Net Profit', '\$1,941.80', '+22.1% this mo', StudioTheme.accent)),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Monthly Revenue Trend',
+            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: StudioTheme.primaryPanel,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.04)),
+              ),
+              child: CustomPaint(
+                painter: FinancialChartPainter(),
+                child: const SizedBox(width: double.infinity, height: double.infinity),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialStatCard(String label, String value, String change, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: StudioTheme.primaryPanel,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+          const SizedBox(height: 12),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text(change, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionsView(String title, List<Map<String, String>> txs, Color amountColor) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: txs.length,
+              itemBuilder: (context, index) {
+                final tx = txs[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: StudioTheme.primaryPanel,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(tx['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                          const SizedBox(height: 4),
+                          Text(tx['date']!, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        ],
+                      ),
+                      Text(tx['amount']!, style: TextStyle(color: amountColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _syncActiveViewFromRoute();
-    final provider = Provider.of<SongProvider>(context);
+    final provider = legacy.Provider.of<SongProvider>(context);
     final songs = provider.songs;
     final activeSong = provider.activeSong;
 
@@ -2262,15 +3161,20 @@ class _DashboardScreenState extends State<DashboardScreen>
       _titleController.text = activeSong.title;
     }
 
+    final navState = ref.watch(navigationProvider);
+    final navNotifier = ref.read(navigationProvider.notifier);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool showSidebar = constraints.maxWidth >= 950;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0D0D14),
+          backgroundColor: StudioTheme.background,
           drawer: !showSidebar
               ? Drawer(
-                  child: _buildSidebar(
+                  child: _buildContextualSidebar(
+                    navState,
+                    navNotifier,
                     provider,
                     songs,
                     activeSong,
@@ -2278,36 +3182,30 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                 )
               : null,
-          body: Row(
+          body: Column(
             children: [
-              // Left Sidebar
-              if (showSidebar) _buildSidebar(provider, songs, activeSong),
-
-              // Main Content
+              // Top Navigation Bar spanning across whole top screen
+              _buildTopNavBar(navState, navNotifier),
+              
+              // Bottom body split into Left Sidebar and Main Canvas Workspace
               Expanded(
-                child: Column(
+                child: Row(
                   children: [
-                    // Header bar with drawer trigger for mobile
-                    if (!showSidebar)
-                      AppBar(
-                        backgroundColor: const Color(0xFF13131A),
-                        leading: Builder(
-                          builder: (context) => IconButton(
-                            icon: const Icon(Icons.menu, color: Colors.white),
-                            onPressed: () => Scaffold.of(context).openDrawer(),
-                          ),
-                        ),
-                        title: const Text(
-                          'Studduo',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
+                    if (showSidebar)
+                      _buildContextualSidebar(
+                        navState,
+                        navNotifier,
+                        provider,
+                        songs,
+                        activeSong,
                       ),
+                    
+                    // Vertical divider separating sidebar from main content
+                    const VerticalDivider(color: Colors.white10, width: 1),
+                    
+                    // Main Workspace content
                     Expanded(
-                      child: widget.child ?? buildViewByName(_activeView),
+                      child: widget.child ?? _buildMainContentForTab(navState, provider),
                     ),
                   ],
                 ),
@@ -4807,7 +5705,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // --- CLOUD-NATIVE AI DAW WORKSPACE ---
   Widget _buildEmptyMixerView() {
-    final activeSong = Provider.of<SongProvider>(context).activeSong;
+    final activeSong = legacy.Provider.of<SongProvider>(context).activeSong;
     final songTitle = activeSong?.title ?? 'Summer Lights';
     final songBpm = activeSong?.bpm ?? 128;
     final songKey = activeSong?.keySignature ?? 'G Min';
@@ -7277,6 +8175,101 @@ class AutomationCurvePainter extends CustomPainter {
     for (var pt in points) {
       canvas.drawCircle(pt, 4.0, nodePaint);
     }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class SheetMusicPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 1.0;
+
+    final notePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    // Draw 5 staff lines
+    double startY = 60.0;
+    double spacing = 12.0;
+
+    for (int section = 0; section < 3; section++) {
+      double sectionY = startY + (section * 100);
+      if (sectionY + spacing * 4 > size.height) break;
+      for (int i = 0; i < 5; i++) {
+        double y = sectionY + (i * spacing);
+        canvas.drawLine(Offset(20, y), Offset(size.width - 20, y), linePaint);
+      }
+      
+      // Clef (Mocked using text or basic shapes)
+      final textPainter = TextPainter(
+        text: const TextSpan(
+          text: '𝄞',
+          style: TextStyle(color: Colors.black, fontSize: 44, height: 1.0),
+        ),
+        textDirection: ui.TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(canvas, Offset(25, sectionY - 10));
+      
+      // Draw some mock notes
+      canvas.drawOval(Rect.fromCenter(center: Offset(120, sectionY + spacing * 3), width: 14, height: 10), notePaint);
+      canvas.drawLine(Offset(127, sectionY + spacing * 3), Offset(127, sectionY + spacing * 0.5), linePaint);
+
+      canvas.drawOval(Rect.fromCenter(center: Offset(180, sectionY + spacing * 2.5), width: 14, height: 10), notePaint);
+      canvas.drawLine(Offset(187, sectionY + spacing * 2.5), Offset(187, sectionY - spacing * 0), linePaint);
+      
+      canvas.drawOval(Rect.fromCenter(center: Offset(240, sectionY + spacing * 2), width: 14, height: 10), notePaint);
+      canvas.drawLine(Offset(247, sectionY + spacing * 2), Offset(247, sectionY - spacing * 0.5), linePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class FinancialChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = StudioTheme.accent
+      ..strokeWidth = 2.5
+      ..style = PaintingStyle.stroke;
+
+    final fillPaint = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(0, size.height * 0.3),
+        Offset(0, size.height),
+        [StudioTheme.accent.withOpacity(0.25), StudioTheme.accent.withOpacity(0.0)],
+      );
+
+    final path = Path();
+    path.moveTo(0, size.height * 0.85);
+    
+    final points = [
+      Offset(0, size.height * 0.85),
+      Offset(size.width * 0.2, size.height * 0.70),
+      Offset(size.width * 0.4, size.height * 0.78),
+      Offset(size.width * 0.6, size.height * 0.55),
+      Offset(size.width * 0.8, size.height * 0.40),
+      Offset(size.width, size.height * 0.25),
+    ];
+
+    for (var i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+    
+    // Create fill path
+    final fillPath = Path.from(path);
+    fillPath.lineTo(size.width, size.height);
+    fillPath.lineTo(0, size.height);
+    fillPath.close();
+
+    canvas.drawPath(fillPath, fillPaint);
+    canvas.drawPath(path, linePaint);
   }
 
   @override
