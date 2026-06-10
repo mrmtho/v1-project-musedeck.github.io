@@ -22,6 +22,7 @@ class _StudioLoaderState extends State<StudioLoader>
     with TickerProviderStateMixin {
   late AnimationController _progressController;
   late AnimationController _pulseController;
+  late AnimationController _particleController;
   late Animation<double> _progressAnimation;
   late Animation<double> _pulseAnimation;
 
@@ -38,6 +39,11 @@ class _StudioLoaderState extends State<StudioLoader>
       duration: const Duration(milliseconds: 900),
     );
 
+    _particleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+
     _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _progressController, curve: Curves.easeInOutCubic),
     );
@@ -51,12 +57,15 @@ class _StudioLoaderState extends State<StudioLoader>
         _pulseController.repeat(reverse: true);
       }
     });
+
+    _particleController.repeat();
   }
 
   @override
   void dispose() {
     _progressController.dispose();
     _pulseController.dispose();
+    _particleController.dispose();
     super.dispose();
   }
 
@@ -68,7 +77,7 @@ class _StudioLoaderState extends State<StudioLoader>
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         AnimatedBuilder(
-          animation: Listenable.merge([_progressController, _pulseController]),
+          animation: Listenable.merge([_progressController, _pulseController, _particleController]),
           builder: (context, child) {
             double scale = 1.0;
             if (_progressController.isCompleted) {
@@ -81,6 +90,7 @@ class _StudioLoaderState extends State<StudioLoader>
                 painter: _WaveformPainter(
                   progress: _progressAnimation.value,
                   pulseGlow: _progressController.isCompleted ? _pulseController.value : 0.0,
+                  particleProgress: _particleController.value,
                 ),
               ),
             );
@@ -94,16 +104,41 @@ class _StudioLoaderState extends State<StudioLoader>
 class _WaveformPainter extends CustomPainter {
   final double progress;
   final double pulseGlow;
+  final double particleProgress;
 
   _WaveformPainter({
     required this.progress,
     required this.pulseGlow,
+    required this.particleProgress,
   });
 
   // Identical bar height mappings as the index.html SVG waveform
   final List<double> barHeights = [
     8, 12, 10, 16, 24, 20, 36, 48, 40, 56, 68, 60, 72, 76, 80, 76, 72, 60, 68, 56, 40, 48, 36, 20, 24, 16, 10, 12, 8
   ];
+
+  void _drawParticleAt(Canvas canvas, Size size, double centerY, double padding, double waveWidth, double spacing, double progressRatio, Color color, double radius, double blurRadius) {
+    final double particleX = padding + (progressRatio * waveWidth);
+    
+    // Calculate interpolated height
+    final double activePos = progressRatio * waveWidth;
+    final int lowerIndex = (activePos / spacing).floor().clamp(0, barHeights.length - 1);
+    final int upperIndex = (lowerIndex + 1).clamp(0, barHeights.length - 1);
+    final double factor = (spacing > 0) ? (activePos / spacing) - lowerIndex : 0.0;
+    
+    final double h1 = (barHeights[lowerIndex] / 80) * size.height;
+    final double h2 = (barHeights[upperIndex] / 80) * size.height;
+    final double interpolatedH = h1 + (h2 - h1) * factor;
+
+    final double time = DateTime.now().millisecondsSinceEpoch * 0.005;
+    final double oscillation = math.sin(time + particleX * 0.05);
+    final double particleY = centerY + (oscillation * (interpolatedH / 2));
+
+    final Paint paint = Paint()
+      ..color = color.withOpacity(0.85)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurRadius);
+    canvas.drawCircle(Offset(particleX, particleY), radius, paint);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -165,40 +200,15 @@ class _WaveformPainter extends CustomPainter {
       }
     }
 
-    // 3. Draw Traveling Neural Particle on the active boundary edge
-    if (progress > 0.0 && progress < 1.0) {
-      final double particleX = padding + activeWidth;
-      
-      // Calculate smooth height interpolation at active boundary
-      final int lowerIndex = (activeWidth / spacing).floor();
-      final int upperIndex = (lowerIndex + 1).clamp(0, totalBars - 1);
-      final double factor = (activeWidth / spacing) - lowerIndex;
-      
-      final double h1 = (barHeights[lowerIndex] / 80) * size.height;
-      final double h2 = (barHeights[upperIndex] / 80) * size.height;
-      final double interpolatedH = h1 + (h2 - h1) * factor;
-
-      // Jitter/oscillate vertically along the top/bottom tips of the active bar
-      final double time = DateTime.now().millisecondsSinceEpoch * 0.005;
-      final double oscillation = math.sin(time + particleX * 0.05);
-      final double particleY = centerY + (oscillation * (interpolatedH / 2));
-
-      // Draw particle halo (Purple glow)
-      final Paint haloPaint = Paint()
-        ..color = const Color(0xFFD03BFF).withOpacity(0.65)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-      canvas.drawCircle(Offset(particleX, particleY), 6.5, haloPaint);
-
-      // Draw particle core (Green center)
-      final Paint corePaint = Paint()
-        ..color = const Color(0xFF00FFCC)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
-      canvas.drawCircle(Offset(particleX, particleY), 3.5, corePaint);
+    // 3. Draw Traveling Neural Particles in loops
+    if (progress < 1.0) {
+      _drawParticleAt(canvas, size, centerY, padding, waveWidth, spacing, particleProgress, const Color(0xFF00FFCC), 3.5, 2.0);
+      _drawParticleAt(canvas, size, centerY, padding, waveWidth, spacing, (particleProgress + 0.5) % 1.0, const Color(0xFFD03BFF), 5.5, 4.0);
     }
   }
 
   @override
   bool shouldRepaint(covariant _WaveformPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.pulseGlow != pulseGlow;
+    return oldDelegate.progress != progress || oldDelegate.pulseGlow != pulseGlow || oldDelegate.particleProgress != particleProgress;
   }
 }

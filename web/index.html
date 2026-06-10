@@ -301,6 +301,9 @@
         return 40 + (osc * (currentBarHeight / 2));
       }
 
+      let p1Pos = 0;
+      let p2Pos = 0.5;
+
       function updateLoader() {
         if (!isFlutterReady) {
           // Slowly fill up to targetProgress
@@ -319,13 +322,23 @@
         clipRect.setAttribute('width', currentX);
 
         if (progress < 100) {
+          // Particles travel constantly across the entire 300px waveform in overlapping loops
+          p1Pos += 0.012; // speed of particle 1
+          p2Pos += 0.009; // speed of particle 2
+          
+          if (p1Pos > 1.0) p1Pos = 0;
+          if (p2Pos > 1.0) p2Pos = 0;
+
+          const x1 = p1Pos * 300;
+          const x2 = p2Pos * 300;
+
           // Show and update neural particles
-          particleCore.setAttribute('cx', currentX);
-          particleCore.setAttribute('cy', getWaveY(currentX));
+          particleCore.setAttribute('cx', x1);
+          particleCore.setAttribute('cy', getWaveY(x1));
           particleCore.setAttribute('style', 'filter: drop-shadow(0 0 5px #00FFCC); opacity: 1;');
           
-          particleHalo.setAttribute('cx', currentX);
-          particleHalo.setAttribute('cy', getWaveY(currentX) + Math.sin(Date.now() * 0.01) * 3);
+          particleHalo.setAttribute('cx', x2);
+          particleHalo.setAttribute('cy', getWaveY(x2) + Math.sin(Date.now() * 0.01) * 3);
           particleHalo.setAttribute('style', 'filter: drop-shadow(0 0 8px #D03BFF); opacity: 0.8;');
         } else {
           // Hide particles & add pulse animation class once full
