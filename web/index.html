@@ -1,24 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Studduo - Premium AI Music Studio & Workspace">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -31,16 +18,357 @@
 
   <title>Studduo</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Prevent default scroll and set black background instantly */
+    html, body {
+      background-color: #111318;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #111318;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 1;
+    }
+
+    /* Logo Styling */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      animation: logo-fade-in 1s ease-out;
+    }
+
+    .logo-icon {
+      padding: 8px;
+      background: linear-gradient(135deg, #00FFCC 0%, #D03BFF 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 255, 204, 0.25);
+    }
+
+    .logo-text {
+      color: white;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin-left: 14px;
+    }
+
+    /* Waveform Container */
+    .waveform-container {
+      position: relative;
+      width: 320px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .waveform-svg {
+      overflow: visible;
+    }
+
+    /* Waveform pulsing animation once fully loaded */
+    .pulse-loop {
+      animation: wave-pulse 1.8s ease-in-out infinite alternate;
+    }
+
+    /* Loading Message Rotation */
+    .message-container {
+      margin-top: 32px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-text {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 300ms ease, transform 300ms ease;
+    }
+
+    .message-text.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animations */
+    @keyframes logo-fade-in {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes wave-pulse {
+      0% {
+        filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.2));
+        opacity: 0.95;
+      }
+      100% {
+        filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.65));
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="loading-overlay">
+    <!-- Centered Studio Logo -->
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" fill="black" />
+          <circle cx="12" cy="6" r="1.5" fill="black" />
+          <circle cx="12" cy="18" r="1.5" fill="black" />
+          <circle cx="6" cy="12" r="1.5" fill="black" />
+          <circle cx="18" cy="12" r="1.5" fill="black" />
+          <circle cx="8" cy="8" r="1.5" fill="black" />
+          <circle cx="16" cy="16" r="1.5" fill="black" />
+          <circle cx="8" cy="16" r="1.5" fill="black" />
+          <circle cx="16" cy="8" r="1.5" fill="black" />
+        </svg>
+      </div>
+      <span class="logo-text">Studduo</span>
+    </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+    <!-- Interactive Waveform Visualizer -->
+    <div class="waveform-container">
+      <svg class="waveform-svg" viewBox="0 0 300 80" width="300" height="80">
+        <defs>
+          <!-- Clip path to reveal the filled (colored) waveform -->
+          <clipPath id="fill-clip">
+            <rect id="clip-rect" x="0" y="0" width="0" height="80" />
+          </clipPath>
+          <!-- Gradient for the filled waveform matching branding -->
+          <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00FFCC" />
+            <stop offset="100%" stop-color="#FFD700" />
+          </linearGradient>
+        </defs>
+        
+        <!-- Background Waveform (Empty Outline) -->
+        <g class="wave-bg" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2" stroke-linecap="round">
+          <line x1="10" y1="36" x2="10" y2="44" />
+          <line x1="20" y1="34" x2="20" y2="46" />
+          <line x1="30" y1="35" x2="30" y2="45" />
+          <line x1="40" y1="32" x2="40" y2="48" />
+          <line x1="50" y1="28" x2="50" y2="52" />
+          <line x1="60" y1="30" x2="60" y2="50" />
+          <line x1="70" y1="22" x2="70" y2="58" />
+          <line x1="80" y1="16" x2="80" y2="64" />
+          <line x1="90" y1="20" x2="90" y2="60" />
+          <line x1="100" y1="12" x2="100" y2="68" />
+          <line x1="110" y1="6" x2="110" y2="74" />
+          <line x1="120" y1="10" x2="120" y2="70" />
+          <line x1="130" y1="4" x2="130" y2="76" />
+          <line x1="140" y1="2" x2="140" y2="78" />
+          <line x1="150" y1="0" x2="150" y2="80" />
+          <line x1="160" y1="2" x2="160" y2="78" />
+          <line x1="170" y1="4" x2="170" y2="76" />
+          <line x1="180" y1="10" x2="180" y2="70" />
+          <line x1="190" y1="6" x2="190" y2="74" />
+          <line x1="200" y1="12" x2="200" y2="68" />
+          <line x1="210" y1="20" x2="210" y2="60" />
+          <line x1="220" y1="16" x2="220" y2="64" />
+          <line x1="230" y1="22" x2="230" y2="58" />
+          <line x1="240" y1="30" x2="240" y2="50" />
+          <line x1="250" y1="28" x2="250" y2="52" />
+          <line x1="260" y1="32" x2="260" y2="48" />
+          <line x1="270" y1="35" x2="270" y2="45" />
+          <line x1="280" y1="34" x2="280" y2="46" />
+          <line x1="290" y1="36" x2="290" y2="44" />
+        </g>
+        
+        <!-- Foreground Waveform (Filled with color gradient, clipped by fill-clip) -->
+        <g id="wave-filled-group" fill="none" stroke="url(#wave-gradient)" stroke-width="2.5" stroke-linecap="round" clip-path="url(#fill-clip)">
+          <line x1="10" y1="36" x2="10" y2="44" />
+          <line x1="20" y1="34" x2="20" y2="46" />
+          <line x1="30" y1="35" x2="30" y2="45" />
+          <line x1="40" y1="32" x2="40" y2="48" />
+          <line x1="50" y1="28" x2="50" y2="52" />
+          <line x1="60" y1="30" x2="60" y2="50" />
+          <line x1="70" y1="22" x2="70" y2="58" />
+          <line x1="80" y1="16" x2="80" y2="64" />
+          <line x1="90" y1="20" x2="90" y2="60" />
+          <line x1="100" y1="12" x2="100" y2="68" />
+          <line x1="110" y1="6" x2="110" y2="74" />
+          <line x1="120" y1="10" x2="120" y2="70" />
+          <line x1="130" y1="4" x2="130" y2="76" />
+          <line x1="140" y1="2" x2="140" y2="78" />
+          <line x1="150" y1="0" x2="150" y2="80" />
+          <line x1="160" y1="2" x2="160" y2="78" />
+          <line x1="170" y1="4" x2="170" y2="76" />
+          <line x1="180" y1="10" x2="180" y2="70" />
+          <line x1="190" y1="6" x2="190" y2="74" />
+          <line x1="200" y1="12" x2="200" y2="68" />
+          <line x1="210" y1="20" x2="210" y2="60" />
+          <line x1="220" y1="16" x2="220" y2="64" />
+          <line x1="230" y1="22" x2="230" y2="58" />
+          <line x1="240" y1="30" x2="240" y2="50" />
+          <line x1="250" y1="28" x2="250" y2="52" />
+          <line x1="260" y1="32" x2="260" y2="48" />
+          <line x1="270" y1="35" x2="270" y2="45" />
+          <line x1="280" y1="34" x2="280" y2="46" />
+          <line x1="290" y1="36" x2="290" y2="44" />
+        </g>
+        
+        <!-- Glowing Neural Particles (travel along the leading edge of the fill) -->
+        <circle id="particle-core" cx="0" cy="40" r="3.5" fill="#00FFCC" style="filter: drop-shadow(0 0 5px #00FFCC); opacity: 0;" />
+        <circle id="particle-halo" cx="0" cy="40" r="6" fill="#D03BFF" style="filter: drop-shadow(0 0 8px #D03BFF); opacity: 0;" />
+      </svg>
+    </div>
+
+    <!-- Rotational Status Messages -->
+    <div class="message-container">
+      <div id="loading-msg" class="message-text">Initializing Studio...</div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Loader Logic
+    (function() {
+      const clipRect = document.getElementById('clip-rect');
+      const particleCore = document.getElementById('particle-core');
+      const particleHalo = document.getElementById('particle-halo');
+      const waveFilledGroup = document.getElementById('wave-filled-group');
+      const loadingMsg = document.getElementById('loading-msg');
+      const overlay = document.getElementById('loading-overlay');
+      
+      let progress = 0; // 0 to 100
+      let targetProgress = 92; // Target to wait at before Flutter signals ready
+      let isFlutterReady = false;
+      
+      // Dynamic loading messages
+      const messages = [
+        "Initializing Studio...",
+        "Connecting Creative Workspace...",
+        "Preparing Your Catalog...",
+        "Warming Up The Mix Console...",
+        "Syncing Creative Intelligence..."
+      ];
+      let msgIndex = 0;
+      
+      // Rotate messages
+      setInterval(() => {
+        if (isFlutterReady) return;
+        loadingMsg.classList.remove('visible');
+        setTimeout(() => {
+          msgIndex = (msgIndex + 1) % messages.length;
+          loadingMsg.textContent = messages[msgIndex];
+          loadingMsg.classList.add('visible');
+        }, 300);
+      }, 1400);
+      
+      // Make initial message visible
+      setTimeout(() => {
+        loadingMsg.classList.add('visible');
+      }, 100);
+
+      // Symmetrical bar heights mapping for particle y-coordinates
+      const barHeights = [8, 12, 10, 16, 24, 20, 36, 48, 40, 56, 68, 60, 72, 76, 80, 76, 72, 60, 68, 56, 40, 48, 36, 20, 24, 16, 10, 12, 8];
+      
+      function getWaveY(x) {
+        // Calculate vertical offset matching the waveform shape
+        const barIndex = Math.min(Math.floor(x / 10), barHeights.length - 1);
+        if (barIndex < 0) return 40;
+        const currentBarHeight = barHeights[barIndex];
+        // Jitter/oscillate particles on top & bottom boundaries of bars
+        const speedFactor = Date.now() * 0.005;
+        const osc = Math.sin(speedFactor + x * 0.05);
+        return 40 + (osc * (currentBarHeight / 2));
+      }
+
+      function updateLoader() {
+        if (!isFlutterReady) {
+          // Slowly fill up to targetProgress
+          if (progress < targetProgress) {
+            progress += 0.85; // Fill rate
+          } else {
+            // Very slow creep at the end to keep it organic
+            progress = Math.min(98.5, progress + 0.03);
+          }
+        } else {
+          // Finish quickly when Flutter is ready
+          progress = Math.min(100, progress + 4.5);
+        }
+
+        const currentX = (progress / 100) * 300;
+        clipRect.setAttribute('width', currentX);
+
+        if (progress < 100) {
+          // Show and update neural particles
+          particleCore.setAttribute('cx', currentX);
+          particleCore.setAttribute('cy', getWaveY(currentX));
+          particleCore.setAttribute('style', 'filter: drop-shadow(0 0 5px #00FFCC); opacity: 1;');
+          
+          particleHalo.setAttribute('cx', currentX);
+          particleHalo.setAttribute('cy', getWaveY(currentX) + Math.sin(Date.now() * 0.01) * 3);
+          particleHalo.setAttribute('style', 'filter: drop-shadow(0 0 8px #D03BFF); opacity: 0.8;');
+        } else {
+          // Hide particles & add pulse animation class once full
+          particleCore.style.opacity = '0';
+          particleHalo.style.opacity = '0';
+          waveFilledGroup.classList.add('pulse-loop');
+          
+          if (isFlutterReady) {
+            // Trigger overlay removal transition
+            triggerFadeOut();
+            return;
+          }
+        }
+
+        requestAnimationFrame(updateLoader);
+      }
+
+      // Initialize loader tick loop
+      requestAnimationFrame(updateLoader);
+
+      function triggerFadeOut() {
+        if (!overlay) return;
+        
+        loadingMsg.textContent = "Workspace Ready";
+        loadingMsg.style.color = "#00FFCC";
+        
+        setTimeout(() => {
+          overlay.style.transition = 'opacity 400ms cubic-bezier(0.25, 1, 0.5, 1)';
+          overlay.style.opacity = '0';
+          
+          setTimeout(() => {
+            overlay.remove();
+          }, 400);
+        }, 300);
+      }
+
+      // 2. Global interop hook for Flutter app
+      window.onFlutterAppAppeared = function() {
+        isFlutterReady = true;
+      };
+    })();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import 'dart:js' as js;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' as legacy;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,8 +56,27 @@ void main() {
   );
 }
 
-class StudduoApp extends StatelessWidget {
+class StudduoApp extends StatefulWidget {
   const StudduoApp({super.key});
+
+  @override
+  State<StudduoApp> createState() => _StudduoAppState();
+}
+
+class _StudduoAppState extends State<StudduoApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (kIsWeb) {
+        try {
+          js.context.callMethod('onFlutterAppAppeared');
+        } catch (e) {
+          debugPrint('Failed to notify index.html: $e');
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
