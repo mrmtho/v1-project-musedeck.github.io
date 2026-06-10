@@ -213,7 +213,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                           Center(
                             child: Container(
                               constraints: const BoxConstraints(maxWidth: 1200),
-                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0,
+                              ),
                               child: Column(
                                 children: [
                                   // Hero Section
@@ -334,7 +336,10 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final double titleFontSize = (screenWidth * 0.08).clamp(36.0, 120.0);
     final double subtitleFontSize = (titleFontSize * 0.25).clamp(15.0, 30.0);
-    final double titleLetterSpacing = (titleFontSize * -0.0125).clamp(-1.8, -0.4);
+    final double titleLetterSpacing = (titleFontSize * -0.0125).clamp(
+      -1.8,
+      -0.4,
+    );
 
     return Column(
       children: [
@@ -1356,7 +1361,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
         Container(
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
-            'AI Powered Workstation for Music Artists',
+            'AI Powered Artist Workstation',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 13,

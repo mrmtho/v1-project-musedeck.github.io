@@ -62,7 +62,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   final TextEditingController _messageController = TextEditingController();
 
   // Calendar states
-  String _calendarTimelineFilter = 'week'; // 'today', 'week', 'month', 'quarter'
+  String _calendarTimelineFilter =
+      'week'; // 'today', 'week', 'month', 'quarter'
   String _calendarMemberFilter = 'all'; // 'all', 'self', 'others'
   DateTime _selectedCalendarDay = DateTime(2026, 6, 8); // Monday, June 8, 2026
 
@@ -183,7 +184,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       'type': 'activity',
       'date': DateTime(2026, 8, 5),
       'time': '2:00 PM - 7:00 PM',
-      'assignees': ['self', 'Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Bax Beatbox'],
+      'assignees': [
+        'self',
+        'Aria North',
+        'kai.wav',
+        'Chloe Keys',
+        'DJ Spark',
+        'Bax Beatbox',
+      ],
       'description': 'Full rehearsal of the audio-visual performance.',
       'color': 0xFFD03BFF,
       'isCompleted': false,
@@ -193,19 +201,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     {
       'contact': 'Aria North',
       'sender': 'Aria North',
-      'text': 'Hey! Did you have a chance to look at the chorus vocals for Glass House?',
+      'text':
+          'Hey! Did you have a chance to look at the chorus vocals for Glass House?',
       'time': '10:24 AM',
     },
     {
       'contact': 'Aria North',
       'sender': 'me',
-      'text': 'Yes! Sounds incredible. I added some subtle tape saturation and a light stereo delay.',
+      'text':
+          'Yes! Sounds incredible. I added some subtle tape saturation and a light stereo delay.',
       'time': '10:28 AM',
     },
     {
       'contact': 'Aria North',
       'sender': 'Aria North',
-      'text': 'Ooh that sounds warm. Can we bounce a draft mix? I want to test it in my car.',
+      'text':
+          'Ooh that sounds warm. Can we bounce a draft mix? I want to test it in my car.',
       'time': '10:30 AM',
     },
     {
@@ -349,7 +360,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             child: Row(
               children: [
                 Icon(
-                  navState.activeTab == 'create' || navState.activeTab == 'produce' || navState.activeTab == 'release'
+                  navState.activeTab == 'create' ||
+                          navState.activeTab == 'produce' ||
+                          navState.activeTab == 'release'
                       ? Icons.folder_open
                       : Icons.work_history,
                   size: 16,
@@ -358,7 +371,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    activeSong != null ? activeSong.title : 'No Project Selected',
+                    activeSong != null
+                        ? activeSong.title
+                        : 'No Project Selected',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -370,25 +385,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ],
             ),
           ),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: _buildSidebarContentForTab(navState, navNotifier, provider, songs, activeSong, isDrawer),
+              child: _buildSidebarContentForTab(
+                navState,
+                navNotifier,
+                provider,
+                songs,
+                activeSong,
+                isDrawer,
+              ),
             ),
           ),
-          
+
           // Workspace info or user sync status at the bottom of sidebar
           const Divider(color: Colors.white10, height: 1),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                const Icon(Icons.cloud_done, color: StudioTheme.success, size: 14),
+                const Icon(
+                  Icons.cloud_done,
+                  color: StudioTheme.success,
+                  size: 14,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Cloud Synced',
-                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -638,7 +667,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             padding: const EdgeInsets.all(20.0),
             child: Text(
               'No menu items',
-              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.3),
+                fontSize: 12,
+              ),
             ),
           ),
         );
@@ -1414,12 +1446,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             const SizedBox(height: 16),
                             const Text(
                               'No active songs in library.',
-                              style: TextStyle(color: Colors.grey, fontSize: 16),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             const Text(
                               'Create a new song workspace above to get started.',
-                              style: TextStyle(color: Colors.grey, fontSize: 13),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                              ),
                             ),
                           ],
                         ),
@@ -1429,12 +1467,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: columns,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: aspectRatio,
-                            ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: columns,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: aspectRatio,
+                                ),
                             itemCount: songs.length,
                             itemBuilder: (context, index) {
                               return _buildSongCard(provider, songs[index]);
@@ -1531,10 +1570,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     const SizedBox(height: 3),
                     Text(
                       '${song.bpm} BPM • ${song.keySignature} • ${song.timeSignature}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 10,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 10),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -1542,10 +1578,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       children: [
                         const Text(
                           'Status:',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 9,
-                          ),
+                          style: TextStyle(color: Colors.grey, fontSize: 9),
                         ),
                         Text(
                           songStatusToString(song.status),
@@ -1570,14 +1603,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   child: Image.network(
                     _getSongThumbnail(song),
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(
-                          color: const Color(0xFF252535),
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                          ),
-                        ),
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: const Color(0xFF252535),
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    ),
                   ),
                 ),
               ),
@@ -2231,7 +2260,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     );
   }
 
-  Widget _buildTopNavBar(NavigationState navState, NavigationNotifier navNotifier) {
+  Widget _buildTopNavBar(
+    NavigationState navState,
+    NavigationNotifier navNotifier,
+  ) {
     return Container(
       height: 76,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -2294,7 +2326,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '•  AI Powered Music Orchestration Platform',
+                            'AI Powered Artist Workstation',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.35),
                               fontSize: 8.5,
@@ -2310,7 +2342,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
             ),
           ),
-          
+
           // Center: Tab Groups (Centered in the remaining horizontal space)
           Expanded(
             child: Row(
@@ -2343,17 +2375,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ],
             ),
           ),
-          
+
           // Right: Controls
           Row(
             children: [
               // Cloud Sync Status Indicator
               const Tooltip(
                 message: 'All files up to date',
-                child: Icon(Icons.cloud_done, color: StudioTheme.success, size: 20),
+                child: Icon(
+                  Icons.cloud_done,
+                  color: StudioTheme.success,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 20),
-              
+
               // Profile Avatar
               GestureDetector(
                 onTap: () => navNotifier.selectTab('account'),
@@ -2362,14 +2398,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: StudioTheme.accent.withOpacity(0.5), width: 1.5),
+                      border: Border.all(
+                        color: StudioTheme.accent.withOpacity(0.5),
+                        width: 1.5,
+                      ),
                     ),
                     child: const CircleAvatar(
                       radius: 16,
                       backgroundColor: StudioTheme.secondaryPanel,
                       child: Text(
                         'JD',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -2399,7 +2442,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             final tabKey = entry.key;
             final tabTitle = entry.value;
             final isSelected = navState.activeTab == tabKey;
-            
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: GestureDetector(
@@ -2412,8 +2455,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       Text(
                         tabTitle,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           fontSize: 15,
                           letterSpacing: 0.5,
                         ),
@@ -2423,7 +2470,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         height: 3,
                         width: 24,
                         decoration: BoxDecoration(
-                          color: isSelected ? StudioTheme.activeTabIndicator : Colors.transparent,
+                          color: isSelected
+                              ? StudioTheme.activeTabIndicator
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(1.5),
                         ),
                       ),
@@ -2434,7 +2483,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             );
           }).toList(),
         ),
-        
+
         // Group label beneath tabs
         const SizedBox(height: 6),
         Text(
@@ -2450,10 +2499,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     );
   }
 
-  Widget _buildMainContentForTab(NavigationState navState, SongProvider provider) {
+  Widget _buildMainContentForTab(
+    NavigationState navState,
+    SongProvider provider,
+  ) {
     final activeSong = provider.activeSong;
     final bool showSidebar = MediaQuery.of(context).size.width >= 950;
-    
+
     switch (navState.activeTab) {
       case 'create':
         switch (navState.activeSubSection) {
@@ -2511,7 +2563,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             return _buildAdditionalSourcesView();
           case 'timeline':
             if (activeSong == null) {
-              return const Center(child: Text('Select a song in sandbox to display the timeline'));
+              return const Center(
+                child: Text('Select a song in sandbox to display the timeline'),
+              );
             }
             return _buildWorkspaceView(provider, activeSong, showSidebar);
           case 'mixer':
@@ -2554,7 +2608,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           Text(
             '📝 Project Notes - ${activeSong?.title ?? 'Sandbox'}',
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -2577,7 +2635,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   hintText: 'Start jotting down thoughts here...',
                   border: InputBorder.none,
                 ),
-                style: TextStyle(color: Colors.white, fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
               ),
             ),
           ),
@@ -2588,16 +2650,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildAIAssistantPanelView(String mode) {
     String title = "AI Lyric Ideator";
-    String description = "Generate lyric ideas based on genre, mood, and prompt.";
-    String promptHint = "e.g., A melancholy verse about neon lights and fading summers...";
+    String description =
+        "Generate lyric ideas based on genre, mood, and prompt.";
+    String promptHint =
+        "e.g., A melancholy verse about neon lights and fading summers...";
     if (mode == 'concepts') {
       title = "AI Song Concept Generator";
-      description = "Brainstorm core structures, themes, and sound architectures.";
-      promptHint = "e.g., Cyberpunk meets 80s synth-pop with a dramatic orchestral climax...";
+      description =
+          "Brainstorm core structures, themes, and sound architectures.";
+      promptHint =
+          "e.g., Cyberpunk meets 80s synth-pop with a dramatic orchestral climax...";
     } else if (mode == 'melody') {
       title = "AI Melody Generator";
       description = "Generate MIDI notation options and outline lead lines.";
-      promptHint = "e.g., An energetic arpeggiated bassline in G minor at 120 bpm...";
+      promptHint =
+          "e.g., An energetic arpeggiated bassline in G minor at 120 bpm...";
     }
 
     return Padding(
@@ -2607,11 +2674,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: StudioTheme.accent, size: 24),
+              const Icon(
+                Icons.auto_awesome,
+                color: StudioTheme.accent,
+                size: 24,
+              ),
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -2633,7 +2708,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               children: [
                 const Text(
                   'Describe your inspiration',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -2656,7 +2735,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Creativity Temp', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                          const Text(
+                            'Creativity Temp',
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
                           Slider(value: 0.7, onChanged: (v) {}),
                         ],
                       ),
@@ -2666,7 +2748,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Structure Length', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                          const Text(
+                            'Structure Length',
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
                           Slider(value: 0.5, onChanged: (v) {}),
                         ],
                       ),
@@ -2684,11 +2769,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     );
                   },
                   icon: const Icon(Icons.bolt, color: Colors.black),
-                  label: const Text('Generate with AI', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  label: const Text(
+                    'Generate with AI',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: StudioTheme.activeTabIndicator,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
@@ -2697,7 +2790,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           const SizedBox(height: 24),
           const Text(
             'Generated History',
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(
@@ -2736,8 +2833,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              Text(date, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              Text(
+                date,
+                style: const TextStyle(color: Colors.grey, fontSize: 10),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -2760,7 +2867,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           const Text(
             '🎼 Score & Lead Sheet Editor',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -2775,11 +2886,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 10)],
+                boxShadow: const [
+                  BoxShadow(color: Colors.black45, blurRadius: 10),
+                ],
               ),
-              child: CustomPaint(
-                painter: SheetMusicPainter(),
-              ),
+              child: CustomPaint(painter: SheetMusicPainter()),
             ),
           ),
         ],
@@ -2789,9 +2900,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildReleasedCatalogGridView() {
     final catalog = [
-      {'title': 'Glass House', 'type': 'Single', 'date': 'June 12, 2026', 'streams': '124.5k', 'cover': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'},
-      {'title': 'Retro Dreamer', 'type': 'EP', 'date': 'April 20, 2026', 'streams': '842.1k', 'cover': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4'},
-      {'title': 'Neon Summers', 'type': 'Album', 'date': 'November 15, 2025', 'streams': '3.2M', 'cover': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a'},
+      {
+        'title': 'Glass House',
+        'type': 'Single',
+        'date': 'June 12, 2026',
+        'streams': '124.5k',
+        'cover': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819',
+      },
+      {
+        'title': 'Retro Dreamer',
+        'type': 'EP',
+        'date': 'April 20, 2026',
+        'streams': '842.1k',
+        'cover': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4',
+      },
+      {
+        'title': 'Neon Summers',
+        'type': 'Album',
+        'date': 'November 15, 2025',
+        'streams': '3.2M',
+        'cover': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a',
+      },
     ];
 
     return Padding(
@@ -2801,7 +2930,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           const Text(
             '💿 Released Catalog',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -2832,7 +2965,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
                             image: DecorationImage(
                               image: NetworkImage(item['cover']!),
                               fit: BoxFit.cover,
@@ -2848,21 +2983,51 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(item['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                                Text(
+                                  item['title']!,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: StudioTheme.accent.withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Text(item['type']!, style: const TextStyle(color: StudioTheme.accent, fontSize: 9, fontWeight: FontWeight.bold)),
+                                  child: Text(
+                                    item['type']!,
+                                    style: const TextStyle(
+                                      color: StudioTheme.accent,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Text('Released: ${item['date']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                            Text(
+                              'Released: ${item['date']}',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 11,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('Streams: ${item['streams']}', style: const TextStyle(color: StudioTheme.success, fontSize: 11, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Streams: ${item['streams']}',
+                              style: const TextStyle(
+                                color: StudioTheme.success,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -2885,7 +3050,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           const Text(
             '📁 Additional Production Sources',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -2895,11 +3064,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(child: _buildSourceActionCard(Icons.library_music, 'Sample Packs', 'Browse loop & synth packs')),
+              Expanded(
+                child: _buildSourceActionCard(
+                  Icons.library_music,
+                  'Sample Packs',
+                  'Browse loop & synth packs',
+                ),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: _buildSourceActionCard(Icons.folder_shared, 'Collaborator Stems', 'View stems shared by co-producers')),
+              Expanded(
+                child: _buildSourceActionCard(
+                  Icons.folder_shared,
+                  'Collaborator Stems',
+                  'View stems shared by co-producers',
+                ),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: _buildSourceActionCard(Icons.upload_file, 'Local Files', 'Import custom audio WAV/MIDI files')),
+              Expanded(
+                child: _buildSourceActionCard(
+                  Icons.upload_file,
+                  'Local Files',
+                  'Import custom audio WAV/MIDI files',
+                ),
+              ),
             ],
           ),
         ],
@@ -2920,7 +3107,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           Icon(icon, size: 28, color: StudioTheme.accent),
           const SizedBox(height: 16),
-          Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
           const SizedBox(height: 6),
           Text(desc, style: const TextStyle(color: Colors.grey, fontSize: 11)),
         ],
@@ -2963,8 +3157,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     };
 
     final items = checklistData[section] ?? checklistData['legal']!;
-    
-    double progress = items.where((i) => i['done'] as bool).length / items.length;
+
+    double progress =
+        items.where((i) => i['done'] as bool).length / items.length;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -2979,7 +3174,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 children: [
                   const Text(
                     '✅ Release Readiness Checklist',
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -2991,18 +3190,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('${(progress * 100).toInt()}% Done', style: const TextStyle(color: StudioTheme.success, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(
+                    '${(progress * 100).toInt()}% Done',
+                    style: const TextStyle(
+                      color: StudioTheme.success,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   Container(
                     width: 120,
                     height: 6,
-                    decoration: BoxDecoration(color: StudioTheme.secondaryPanel, borderRadius: BorderRadius.circular(3)),
+                    decoration: BoxDecoration(
+                      color: StudioTheme.secondaryPanel,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
                         width: 120 * progress,
                         height: 6,
-                        decoration: BoxDecoration(color: StudioTheme.success, borderRadius: BorderRadius.circular(3)),
+                        decoration: BoxDecoration(
+                          color: StudioTheme.success,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
                       ),
                     ),
                   ),
@@ -3053,15 +3265,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   Widget _buildEarningsDashboardView(String section) {
     if (section == 'income') {
       return _buildTransactionsView('Income Streams', [
-        {'title': 'Spotify Streaming Royalties', 'amount': '+\$1,240.50', 'date': 'June 8, 2026'},
-        {'title': 'Apple Music Royalties', 'amount': '+\$410.20', 'date': 'June 5, 2026'},
-        {'title': 'Bandcamp Merch Sales', 'amount': '+\$215.00', 'date': 'May 28, 2026'},
+        {
+          'title': 'Spotify Streaming Royalties',
+          'amount': '+\$1,240.50',
+          'date': 'June 8, 2026',
+        },
+        {
+          'title': 'Apple Music Royalties',
+          'amount': '+\$410.20',
+          'date': 'June 5, 2026',
+        },
+        {
+          'title': 'Bandcamp Merch Sales',
+          'amount': '+\$215.00',
+          'date': 'May 28, 2026',
+        },
       ], StudioTheme.success);
     } else if (section == 'expenses') {
       return _buildTransactionsView('Production Expenses', [
-        {'title': 'Vocal Tuning (Contractor)', 'amount': '-\$250.00', 'date': 'June 7, 2026'},
-        {'title': 'Studio A Booking (2 hours)', 'amount': '-\$160.00', 'date': 'June 2, 2026'},
-        {'title': 'Mastering Plugin License', 'amount': '-\$99.00', 'date': 'May 20, 2026'},
+        {
+          'title': 'Vocal Tuning (Contractor)',
+          'amount': '-\$250.00',
+          'date': 'June 7, 2026',
+        },
+        {
+          'title': 'Studio A Booking (2 hours)',
+          'amount': '-\$160.00',
+          'date': 'June 2, 2026',
+        },
+        {
+          'title': 'Mastering Plugin License',
+          'amount': '-\$99.00',
+          'date': 'May 20, 2026',
+        },
       ], StudioTheme.record);
     }
 
@@ -3072,7 +3308,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           const Text(
             '📊 Financial Overview',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -3082,17 +3322,42 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(child: _buildFinancialStatCard('Gross Income', '\$2,450.80', '+18.2% this mo', StudioTheme.success)),
+              Expanded(
+                child: _buildFinancialStatCard(
+                  'Gross Income',
+                  '\$2,450.80',
+                  '+18.2% this mo',
+                  StudioTheme.success,
+                ),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: _buildFinancialStatCard('Total Expenses', '\$509.00', '+5.4% this mo', StudioTheme.record)),
+              Expanded(
+                child: _buildFinancialStatCard(
+                  'Total Expenses',
+                  '\$509.00',
+                  '+5.4% this mo',
+                  StudioTheme.record,
+                ),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: _buildFinancialStatCard('Net Profit', '\$1,941.80', '+22.1% this mo', StudioTheme.accent)),
+              Expanded(
+                child: _buildFinancialStatCard(
+                  'Net Profit',
+                  '\$1,941.80',
+                  '+22.1% this mo',
+                  StudioTheme.accent,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 24),
           const Text(
             'Monthly Revenue Trend',
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(
@@ -3105,7 +3370,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
               child: CustomPaint(
                 painter: FinancialChartPainter(),
-                child: const SizedBox(width: double.infinity, height: double.infinity),
+                child: const SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
               ),
             ),
           ),
@@ -3114,7 +3382,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     );
   }
 
-  Widget _buildFinancialStatCard(String label, String value, String change, Color color) {
+  Widget _buildFinancialStatCard(
+    String label,
+    String value,
+    String change,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -3127,15 +3400,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
           const SizedBox(height: 12),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(change, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(
+            change,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionsView(String title, List<Map<String, String>> txs, Color amountColor) {
+  Widget _buildTransactionsView(
+    String title,
+    List<Map<String, String>> txs,
+    Color amountColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -3143,7 +3434,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         children: [
           Text(
             title,
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 20),
           Expanded(
@@ -3165,12 +3460,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(tx['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text(
+                            tx['title']!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text(tx['date']!, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                          Text(
+                            tx['date']!,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
-                      Text(tx['amount']!, style: TextStyle(color: amountColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        tx['amount']!,
+                        style: TextStyle(
+                          color: amountColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -3219,7 +3534,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             children: [
               // Top Navigation Bar spanning across whole top screen
               _buildTopNavBar(navState, navNotifier),
-              
+
               // Bottom body split into Left Sidebar and Main Canvas Workspace
               Expanded(
                 child: Row(
@@ -3232,13 +3547,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         songs,
                         activeSong,
                       ),
-                    
+
                     // Vertical divider separating sidebar from main content
                     const VerticalDivider(color: Colors.white10, width: 1),
-                    
+
                     // Main Workspace content
                     Expanded(
-                      child: widget.child ?? _buildMainContentForTab(navState, provider),
+                      child:
+                          widget.child ??
+                          _buildMainContentForTab(navState, provider),
                     ),
                   ],
                 ),
@@ -3863,7 +4180,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         Container(
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
-            'AI Powered Workstation for Music Artists',
+            'AI Powered Artist Workstation',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 13,
@@ -4259,19 +4576,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       bool timelineMatch = true;
       final DateTime itemDate = item['date'] as DateTime;
       if (_calendarTimelineFilter == 'today') {
-        timelineMatch = itemDate.year == _selectedCalendarDay.year &&
+        timelineMatch =
+            itemDate.year == _selectedCalendarDay.year &&
             itemDate.month == _selectedCalendarDay.month &&
             itemDate.day == _selectedCalendarDay.day;
       } else if (_calendarTimelineFilter == 'week') {
         // week of June 8 - June 14, 2026
         final startOfWeek = DateTime(2026, 6, 8);
         final endOfWeek = DateTime(2026, 6, 14);
-        timelineMatch = itemDate.isAfter(startOfWeek.subtract(const Duration(seconds: 1))) &&
+        timelineMatch =
+            itemDate.isAfter(
+              startOfWeek.subtract(const Duration(seconds: 1)),
+            ) &&
             itemDate.isBefore(endOfWeek.add(const Duration(days: 1)));
       } else if (_calendarTimelineFilter == 'month') {
         timelineMatch = itemDate.year == 2026 && itemDate.month == 6;
       } else if (_calendarTimelineFilter == 'quarter') {
-        timelineMatch = itemDate.year == 2026 && itemDate.month >= 6 && itemDate.month <= 8;
+        timelineMatch =
+            itemDate.year == 2026 && itemDate.month >= 6 && itemDate.month <= 8;
       }
 
       return memberMatch && timelineMatch;
@@ -4303,7 +4625,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     const SizedBox(height: 8),
                     Text(
                       'Coordinate recording sessions, releases, and deadlines.',
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -4311,12 +4636,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00FFCC),
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                   onPressed: _showAddCalendarItemDialog,
                   icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Add Activity', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  label: const Text(
+                    'Add Activity',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
                 ),
               ],
             ),
@@ -4354,15 +4687,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 4,
-                    child: _buildMonthCalendarGrid(),
-                  ),
+                  Expanded(flex: 4, child: _buildMonthCalendarGrid()),
                   const SizedBox(width: 24),
-                  Expanded(
-                    flex: 5,
-                    child: _buildAgendaList(filteredItems),
-                  ),
+                  Expanded(flex: 5, child: _buildAgendaList(filteredItems)),
                 ],
               )
             else
@@ -4386,7 +4713,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       children: [
         const Text(
           'Timeline: ',
-          style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(width: 8),
         Wrap(
@@ -4423,7 +4754,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       children: [
         const Text(
           'Assignee: ',
-          style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(width: 8),
         Wrap(
@@ -4460,10 +4795,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF6C3BF5).withOpacity(0.2) : const Color(0xFF1B1B22),
+          color: isSelected
+              ? const Color(0xFF6C3BF5).withOpacity(0.2)
+              : const Color(0xFF1B1B22),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF00FFCC) : Colors.white.withOpacity(0.05),
+            color: isSelected
+                ? const Color(0xFF00FFCC)
+                : Colors.white.withOpacity(0.05),
           ),
         ),
         child: Text(
@@ -4505,11 +4844,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, color: Colors.grey, size: 20),
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
                     onPressed: () {},
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
                     onPressed: () {},
                   ),
                 ],
@@ -4521,18 +4868,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: weekdays
-                .map((day) => Expanded(
-                      child: Center(
-                        child: Text(
-                          day,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                .map(
+                  (day) => Expanded(
+                    child: Center(
+                      child: Text(
+                        day,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 8),
@@ -4552,7 +4901,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             itemBuilder: (context, index) {
               final int dayNumber = index + 1;
               final DateTime currentDay = DateTime(2026, 6, dayNumber);
-              final bool isSelected = _selectedCalendarDay.year == 2026 &&
+              final bool isSelected =
+                  _selectedCalendarDay.year == 2026 &&
                   _selectedCalendarDay.month == 6 &&
                   _selectedCalendarDay.day == dayNumber;
 
@@ -4569,14 +4919,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF6C3BF5) : Colors.transparent,
+                    color: isSelected
+                        ? const Color(0xFF6C3BF5)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF00FFCC)
                           : dayEvents.isNotEmpty
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.transparent,
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.transparent,
                     ),
                   ),
                   child: Column(
@@ -4586,7 +4938,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         '$dayNumber',
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.white70,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           fontSize: 13,
                         ),
                       ),
@@ -4709,11 +5063,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Color(item['color'] as int).withOpacity(0.1),
+                                  color: Color(
+                                    item['color'] as int,
+                                  ).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Color(item['color'] as int).withOpacity(0.5), width: 0.5),
+                                  border: Border.all(
+                                    color: Color(
+                                      item['color'] as int,
+                                    ).withOpacity(0.5),
+                                    width: 0.5,
+                                  ),
                                 ),
                                 child: Text(
                                   typeStr,
@@ -4726,7 +5090,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                               ),
                               Text(
                                 item['time'] as String,
-                                style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 11,
+                                ),
                               ),
                             ],
                           ),
@@ -4734,10 +5101,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           Text(
                             item['title'] as String,
                             style: TextStyle(
-                              color: item['isCompleted'] == true ? Colors.white38 : Colors.white,
+                              color: item['isCompleted'] == true
+                                  ? Colors.white38
+                                  : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              decoration: item['isCompleted'] == true ? TextDecoration.lineThrough : null,
+                              decoration: item['isCompleted'] == true
+                                  ? TextDecoration.lineThrough
+                                  : null,
                             ),
                           ),
                           if (item['description'] != '') ...[
@@ -4745,7 +5116,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             Text(
                               item['description'] as String,
                               style: TextStyle(
-                                color: item['isCompleted'] == true ? Colors.white30 : Colors.white54,
+                                color: item['isCompleted'] == true
+                                    ? Colors.white30
+                                    : Colors.white54,
                                 fontSize: 12,
                               ),
                             ),
@@ -4757,11 +5130,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                               // Date indicator
                               Text(
                                 'Date: ${_formatDate(item['date'] as DateTime)}',
-                                style: const TextStyle(color: Colors.white30, fontSize: 10),
+                                style: const TextStyle(
+                                  color: Colors.white30,
+                                  fontSize: 10,
+                                ),
                               ),
                               // Assignees avatars row
                               Row(
-                                children: assignees.map((a) => _buildAssigneeAvatar(a)).toList(),
+                                children: assignees
+                                    .map((a) => _buildAssigneeAvatar(a))
+                                    .toList(),
                               ),
                             ],
                           ),
@@ -4783,7 +5161,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildAssigneeAvatar(String assignee) {
     String initial = assignee == 'self' ? 'Me' : assignee[0].toUpperCase();
-    Color avatarColor = assignee == 'self' ? const Color(0xFF00FFCC) : const Color(0xFF6C3BF5);
+    Color avatarColor = assignee == 'self'
+        ? const Color(0xFF00FFCC)
+        : const Color(0xFF6C3BF5);
     Color textColor = assignee == 'self' ? Colors.black : Colors.white;
 
     return Container(
@@ -4829,7 +5209,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
               title: const Text(
                 '📅 Add Activity / Todo',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -4842,12 +5225,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       decoration: const InputDecoration(
                         labelText: 'Title',
                         labelStyle: TextStyle(color: Colors.grey),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white12),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF00FFCC)),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Type', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text(
+                      'Type',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       children: ['event', 'todo', 'activity'].map((t) {
@@ -4912,50 +5302,69 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Assignees', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text(
+                      'Assignees',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
-                      children: ['self', 'Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Bax Beatbox'].map((member) {
-                        final bool isAssigned = assignees.contains(member);
-                        return FilterChip(
-                          label: Text(member == 'self' ? 'Me' : member),
-                          selected: isAssigned,
-                          onSelected: (selected) {
-                            setDialogState(() {
-                              if (selected) {
-                                assignees.add(member);
-                              } else {
-                                assignees.remove(member);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
+                      children:
+                          [
+                            'self',
+                            'Aria North',
+                            'kai.wav',
+                            'Chloe Keys',
+                            'DJ Spark',
+                            'Bax Beatbox',
+                          ].map((member) {
+                            final bool isAssigned = assignees.contains(member);
+                            return FilterChip(
+                              label: Text(member == 'self' ? 'Me' : member),
+                              selected: isAssigned,
+                              onSelected: (selected) {
+                                setDialogState(() {
+                                  if (selected) {
+                                    assignees.add(member);
+                                  } else {
+                                    assignees.remove(member);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Label Color', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text(
+                      'Label Color',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                     const SizedBox(height: 8),
                     Row(
-                      children: [0xFF00FFCC, 0xFFD03BFF, 0xFFFFD700, 0xFFFF5722].map((c) {
-                        final bool isSel = selectedColor == c;
-                        return GestureDetector(
-                          onTap: () => setDialogState(() => selectedColor = c),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(c),
-                              border: Border.all(
-                                color: isSel ? Colors.white : Colors.transparent,
-                                width: 2,
+                      children: [0xFF00FFCC, 0xFFD03BFF, 0xFFFFD700, 0xFFFF5722]
+                          .map((c) {
+                            final bool isSel = selectedColor == c;
+                            return GestureDetector(
+                              onTap: () =>
+                                  setDialogState(() => selectedColor = c),
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(c),
+                                  border: Border.all(
+                                    color: isSel
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          })
+                          .toList(),
                     ),
                     const SizedBox(height: 16),
                     TextField(
@@ -4965,8 +5374,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       decoration: const InputDecoration(
                         labelText: 'Description',
                         labelStyle: TextStyle(color: Colors.grey),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white12),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF00FFCC)),
+                        ),
                       ),
                     ),
                   ],
@@ -4975,7 +5388,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -4999,10 +5415,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     });
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Activity created successfully!')),
+                      const SnackBar(
+                        content: Text('Activity created successfully!'),
+                      ),
                     );
                   },
-                  child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             );
@@ -7547,8 +7968,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }
 
   Widget _buildDMsMessagesView() {
-    final activeMessages = _mockMessages.where((msg) => msg['contact'] == _selectedContactName).toList();
-    final List<String> contacts = ['Aria North', 'kai.wav', 'Chloe Keys', 'DJ Spark', 'Luna Eclipse', 'Zoe Synth'];
+    final activeMessages = _mockMessages
+        .where((msg) => msg['contact'] == _selectedContactName)
+        .toList();
+    final List<String> contacts = [
+      'Aria North',
+      'kai.wav',
+      'Chloe Keys',
+      'DJ Spark',
+      'Luna Eclipse',
+      'Zoe Synth',
+    ];
 
     return Row(
       children: [
@@ -7557,7 +7987,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           width: 280,
           decoration: BoxDecoration(
             color: const Color(0xFF13131A),
-            border: Border(right: BorderSide(color: Colors.white.withOpacity(0.05))),
+            border: Border(
+              right: BorderSide(color: Colors.white.withOpacity(0.05)),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -7566,7 +7998,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 padding: EdgeInsets.all(20.0),
                 child: Text(
                   'DMs & Messages',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Outfit',
+                  ),
                 ),
               ),
               const Divider(color: Colors.white10, height: 1),
@@ -7576,24 +8013,40 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   itemBuilder: (context, index) {
                     final contact = contacts[index];
                     final isSelected = contact == _selectedContactName;
-                    
+
                     // Find last message snippet
                     final lastMsg = _mockMessages.lastWhere(
                       (msg) => msg['contact'] == contact,
-                      orElse: () => {'text': 'Click to start conversation...', 'time': ''},
+                      orElse: () => {
+                        'text': 'Click to start conversation...',
+                        'time': '',
+                      },
                     );
 
                     return InkWell(
-                      onTap: () => setState(() => _selectedContactName = contact),
+                      onTap: () =>
+                          setState(() => _selectedContactName = contact),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                        color: isSelected ? const Color(0xFF6C3BF5).withOpacity(0.15) : Colors.transparent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        color: isSelected
+                            ? const Color(0xFF6C3BF5).withOpacity(0.15)
+                            : Colors.transparent,
                         child: Row(
                           children: [
                             CircleAvatar(
                               radius: 20,
                               backgroundColor: const Color(0xFF6C3BF5),
-                              child: Text(contact[0], style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                              child: Text(
+                                contact[0],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -7601,19 +8054,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         contact,
                                         style: TextStyle(
-                                          color: isSelected ? Colors.white : Colors.white70,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.white70,
                                           fontSize: 13,
-                                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                          fontWeight: isSelected
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
                                         ),
                                       ),
                                       Text(
                                         lastMsg['time'] ?? '',
-                                        style: const TextStyle(color: Colors.grey, fontSize: 9),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 9,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -7623,7 +8084,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: isSelected ? const Color(0xFF00FFCC) : Colors.grey,
+                                      color: isSelected
+                                          ? const Color(0xFF00FFCC)
+                                          : Colors.grey,
                                       fontSize: 11,
                                     ),
                                   ),
@@ -7640,7 +8103,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ],
           ),
         ),
-        
+
         // Right Column - Active Chat Thread
         Expanded(
           child: Container(
@@ -7650,17 +8113,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               children: [
                 // Header of active contact
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF13131A),
-                    border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+                    ),
                   ),
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: const Color(0xFF00FFCC),
-                        child: Text(_selectedContactName[0], style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
+                        child: Text(
+                          _selectedContactName[0],
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -7669,17 +8144,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           children: [
                             Text(
                               _selectedContactName,
-                              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Row(
                               children: [
                                 Container(
                                   width: 6,
                                   height: 6,
-                                  decoration: const BoxDecoration(color: Color(0xFF00FFCC), shape: BoxShape.circle),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF00FFCC),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Text('Online & in workspace', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                                const Text(
+                                  'Online & in workspace',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10,
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -7688,7 +8176,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     ],
                   ),
                 ),
-                
+
                 // Messages thread
                 Expanded(
                   child: ListView.builder(
@@ -7699,34 +8187,54 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       final isMe = msg['sender'] == 'me';
 
                       return Align(
-                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           constraints: const BoxConstraints(maxWidth: 450),
                           decoration: BoxDecoration(
-                            color: isMe ? const Color(0xFF6C3BF5) : const Color(0xFF1E1E28),
+                            color: isMe
+                                ? const Color(0xFF6C3BF5)
+                                : const Color(0xFF1E1E28),
                             borderRadius: BorderRadius.only(
                               topLeft: const Radius.circular(16),
                               topRight: const Radius.circular(16),
-                              bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-                              bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+                              bottomLeft: isMe
+                                  ? const Radius.circular(16)
+                                  : Radius.zero,
+                              bottomRight: isMe
+                                  ? Radius.zero
+                                  : const Radius.circular(16),
                             ),
-                            border: Border.all(color: Colors.white.withOpacity(0.02)),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.02),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 msg['text'] ?? '',
-                                style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  height: 1.4,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: Text(
                                   msg['time'] ?? '',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 8),
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 8,
+                                  ),
                                 ),
                               ),
                             ],
@@ -7736,23 +8244,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     },
                   ),
                 ),
-                
+
                 // Typing Box
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: const Color(0xFF13131A),
-                    border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+                    border: Border(
+                      top: BorderSide(color: Colors.white.withOpacity(0.05)),
+                    ),
                   ),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.music_note, color: Color(0xFFD03BFF), size: 20),
+                        icon: const Icon(
+                          Icons.music_note,
+                          color: Color(0xFFD03BFF),
+                          size: 20,
+                        ),
                         tooltip: 'Share track draft',
                         onPressed: () {},
                       ),
                       IconButton(
-                        icon: const Icon(Icons.attach_file, color: Colors.grey, size: 20),
+                        icon: const Icon(
+                          Icons.attach_file,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
                         tooltip: 'Attach stems/samples',
                         onPressed: () {},
                       ),
@@ -7763,16 +8281,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           decoration: BoxDecoration(
                             color: const Color(0xFF1A1A24),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.05),
+                            ),
                           ),
                           child: TextField(
                             controller: _messageController,
-                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
                             decoration: const InputDecoration(
                               hintText: 'Write a response...',
-                              hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
                             ),
                             onSubmitted: (val) {
                               if (val.trim().isEmpty) return;
@@ -7794,7 +8323,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         radius: 20,
                         backgroundColor: const Color(0xFF6C3BF5),
                         child: IconButton(
-                          icon: const Icon(Icons.send, color: Colors.white, size: 16),
+                          icon: const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                           onPressed: () {
                             final val = _messageController.text;
                             if (val.trim().isEmpty) return;
@@ -7876,12 +8409,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               children: [
                 const Text(
                   '👥 Team Workspace',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Outfit',
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Collaborators and roles on your active song projects.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -7889,21 +8430,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6C3BF5),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invitation link copied to clipboard!')),
+                  const SnackBar(
+                    content: Text('Invitation link copied to clipboard!'),
+                  ),
                 );
               },
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('Invite Member', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              label: const Text(
+                'Invite Member',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 32),
-        
+
         LayoutBuilder(
           builder: (context, constraints) {
             bool isMobile = constraints.maxWidth < 800;
@@ -7933,8 +8484,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundColor: member['online'] ? const Color(0xFF00FFCC).withOpacity(0.15) : Colors.white10,
-                            child: Text(member['avatar'], style: TextStyle(color: member['online'] ? const Color(0xFF00FFCC) : Colors.grey, fontWeight: FontWeight.bold)),
+                            backgroundColor: member['online']
+                                ? const Color(0xFF00FFCC).withOpacity(0.15)
+                                : Colors.white10,
+                            child: Text(
+                              member['avatar'],
+                              style: TextStyle(
+                                color: member['online']
+                                    ? const Color(0xFF00FFCC)
+                                    : Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -7943,12 +8504,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                               children: [
                                 Text(
                                   member['name'],
-                                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   member['role'],
-                                  style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 11,
+                                  ),
                                 ),
                               ],
                             ),
@@ -7962,7 +8530,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                           children: [
                             Text(
                               'Shared tracks: ${member['projects']}',
-                              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 11,
+                              ),
                             ),
                             const Spacer(),
                             Row(
@@ -7971,7 +8542,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                                   width: 6,
                                   height: 6,
                                   decoration: BoxDecoration(
-                                    color: member['online'] ? const Color(0xFF00FFCC) : Colors.grey,
+                                    color: member['online']
+                                        ? const Color(0xFF00FFCC)
+                                        : Colors.grey,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -7979,7 +8552,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                                 Expanded(
                                   child: Text(
                                     member['status'],
-                                    style: const TextStyle(color: Colors.grey, fontSize: 10.5, fontStyle: FontStyle.italic),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 10.5,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -7994,7 +8571,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 );
               },
             );
-          }
+          },
         ),
       ],
     );
@@ -8236,7 +8813,7 @@ class SheetMusicPainter extends CustomPainter {
         double y = sectionY + (i * spacing);
         canvas.drawLine(Offset(20, y), Offset(size.width - 20, y), linePaint);
       }
-      
+
       // Clef (Mocked using text or basic shapes)
       final textPainter = TextPainter(
         text: const TextSpan(
@@ -8247,16 +8824,49 @@ class SheetMusicPainter extends CustomPainter {
       );
       textPainter.layout();
       textPainter.paint(canvas, Offset(25, sectionY - 10));
-      
-      // Draw some mock notes
-      canvas.drawOval(Rect.fromCenter(center: Offset(120, sectionY + spacing * 3), width: 14, height: 10), notePaint);
-      canvas.drawLine(Offset(127, sectionY + spacing * 3), Offset(127, sectionY + spacing * 0.5), linePaint);
 
-      canvas.drawOval(Rect.fromCenter(center: Offset(180, sectionY + spacing * 2.5), width: 14, height: 10), notePaint);
-      canvas.drawLine(Offset(187, sectionY + spacing * 2.5), Offset(187, sectionY - spacing * 0), linePaint);
-      
-      canvas.drawOval(Rect.fromCenter(center: Offset(240, sectionY + spacing * 2), width: 14, height: 10), notePaint);
-      canvas.drawLine(Offset(247, sectionY + spacing * 2), Offset(247, sectionY - spacing * 0.5), linePaint);
+      // Draw some mock notes
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(120, sectionY + spacing * 3),
+          width: 14,
+          height: 10,
+        ),
+        notePaint,
+      );
+      canvas.drawLine(
+        Offset(127, sectionY + spacing * 3),
+        Offset(127, sectionY + spacing * 0.5),
+        linePaint,
+      );
+
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(180, sectionY + spacing * 2.5),
+          width: 14,
+          height: 10,
+        ),
+        notePaint,
+      );
+      canvas.drawLine(
+        Offset(187, sectionY + spacing * 2.5),
+        Offset(187, sectionY - spacing * 0),
+        linePaint,
+      );
+
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(240, sectionY + spacing * 2),
+          width: 14,
+          height: 10,
+        ),
+        notePaint,
+      );
+      canvas.drawLine(
+        Offset(247, sectionY + spacing * 2),
+        Offset(247, sectionY - spacing * 0.5),
+        linePaint,
+      );
     }
   }
 
@@ -8276,12 +8886,15 @@ class FinancialChartPainter extends CustomPainter {
       ..shader = ui.Gradient.linear(
         Offset(0, size.height * 0.3),
         Offset(0, size.height),
-        [StudioTheme.accent.withOpacity(0.25), StudioTheme.accent.withOpacity(0.0)],
+        [
+          StudioTheme.accent.withOpacity(0.25),
+          StudioTheme.accent.withOpacity(0.0),
+        ],
       );
 
     final path = Path();
     path.moveTo(0, size.height * 0.85);
-    
+
     final points = [
       Offset(0, size.height * 0.85),
       Offset(size.width * 0.2, size.height * 0.70),
@@ -8294,7 +8907,7 @@ class FinancialChartPainter extends CustomPainter {
     for (var i = 1; i < points.length; i++) {
       path.lineTo(points[i].dx, points[i].dy);
     }
-    
+
     // Create fill path
     final fillPath = Path.from(path);
     fillPath.lineTo(size.width, size.height);
