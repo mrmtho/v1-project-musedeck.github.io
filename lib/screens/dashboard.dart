@@ -233,6 +233,63 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     },
   ];
   String _vaultSearchQuery = '';
+
+  // Fan CRM state variables
+  final TextEditingController _fanSearchController = TextEditingController();
+  String _fanTagFilter = 'all'; // 'all', 'Superfan', 'Active Fan', 'Casual Listener', 'Lead'
+  late final List<Map<String, dynamic>> _mockFans = [
+    {
+      'name': 'Marcus Vance',
+      'email': 'marcus.v@gmail.com',
+      'location': 'New York, USA',
+      'source': 'Instagram Link-in-bio',
+      'tier': 'Superfan',
+      'spent': 185.00,
+      'conversionStage': 'collector',
+      'avatarColor': 0xFF00FFCC,
+    },
+    {
+      'name': 'Sophia Martinez',
+      'email': 'sophia.m@yahoo.com',
+      'location': 'London, UK',
+      'source': 'TikTok Sound Link',
+      'tier': 'Active Fan',
+      'spent': 45.00,
+      'conversionStage': 'ticket_buyer',
+      'avatarColor': 0xFFD03BFF,
+    },
+    {
+      'name': 'Kenji Sato',
+      'email': 'kenji@sato.jp',
+      'location': 'Tokyo, Japan',
+      'source': 'Spotify Pre-save',
+      'tier': 'Superfan',
+      'spent': 220.00,
+      'conversionStage': 'collector',
+      'avatarColor': 0xFFFFD700,
+    },
+    {
+      'name': 'Elena Rostova',
+      'email': 'elena.ros@mail.ru',
+      'location': 'Berlin, Germany',
+      'source': 'Instagram Story Swipe',
+      'tier': 'Casual Listener',
+      'spent': 0.00,
+      'conversionStage': 'free_signup',
+      'avatarColor': 0xFF4D8DFF,
+    },
+    {
+      'name': 'Liam O\'Connor',
+      'email': 'liam.oc@outlook.ie',
+      'location': 'Dublin, Ireland',
+      'source': 'YouTube Video Link',
+      'tier': 'Lead',
+      'spent': 0.00,
+      'conversionStage': 'follower',
+      'avatarColor': 0xFFFF5252,
+    },
+  ];
+  
   String _selectedGenre = 'Synthwave';
   String _selectedCountry = 'Global';
 
@@ -317,6 +374,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     _titleController.dispose();
     _searchController.dispose();
     _messageController.dispose();
+    _fanSearchController.dispose();
     super.dispose();
   }
 
@@ -617,6 +675,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               label: 'Expense Log',
               isSelected: navState.activeSubSection == 'expenses',
               onTap: () => navNotifier.selectSubSection('expenses'),
+            ),
+          ],
+        );
+      case 'fans':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildContextualSidebarHeader('Fan CRM'),
+            _buildSidebarNavItem(
+              icon: Icons.people_outline,
+              label: 'Fan Directory',
+              isSelected: navState.activeSubSection == 'directory',
+              onTap: () => navNotifier.selectSubSection('directory'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.filter_alt_outlined,
+              label: 'Pipelines & Funnels',
+              isSelected: navState.activeSubSection == 'pipeline',
+              onTap: () => navNotifier.selectSubSection('pipeline'),
+            ),
+            _buildSidebarNavItem(
+              icon: Icons.insights_outlined,
+              label: 'Social Conversion',
+              isSelected: navState.activeSubSection == 'conversion',
+              onTap: () => navNotifier.selectSubSection('conversion'),
             ),
           ],
         );
@@ -945,6 +1028,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       return _buildDMsMessagesView();
     } else if (viewName == 'team') {
       return _buildTeamMembersView();
+    } else if (viewName == 'fans') {
+      return _buildFansCRMView();
     } else if (viewName == 'calendar') {
       return _buildCalendarView(provider);
     } else if (viewName == 'account') {
@@ -2365,6 +2450,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     'messages': 'Messages',
                     'calendar': 'Calendar',
                     'team': 'Team',
+                    'fans': 'Fans',
                     'earnings': 'Earnings',
                     'catalog': 'Catalog',
                     'industry': 'Industry',
@@ -8576,6 +8662,880 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ],
     );
   }
+
+  // --- FANS CRM SYSTEM (Salesforce for Artists) ---
+
+  Widget _buildFansCRMView() {
+    final navState = ref.watch(navigationProvider);
+    
+    switch (navState.activeSubSection) {
+      case 'pipeline':
+        return _buildFansPipelineView();
+      case 'conversion':
+        return _buildFansConversionView();
+      case 'directory':
+      default:
+        return _buildFansDirectoryView();
+    }
+  }
+
+  Widget _buildFansDirectoryView() {
+    // Filter contacts based on search and selected tag
+    final query = _fanSearchController.text.toLowerCase().trim();
+    final filteredFans = _mockFans.where((fan) {
+      final matchesQuery = query.isEmpty ||
+          fan['name'].toString().toLowerCase().contains(query) ||
+          fan['email'].toString().toLowerCase().contains(query) ||
+          fan['location'].toString().toLowerCase().contains(query);
+          
+      final matchesTag = _fanTagFilter == 'all' ||
+          fan['tier'].toString().toLowerCase() == _fanTagFilter.toLowerCase();
+          
+      return matchesQuery && matchesTag;
+    }).toList();
+
+    // CRM statistics calculations
+    final double totalSpent = _mockFans.fold(0.0, (sum, f) => sum + (f['spent'] as double));
+    final double avgSpent = _mockFans.isEmpty ? 0.0 : totalSpent / _mockFans.length;
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '👥 Fan Database & CRM',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Outfit',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'A centralized CRM workspace to turn social media followers into loyal fans.',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00FFCC),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () => _showAddFanDialog(),
+                icon: const Icon(Icons.person_add, size: 16),
+                label: const Text(
+                  'Add Fan Contact',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // CRM Dashboard Quick Stats
+          Row(
+            children: [
+              Expanded(child: _buildCrmStatCard('Total Fans Collected', '${_mockFans.length * 75}', Icons.people, const Color(0xFF4D8DFF))),
+              const SizedBox(width: 16),
+              Expanded(child: _buildCrmStatCard('Superfans (Tier 1)', '${_mockFans.where((f) => f['tier'] == 'Superfan').length * 75}', Icons.star, const Color(0xFFFFD700))),
+              const SizedBox(width: 16),
+              Expanded(child: _buildCrmStatCard('Conversion Flow', '2.4%', Icons.change_circle_outlined, const Color(0xFFD03BFF))),
+              const SizedBox(width: 16),
+              Expanded(child: _buildCrmStatCard('Avg. Merch Support', '\$${avgSpent.toStringAsFixed(2)}', Icons.shopping_bag_outlined, const Color(0xFF00FFCC))),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Directory Search & Filter Panel
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF13131A),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.03)),
+            ),
+            child: Row(
+              children: [
+                // Search Input
+                Expanded(
+                  child: Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A24),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                    ),
+                    child: TextField(
+                      controller: _fanSearchController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      onChanged: (val) => setState(() {}),
+                      decoration: const InputDecoration(
+                        hintText: 'Search by name, email, location or source...',
+                        hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
+                        prefixIcon: Icon(Icons.search, color: Colors.grey, size: 18),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                
+                // Filter dropdown/label
+                Text(
+                  'Segment:',
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A24),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      dropdownColor: const Color(0xFF1E1E2E),
+                      value: _fanTagFilter,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      items: const [
+                        DropdownMenuItem(value: 'all', child: Text('All Segments')),
+                        DropdownMenuItem(value: 'Superfan', child: Text('Superfans')),
+                        DropdownMenuItem(value: 'Active Fan', child: Text('Active Fans')),
+                        DropdownMenuItem(value: 'Casual Listener', child: Text('Casual Listeners')),
+                        DropdownMenuItem(value: 'Lead', child: Text('Social Leads')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            _fanTagFilter = val;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Fan Database Table
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF13131A),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.03)),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: filteredFans.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No fan contacts match your query or active segment filter.',
+                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: filteredFans.length,
+                        separatorBuilder: (context, index) => Divider(
+                          color: Colors.white.withOpacity(0.02),
+                          height: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          final fan = filteredFans[index];
+                          
+                          // Custom colored tag mapping
+                          Color tagColor = Colors.grey;
+                          if (fan['tier'] == 'Superfan') tagColor = const Color(0xFFFFD700);
+                          if (fan['tier'] == 'Active Fan') tagColor = const Color(0xFF00FFCC);
+                          if (fan['tier'] == 'Casual Listener') tagColor = const Color(0xFF4D8DFF);
+                          if (fan['tier'] == 'Lead') tagColor = const Color(0xFFFF5252);
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: Color(fan['avatarColor'] as int).withOpacity(0.15),
+                                  child: Text(
+                                    fan['name'][0],
+                                    style: TextStyle(
+                                      color: Color(fan['avatarColor'] as int),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        fan['name'],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        fan['email'],
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.4),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.location_on_outlined, color: Colors.grey, size: 12),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        fan['location'],
+                                        style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    fan['source'],
+                                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                                  ),
+                                ),
+                                Container(
+                                  width: 110,
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: tagColor.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: tagColor.withOpacity(0.35), width: 0.5),
+                                    ),
+                                    child: Text(
+                                      fan['tier'].toUpperCase(),
+                                      style: TextStyle(
+                                        color: tagColor,
+                                        fontSize: 8.5,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '\$${(fan['spent'] as double).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF00FFCC),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Action Menu Trigger
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: const Icon(Icons.email_outlined, color: Colors.grey, size: 16),
+                                  tooltip: 'Email Fan',
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Composing email sequence to ${fan['name']}...'),
+                                        backgroundColor: const Color(0xFF6C3BF5),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCrmStatCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.12),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFansPipelineView() {
+    // Kanban pipeline column lists based on stages
+    final followers = _mockFans.where((f) => f['conversionStage'] == 'follower').toList();
+    final signups = _mockFans.where((f) => f['conversionStage'] == 'free_signup').toList();
+    final buyers = _mockFans.where((f) => f['conversionStage'] == 'ticket_buyer').toList();
+    final collectors = _mockFans.where((f) => f['conversionStage'] == 'collector').toList();
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📈 Social-to-Fan Conversion Funnel',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Outfit',
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Pipeline map tracking leads from raw social media followers into purchasing fans.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Kanban Columns
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildPipelineColumn('Social Follower (Leads)', followers, 'follower', const Color(0xFFFF5252))),
+                const SizedBox(width: 12),
+                Expanded(child: _buildPipelineColumn('Signed Up (Freebie)', signups, 'free_signup', const Color(0xFF4D8DFF))),
+                const SizedBox(width: 12),
+                Expanded(child: _buildPipelineColumn('Paid Listener (Ticket)', buyers, 'ticket_buyer', const Color(0xFFD03BFF))),
+                const SizedBox(width: 12),
+                Expanded(child: _buildPipelineColumn('Superfan Collector', collectors, 'collector', const Color(0xFF00FFCC))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPipelineColumn(String name, List<Map<String, dynamic>> list, String stage, Color themeColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: themeColor.withOpacity(0.3), width: 1.5),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: themeColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${list.length}',
+                    style: TextStyle(color: themeColor, fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Cards List
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                final fan = list[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A24),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Color(fan['avatarColor'] as int).withOpacity(0.2),
+                            child: Text(
+                              fan['name'][0],
+                              style: TextStyle(color: Color(fan['avatarColor'] as int), fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              fan['name'],
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Platform: ${fan['source']}',
+                        style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9.5),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '\$${(fan['spent'] as double).toStringAsFixed(2)} Spent',
+                            style: const TextStyle(color: Color(0xFF00FFCC), fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                          if (stage != 'collector')
+                            GestureDetector(
+                              onTap: () {
+                                // Advance fan CRM stage state
+                                String nextStage = '';
+                                String nextTier = '';
+                                if (stage == 'follower') {
+                                  nextStage = 'free_signup';
+                                  nextTier = 'Casual Listener';
+                                } else if (stage == 'free_signup') {
+                                  nextStage = 'ticket_buyer';
+                                  nextTier = 'Active Fan';
+                                } else if (stage == 'ticket_buyer') {
+                                  nextStage = 'collector';
+                                  nextTier = 'Superfan';
+                                }
+                                
+                                setState(() {
+                                  fan['conversionStage'] = nextStage;
+                                  fan['tier'] = nextTier;
+                                });
+                              },
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'PROMPT ➔',
+                                  style: TextStyle(color: themeColor, fontSize: 9, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFansConversionView() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📊 Social Platform Conversion Insights',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Outfit',
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Conversion statistics showing where your incoming traffic generates actual fan engagement.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Funnel and Campaign Grid
+          Expanded(
+            child: Row(
+              children: [
+                // Left side - funnel painter container
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF13131A),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withOpacity(0.03)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'Social-to-Fan Funnel Depth',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: CustomPaint(
+                            size: Size.infinite,
+                            painter: FunnelChartPainter(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                
+                // Right side - actions & export tools
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      // Social Sync Card
+                      _buildSocialSyncCard('Instagram Audience Sync', '124.5K Followers', const Color(0xFFD03BFF), Icons.camera_alt),
+                      const SizedBox(height: 12),
+                      _buildSocialSyncCard('TikTok Playthrough Sync', '45.1K Likes', const Color(0xFF00FFCC), Icons.play_arrow),
+                      const SizedBox(height: 12),
+                      _buildSocialSyncCard('Spotify Listener Exports', '16.8K Monthly', const Color(0xFFFFD700), Icons.music_video_outlined),
+                      const SizedBox(height: 12),
+                      
+                      // Run automated email sequence campaign card
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6C3BF5), Color(0xFF1E1E2A)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.mark_email_read, color: Color(0xFF00FFCC), size: 32),
+                              const SizedBox(height: 12),
+                              const Text(
+                                'Launch Active Campaign',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Deploy automated welcome messages, discount links and exclusive track preview codes to conversion segments.',
+                                style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 11, height: 1.4),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Fan campaign has been broadcasted!')),
+                                  );
+                                },
+                                child: const Text('Broadcast Campaign', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialSyncCard(String title, String status, Color accentColor, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF13131A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.03)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: accentColor.withOpacity(0.12),
+            child: Icon(icon, color: accentColor, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  status,
+                  style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Syncing contacts from $title...')),
+              );
+            },
+            child: const Text('SYNC', style: TextStyle(color: Color(0xFF00FFCC), fontSize: 10, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddFanDialog() {
+    final nameCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final locCtrl = TextEditingController();
+    String selectedSource = 'Instagram Link-in-bio';
+    String selectedTier = 'Lead';
+    String selectedStage = 'follower';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1E1E2E),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text(
+                'Add Fan Contact Record',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                width: 340,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: nameCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: const InputDecoration(
+                          labelText: 'Full Name',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: emailCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: const InputDecoration(
+                          labelText: 'Email Address',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: locCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: const InputDecoration(
+                          labelText: 'Location (City, Country)',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF00FFCC))),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Source dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Acquisition Source', labelStyle: TextStyle(color: Colors.grey)),
+                        dropdownColor: const Color(0xFF1E1E2E),
+                        value: selectedSource,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        items: const [
+                          DropdownMenuItem(value: 'Instagram Link-in-bio', child: Text('Instagram Link-in-bio')),
+                          DropdownMenuItem(value: 'TikTok Sound Link', child: Text('TikTok Sound Link')),
+                          DropdownMenuItem(value: 'Spotify Pre-save', child: Text('Spotify Pre-save')),
+                          DropdownMenuItem(value: 'YouTube Video Link', child: Text('YouTube Video Link')),
+                          DropdownMenuItem(value: 'SoundCloud Comment', child: Text('SoundCloud Comment')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) setDialogState(() => selectedSource = val);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Tier dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Fan Engagement Segment', labelStyle: TextStyle(color: Colors.grey)),
+                        dropdownColor: const Color(0xFF1E1E2E),
+                        value: selectedTier,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        items: const [
+                          DropdownMenuItem(value: 'Lead', child: Text('Social Lead')),
+                          DropdownMenuItem(value: 'Casual Listener', child: Text('Casual Listener')),
+                          DropdownMenuItem(value: 'Active Fan', child: Text('Active Fan')),
+                          DropdownMenuItem(value: 'Superfan', child: Text('Superfan')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setDialogState(() {
+                              selectedTier = val;
+                              // Match stages
+                              if (val == 'Lead') selectedStage = 'follower';
+                              if (val == 'Casual Listener') selectedStage = 'free_signup';
+                              if (val == 'Active Fan') selectedStage = 'ticket_buyer';
+                              if (val == 'Superfan') selectedStage = 'collector';
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFCC),
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () {
+                    if (nameCtrl.text.trim().isEmpty || emailCtrl.text.trim().isEmpty) return;
+                    
+                    // Generate random avatar color
+                    final colors = [0xFF00FFCC, 0xFFD03BFF, 0xFFFFD700, 0xFF4D8DFF, 0xFFFF5252];
+                    final randomColor = colors[Random().nextInt(colors.length)];
+
+                    setState(() {
+                      _mockFans.add({
+                        'name': nameCtrl.text.trim(),
+                        'email': emailCtrl.text.trim(),
+                        'location': locCtrl.text.isEmpty ? 'Unknown' : locCtrl.text.trim(),
+                        'source': selectedSource,
+                        'tier': selectedTier,
+                        'spent': selectedTier == 'Superfan' ? 120.00 : (selectedTier == 'Active Fan' ? 30.00 : 0.00),
+                        'conversionStage': selectedStage,
+                        'avatarColor': randomColor,
+                      });
+                    });
+                    
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Save Fan', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 // --- CUSTOM PAINTERS FOR TIMELINE & AUDIO/MIDI GRAPHICS ---
@@ -8916,6 +9876,72 @@ class FinancialChartPainter extends CustomPainter {
 
     canvas.drawPath(fillPath, fillPaint);
     canvas.drawPath(path, linePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class FunnelChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    final stages = [
+      {'name': '1. Social Followers', 'count': '145.2K', 'color': const Color(0xFF4D8DFF), 'top': 1.0, 'bottom': 0.75},
+      {'name': '2. Free Signups (Freebie)', 'count': '12.4K', 'color': const Color(0xFFD03BFF), 'top': 0.75, 'bottom': 0.5},
+      {'name': '3. Ticket Buyers (Active)', 'count': '3.8K', 'color': const Color(0xFF00FFCC), 'top': 0.5, 'bottom': 0.3},
+      {'name': '4. Superfan Collectors', 'count': '920', 'color': const Color(0xFFFFD700), 'top': 0.3, 'bottom': 0.15},
+    ];
+    
+    double segmentHeight = size.height / stages.length;
+    
+    for (int i = 0; i < stages.length; i++) {
+      final stage = stages[i];
+      final color = stage['color'] as Color;
+      final topRatio = stage['top'] as double;
+      final bottomRatio = stage['bottom'] as double;
+      
+      double topY = i * segmentHeight;
+      double bottomY = (i + 1) * segmentHeight;
+      
+      double topWidth = size.width * topRatio;
+      double bottomWidth = size.width * bottomRatio;
+      
+      double topLeftX = (size.width - topWidth) / 2;
+      double topRightX = topLeftX + topWidth;
+      
+      double bottomLeftX = (size.width - bottomWidth) / 2;
+      double bottomRightX = bottomLeftX + bottomWidth;
+      
+      final path = Path()
+        ..moveTo(topLeftX, topY)
+        ..lineTo(topRightX, topY)
+        ..lineTo(bottomRightX, bottomY)
+        ..lineTo(bottomLeftX, bottomY)
+        ..close();
+        
+      paint.color = color.withOpacity(0.8);
+      canvas.drawPath(path, paint);
+      
+      // Draw label
+      final textSpan = TextSpan(
+        text: '${stage['name']} - ${stage['count']}',
+        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: ui.TextDirection.ltr,
+      )..layout();
+      
+      textPainter.paint(
+        canvas,
+        Offset(
+          (size.width - textPainter.width) / 2,
+          topY + (segmentHeight - textPainter.height) / 2,
+        ),
+      );
+    }
   }
 
   @override

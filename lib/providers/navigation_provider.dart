@@ -42,6 +42,9 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
       case 'earnings':
         defaultSub = 'overview';
         break;
+      case 'fans':
+        defaultSub = 'directory';
+        break;
       default:
         defaultSub = '';
     }
